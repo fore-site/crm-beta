@@ -186,11 +186,9 @@ app.post('/api/send/ad', async (req, res) => {
         const clients = await Client.find({});
 
         if (!campaign || !clients.length) {
-            return res
-                .status(404)
-                .json({
-                    message: 'Campaign not found or no clients to send to.',
-                });
+            return res.status(404).json({
+                message: 'Campaign not found or no clients to send to.',
+            });
         }
 
         // Process each client

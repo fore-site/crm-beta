@@ -3,6 +3,10 @@
 
 import React, { useState, useEffect } from 'react';
 
+// Define the base URL for API calls. Use an empty string for relative paths
+// which work when the frontend and backend are on the same domain.
+const API_BASE_URL = '';
+
 // Main App component
 export default function App() {
     // State for application data
@@ -17,16 +21,20 @@ export default function App() {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const clientsRes = await fetch('/api/clients');
+                // Fetch clients data from the backend API
+                const clientsRes = await fetch(`/api/clients`);
                 const clientsData = await clientsRes.json();
+                // Sort clients by creation date in descending order
                 setClients(
                     clientsData.sort(
                         (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
                     )
                 );
 
-                const campaignsRes = await fetch('/api/campaigns');
+                // Fetch campaigns data from the backend API
+                const campaignsRes = await fetch(`/api/campaigns`);
                 const campaignsData = await campaignsRes.json();
+                // Sort campaigns by creation date in descending order
                 setCampaigns(
                     campaignsData.sort(
                         (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
@@ -45,13 +53,13 @@ export default function App() {
     // If data is still loading, show a loading message
     if (loading) {
         return (
-            <div className="flex items-center justify-center min-h-screen bg-gray-100 p-8">
+            <div className="flex items-center justify-center min-h-screen bg-slate-50 p-8">
                 <p className="text-gray-600 text-lg">Loading CRM...</p>
             </div>
         );
     }
 
-    // Helper function to render the current page
+    // Helper function to render the current page based on state
     const renderPage = () => {
         switch (currentPage) {
             case 'dashboard':
@@ -72,39 +80,39 @@ export default function App() {
     };
 
     return (
-        <div className="bg-gray-50 min-h-screen font-sans antialiased text-gray-800 p-6">
+        <div className="bg-slate-50 min-h-screen font-sans antialiased text-gray-800 p-6">
             {/* Navigation bar */}
-            <nav className="flex items-center justify-between bg-white shadow-lg rounded-lg p-4 mb-6">
-                <h1 className="text-2xl font-bold text-indigo-600">
-                    Roware CRM
+            <nav className="flex items-center justify-between bg-white shadow-lg rounded-xl p-6 mb-8">
+                <h1 className="text-3xl font-extrabold text-indigo-700 tracking-tight">
+                    Ad CRM
                 </h1>
-                <div className="flex space-x-4">
+                <div className="flex space-x-2 sm:space-x-4">
                     <button
                         onClick={() => setCurrentPage('dashboard')}
-                        className={`px-4 py-2 rounded-lg transition-colors ${
+                        className={`px-4 py-2 rounded-lg font-semibold transition-all duration-300 ${
                             currentPage === 'dashboard'
-                                ? 'bg-indigo-600 text-white'
-                                : 'text-gray-600 hover:bg-gray-100'
+                                ? 'bg-indigo-600 text-white shadow-md'
+                                : 'text-gray-600 hover:bg-slate-100 hover:text-indigo-600'
                         }`}
                     >
                         Dashboard
                     </button>
                     <button
                         onClick={() => setCurrentPage('clients')}
-                        className={`px-4 py-2 rounded-lg transition-colors ${
+                        className={`px-4 py-2 rounded-lg font-semibold transition-all duration-300 ${
                             currentPage === 'clients'
-                                ? 'bg-indigo-600 text-white'
-                                : 'text-gray-600 hover:bg-gray-100'
+                                ? 'bg-indigo-600 text-white shadow-md'
+                                : 'text-gray-600 hover:bg-slate-100 hover:text-indigo-600'
                         }`}
                     >
                         Clients
                     </button>
                     <button
                         onClick={() => setCurrentPage('campaigns')}
-                        className={`px-4 py-2 rounded-lg transition-colors ${
+                        className={`px-4 py-2 rounded-lg font-semibold transition-all duration-300 ${
                             currentPage === 'campaigns'
-                                ? 'bg-indigo-600 text-white'
-                                : 'text-gray-600 hover:bg-gray-100'
+                                ? 'bg-indigo-600 text-white shadow-md'
+                                : 'text-gray-600 hover:bg-slate-100 hover:text-indigo-600'
                         }`}
                     >
                         Campaigns
@@ -123,32 +131,32 @@ const Dashboard = ({ clients, campaigns }) => {
     const recentCampaigns = campaigns.slice(0, 5); // Show up to 5 recent campaigns
 
     return (
-        <div className="space-y-8">
-            <h2 className="text-3xl font-bold text-gray-700 mb-6">Dashboard</h2>
+        <div className="space-y-10">
+            <h2 className="text-4xl font-bold text-gray-700 mb-6">Overview</h2>
 
             {/* Stats cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
                     <h3 className="text-xl font-semibold text-gray-600">
                         Total Clients
                     </h3>
-                    <p className="mt-2 text-4xl font-extrabold text-indigo-600">
+                    <p className="mt-2 text-5xl font-extrabold text-indigo-600">
                         {clients.length}
                     </p>
                 </div>
-                <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300">
+                <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
                     <h3 className="text-xl font-semibold text-gray-600">
                         Total Campaigns
                     </h3>
-                    <p className="mt-2 text-4xl font-extrabold text-teal-600">
+                    <p className="mt-2 text-5xl font-extrabold text-teal-600">
                         {campaigns.length}
                     </p>
                 </div>
             </div>
 
             {/* Recent Campaigns section */}
-            <div className="bg-white p-8 rounded-lg shadow-md">
-                <h3 className="text-2xl font-semibold text-gray-600 mb-4">
+            <div className="bg-white p-10 rounded-xl shadow-lg">
+                <h3 className="text-2xl font-semibold text-gray-700 mb-6">
                     Recent Campaigns
                 </h3>
                 {recentCampaigns.length > 0 ? (
@@ -156,12 +164,12 @@ const Dashboard = ({ clients, campaigns }) => {
                         {recentCampaigns.map((campaign, index) => (
                             <li
                                 key={index}
-                                className="border-b pb-4 last:border-b-0"
+                                className="border-b border-gray-200 pb-4 last:border-b-0"
                             >
                                 <p className="text-lg font-medium text-gray-700">
                                     {campaign.campaignName}
                                 </p>
-                                <p className="text-sm text-gray-500">
+                                <p className="text-sm text-gray-500 mt-1">
                                     Created:{' '}
                                     {new Date(
                                         campaign.createdAt
@@ -226,7 +234,7 @@ const Clients = ({ clients, setClients }) => {
                 setMessage('Client updated successfully!');
             } else {
                 // Handle add logic
-                const res = await fetch('/api/clients', {
+                const res = await fetch(`/api/clients`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name, email, phone }),
@@ -296,7 +304,7 @@ const Clients = ({ clients, setClients }) => {
                 }
 
                 const uploadPromises = clientsToUpload.map((client) =>
-                    fetch('/api/clients', {
+                    fetch(`/api/clients`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(client),
@@ -312,7 +320,7 @@ const Clients = ({ clients, setClients }) => {
                 );
 
                 // Re-fetch all clients to update the list
-                const res = await fetch('/api/clients');
+                const res = await fetch(`/api/clients`);
                 const updatedClientsData = await res.json();
                 setClients(
                     updatedClientsData.sort(
@@ -371,8 +379,8 @@ const Clients = ({ clients, setClients }) => {
     };
 
     return (
-        <div className="space-y-8">
-            <h2 className="text-3xl font-bold text-gray-700 mb-6">
+        <div className="space-y-10">
+            <h2 className="text-4xl font-bold text-gray-700 mb-6">
                 {editingClientId ? 'Edit Client' : 'Add Client'}
             </h2>
 
@@ -388,24 +396,24 @@ const Clients = ({ clients, setClients }) => {
             {/* Delete Confirmation Modal */}
             {showDeleteModal && (
                 <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50">
-                    <div className="bg-white p-6 rounded-lg shadow-xl max-w-sm mx-auto">
-                        <h3 className="text-lg font-bold text-gray-800 mb-2">
+                    <div className="bg-white p-8 rounded-xl shadow-2xl max-w-sm mx-auto transform scale-95 md:scale-100 transition-all duration-300">
+                        <h3 className="text-xl font-bold text-gray-800 mb-4">
                             Confirm Delete
                         </h3>
-                        <p className="text-gray-600 mb-4">
+                        <p className="text-gray-600 mb-6">
                             Are you sure you want to delete this client? This
                             action cannot be undone.
                         </p>
                         <div className="flex justify-end space-x-4">
                             <button
                                 onClick={() => setShowDeleteModal(false)}
-                                className="px-4 py-2 rounded-lg font-semibold text-gray-700 bg-gray-200 hover:bg-gray-300 transition-colors"
+                                className="px-6 py-3 rounded-lg font-semibold text-gray-700 bg-gray-200 hover:bg-gray-300 transition-colors"
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={confirmDelete}
-                                className="px-4 py-2 rounded-lg font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors"
+                                className="px-6 py-3 rounded-lg font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors"
                             >
                                 Delete
                             </button>
@@ -415,36 +423,36 @@ const Clients = ({ clients, setClients }) => {
             )}
 
             {/* Manual Add/Edit Client Form */}
-            <div className="bg-white p-8 rounded-lg shadow-md">
-                <h3 className="text-2xl font-semibold text-gray-600 mb-4">
+            <div className="bg-white p-10 rounded-xl shadow-lg">
+                <h3 className="text-2xl font-semibold text-gray-700 mb-6">
                     {editingClientId ? 'Edit Client' : 'Add Client Manually'}
                 </h3>
-                <form onSubmit={handleFormSubmit} className="space-y-4">
+                <form onSubmit={handleFormSubmit} className="space-y-6">
                     <input
                         type="text"
                         placeholder="Name"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
                     />
                     <input
                         type="email"
                         placeholder="Email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
                     />
                     <input
                         type="tel"
                         placeholder="Phone"
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
                     />
                     <div className="flex space-x-4">
                         <button
                             type="submit"
-                            className="flex-1 bg-indigo-600 text-white p-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors"
+                            className="flex-1 bg-indigo-600 text-white p-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors shadow-md hover:shadow-lg"
                         >
                             {editingClientId ? 'Update Client' : 'Add Client'}
                         </button>
@@ -452,7 +460,7 @@ const Clients = ({ clients, setClients }) => {
                             <button
                                 type="button"
                                 onClick={resetForm}
-                                className="flex-1 bg-gray-400 text-white p-3 rounded-lg font-semibold hover:bg-gray-500 transition-colors"
+                                className="flex-1 bg-gray-400 text-white p-4 rounded-lg font-semibold hover:bg-gray-500 transition-colors shadow-md hover:shadow-lg"
                             >
                                 Cancel Edit
                             </button>
@@ -462,21 +470,21 @@ const Clients = ({ clients, setClients }) => {
             </div>
 
             {/* File Upload Section */}
-            <div className="bg-white p-8 rounded-lg shadow-md">
-                <h3 className="text-2xl font-semibold text-gray-600 mb-4">
+            <div className="bg-white p-10 rounded-xl shadow-lg">
+                <h3 className="text-2xl font-semibold text-gray-700 mb-6">
                     Upload Clients (JSON or CSV)
                 </h3>
                 <input
                     type="file"
                     accept=".json, .csv"
                     onChange={handleFileUpload}
-                    className="w-full text-gray-700 border border-gray-300 rounded-lg p-2 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                    className="w-full text-gray-700 border border-gray-300 rounded-lg p-3 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 transition-colors"
                 />
             </div>
 
             {/* All Clients List */}
-            <div className="bg-white p-8 rounded-lg shadow-md">
-                <h3 className="text-2xl font-semibold text-gray-600 mb-4">
+            <div className="bg-white p-10 rounded-xl shadow-lg">
+                <h3 className="text-2xl font-semibold text-gray-700 mb-6">
                     All Clients
                 </h3>
                 {clients.length > 0 ? (
@@ -484,23 +492,23 @@ const Clients = ({ clients, setClients }) => {
                         {clients.map((client) => (
                             <li
                                 key={client._id}
-                                className="flex flex-col md:flex-row md:items-center justify-between p-4 bg-gray-50 rounded-lg shadow-sm"
+                                className="flex flex-col md:flex-row md:items-center justify-between p-6 bg-slate-50 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300"
                             >
                                 <div className="flex-1">
                                     <p className="text-lg font-medium text-gray-700">
                                         {client.name}
                                     </p>
-                                    <p className="text-sm text-gray-500">
+                                    <p className="text-sm text-gray-500 mt-1">
                                         Email: {client.email}
                                     </p>
                                     <p className="text-sm text-gray-500">
                                         Phone: {client.phone}
                                     </p>
                                 </div>
-                                <div className="flex space-x-2 mt-2 md:mt-0">
+                                <div className="flex space-x-2 mt-4 md:mt-0">
                                     <button
                                         onClick={() => handleEditClick(client)}
-                                        className="px-3 py-1 text-sm rounded-lg font-semibold text-indigo-600 bg-indigo-100 hover:bg-indigo-200 transition-colors"
+                                        className="px-4 py-2 text-sm rounded-lg font-semibold text-indigo-600 bg-indigo-100 hover:bg-indigo-200 transition-colors"
                                     >
                                         Edit
                                     </button>
@@ -508,7 +516,7 @@ const Clients = ({ clients, setClients }) => {
                                         onClick={() =>
                                             handleDeleteClick(client._id)
                                         }
-                                        className="px-3 py-1 text-sm rounded-lg font-semibold text-red-600 bg-red-100 hover:bg-red-200 transition-colors"
+                                        className="px-4 py-2 text-sm rounded-lg font-semibold text-red-600 bg-red-100 hover:bg-red-200 transition-colors"
                                     >
                                         Delete
                                     </button>
@@ -555,29 +563,27 @@ const Campaigns = ({ clients, campaigns, setCampaigns }) => {
     const generatePreviews = () => {
         // Email Preview (HTML)
         setEmailPreview(
-            <div className="bg-gray-100 p-6 rounded-lg shadow-inner">
-                <div className="bg-white rounded-lg p-6 shadow-md">
-                    <h4 className="text-xl font-bold text-gray-800 mb-2">
-                        {advertTitle}
-                    </h4>
-                    {imageUrl && (
-                        <img
-                            src={imageUrl}
-                            alt="Advert"
-                            className="w-full h-auto object-cover rounded-lg mb-4"
-                        />
-                    )}
-                    <p className="text-gray-600 leading-relaxed whitespace-pre-wrap">
-                        {message}
-                    </p>
-                </div>
+            <div className="bg-white p-6 rounded-lg shadow-md">
+                <h4 className="text-xl font-bold text-gray-800 mb-2">
+                    {advertTitle}
+                </h4>
+                {imageUrl && (
+                    <img
+                        src={imageUrl}
+                        alt="Advert"
+                        className="w-full h-auto object-cover rounded-lg mb-4"
+                    />
+                )}
+                <p className="text-gray-600 leading-relaxed whitespace-pre-wrap">
+                    {message}
+                </p>
             </div>
         );
 
         // SMS Preview (Plain Text)
         setSmsPreview(
-            <div className="bg-gray-100 p-4 rounded-lg shadow-inner">
-                <div className="bg-gray-50 rounded-lg p-4">
+            <div className="bg-slate-50 p-6 rounded-lg shadow-md">
+                <div className="bg-white rounded-lg p-4">
                     <p className="text-sm text-gray-700 whitespace-pre-wrap">
                         {advertTitle}
                     </p>
@@ -593,20 +599,16 @@ const Campaigns = ({ clients, campaigns, setCampaigns }) => {
 
         // Telegram Preview (with image and rich text)
         setTelegramPreview(
-            <div className="bg-gray-100 p-4 rounded-lg shadow-inner">
-                <div className="bg-white rounded-lg p-4 shadow-md">
-                    {imageUrl && (
-                        <img
-                            src={imageUrl}
-                            alt="Advert"
-                            className="w-full h-auto object-cover rounded-lg mb-2"
-                        />
-                    )}
-                    <h4 className="font-bold text-gray-800">{advertTitle}</h4>
-                    <p className="text-gray-700 whitespace-pre-wrap">
-                        {message}
-                    </p>
-                </div>
+            <div className="bg-white p-6 rounded-lg shadow-md">
+                {imageUrl && (
+                    <img
+                        src={imageUrl}
+                        alt="Advert"
+                        className="w-full h-auto object-cover rounded-lg mb-2"
+                    />
+                )}
+                <h4 className="font-bold text-gray-800">{advertTitle}</h4>
+                <p className="text-gray-700 whitespace-pre-wrap">{message}</p>
             </div>
         );
     };
@@ -655,7 +657,7 @@ const Campaigns = ({ clients, campaigns, setCampaigns }) => {
                 setCampaignMessage('Campaign updated successfully!');
             } else {
                 // Create new campaign
-                const res = await fetch('/api/campaigns', {
+                const res = await fetch(`/api/campaigns`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -732,7 +734,7 @@ const Campaigns = ({ clients, campaigns, setCampaigns }) => {
         setIsSending(true);
 
         try {
-            const res = await fetch('/api/send/ad', {
+            const res = await fetch(`api/send/ad`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ campaignId: campaign._id }),
@@ -767,8 +769,8 @@ const Campaigns = ({ clients, campaigns, setCampaigns }) => {
     };
 
     return (
-        <div className="space-y-8">
-            <h2 className="text-3xl font-bold text-gray-700 mb-6">
+        <div className="space-y-10">
+            <h2 className="text-4xl font-bold text-gray-700 mb-6">
                 {editingCampaignId ? 'Edit Campaign' : 'Create Campaign'}
             </h2>
             {campaignMessage && (
@@ -783,16 +785,16 @@ const Campaigns = ({ clients, campaigns, setCampaigns }) => {
             {/* Modal for send confirmation */}
             {sendConfirmation && (
                 <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50">
-                    <div className="bg-white p-6 rounded-lg shadow-xl max-w-sm mx-auto">
-                        <h3 className="text-lg font-bold text-gray-800 mb-2">
+                    <div className="bg-white p-8 rounded-xl shadow-2xl max-w-sm mx-auto transform scale-95 md:scale-100 transition-all duration-300">
+                        <h3 className="text-xl font-bold text-gray-800 mb-4">
                             Campaign Status
                         </h3>
-                        <p className="text-gray-600 mb-4">
+                        <p className="text-gray-600 mb-6">
                             {sendConfirmation.message}
                         </p>
                         <button
                             onClick={() => setSendConfirmation(null)}
-                            className="w-full bg-indigo-600 text-white p-2 rounded-lg font-semibold hover:bg-indigo-700 transition-colors"
+                            className="w-full bg-indigo-600 text-white p-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors shadow-md hover:shadow-lg"
                         >
                             Close
                         </button>
@@ -803,24 +805,24 @@ const Campaigns = ({ clients, campaigns, setCampaigns }) => {
             {/* Modal for delete confirmation */}
             {showDeleteModal && (
                 <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50">
-                    <div className="bg-white p-6 rounded-lg shadow-xl max-w-sm mx-auto">
-                        <h3 className="text-lg font-bold text-gray-800 mb-2">
+                    <div className="bg-white p-8 rounded-xl shadow-2xl max-w-sm mx-auto transform scale-95 md:scale-100 transition-all duration-300">
+                        <h3 className="text-xl font-bold text-gray-800 mb-4">
                             Confirm Delete
                         </h3>
-                        <p className="text-gray-600 mb-4">
+                        <p className="text-gray-600 mb-6">
                             Are you sure you want to delete this campaign? This
                             action cannot be undone.
                         </p>
                         <div className="flex justify-end space-x-4">
                             <button
                                 onClick={() => setShowDeleteModal(false)}
-                                className="px-4 py-2 rounded-lg font-semibold text-gray-700 bg-gray-200 hover:bg-gray-300 transition-colors"
+                                className="px-6 py-3 rounded-lg font-semibold text-gray-700 bg-gray-200 hover:bg-gray-300 transition-colors"
                             >
                                 Cancel
                             </button>
                             <button
                                 onClick={confirmDelete}
-                                className="px-4 py-2 rounded-lg font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors"
+                                className="px-6 py-3 rounded-lg font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors"
                             >
                                 Delete
                             </button>
@@ -830,28 +832,31 @@ const Campaigns = ({ clients, campaigns, setCampaigns }) => {
             )}
 
             {/* Campaign Form */}
-            <div className="bg-white p-8 rounded-lg shadow-md">
-                <form onSubmit={handleCreateCampaign} className="space-y-4">
+            <div className="bg-white p-10 rounded-xl shadow-lg">
+                <h3 className="text-2xl font-semibold text-gray-700 mb-6">
+                    {editingCampaignId ? 'Edit Campaign' : 'Create Campaign'}
+                </h3>
+                <form onSubmit={handleCreateCampaign} className="space-y-6">
                     <input
                         type="text"
                         placeholder="Campaign Name"
                         value={campaignName}
                         onChange={(e) => setCampaignName(e.target.value)}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
                     />
                     <input
                         type="text"
                         placeholder="Advert Title"
                         value={advertTitle}
                         onChange={(e) => setAdvertTitle(e.target.value)}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
                     />
                     <textarea
                         placeholder="Advert Message"
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
                         rows="5"
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
                     ></textarea>
 
                     {/* Image URL input */}
@@ -864,20 +869,20 @@ const Campaigns = ({ clients, campaigns, setCampaigns }) => {
                         placeholder="Image URL (e.g., https://example.com/image.jpg)"
                         value={imageUrl}
                         onChange={(e) => setImageUrl(e.target.value)}
-                        className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors"
                     />
 
-                    <div className="flex space-x-4">
+                    <div className="flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
                         <button
                             type="button"
                             onClick={generatePreviews}
-                            className="flex-1 bg-gray-500 text-white p-3 rounded-lg font-semibold hover:bg-gray-600 transition-colors"
+                            className="flex-1 bg-gray-500 text-white p-4 rounded-lg font-semibold hover:bg-gray-600 transition-colors shadow-md hover:shadow-lg"
                         >
                             Show Previews
                         </button>
                         <button
                             type="submit"
-                            className="flex-1 bg-indigo-600 text-white p-3 rounded-lg font-semibold hover:bg-indigo-700 transition-colors"
+                            className="flex-1 bg-indigo-600 text-white p-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors shadow-md hover:shadow-lg"
                         >
                             {editingCampaignId
                                 ? 'Update Campaign'
@@ -888,7 +893,7 @@ const Campaigns = ({ clients, campaigns, setCampaigns }) => {
                         <button
                             type="button"
                             onClick={resetForm}
-                            className="w-full bg-gray-400 text-white p-3 rounded-lg font-semibold hover:bg-gray-500 transition-colors"
+                            className="w-full mt-4 bg-gray-400 text-white p-4 rounded-lg font-semibold hover:bg-gray-500 transition-colors shadow-md hover:shadow-lg"
                         >
                             Cancel Edit
                         </button>
@@ -899,24 +904,24 @@ const Campaigns = ({ clients, campaigns, setCampaigns }) => {
             {/* Previews Section */}
             {(emailPreview || smsPreview || telegramPreview) && (
                 <div className="space-y-6">
-                    <h3 className="text-2xl font-semibold text-gray-600">
+                    <h3 className="text-2xl font-semibold text-gray-700">
                         Advert Previews
                     </h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div className="bg-white p-6 rounded-lg shadow-md">
-                            <h4 className="text-xl font-semibold mb-3">
+                        <div className="bg-white p-8 rounded-xl shadow-lg">
+                            <h4 className="text-xl font-semibold mb-4">
                                 Email Preview
                             </h4>
                             {emailPreview}
                         </div>
-                        <div className="bg-white p-6 rounded-lg shadow-md">
-                            <h4 className="text-xl font-semibold mb-3">
+                        <div className="bg-white p-8 rounded-xl shadow-lg">
+                            <h4 className="text-xl font-semibold mb-4">
                                 SMS Preview
                             </h4>
                             {smsPreview}
                         </div>
-                        <div className="bg-white p-6 rounded-lg shadow-md">
-                            <h4 className="text-xl font-semibold mb-3">
+                        <div className="bg-white p-8 rounded-xl shadow-lg">
+                            <h4 className="text-xl font-semibold mb-4">
                                 Telegram Preview
                             </h4>
                             {telegramPreview}
@@ -926,8 +931,8 @@ const Campaigns = ({ clients, campaigns, setCampaigns }) => {
             )}
 
             {/* Campaigns List Section */}
-            <div className="bg-white p-8 rounded-lg shadow-md">
-                <h3 className="text-2xl font-semibold text-gray-600 mb-4">
+            <div className="bg-white p-10 rounded-xl shadow-lg">
+                <h3 className="text-2xl font-semibold text-gray-700 mb-6">
                     Saved Campaigns
                 </h3>
                 {campaigns.length > 0 ? (
@@ -935,13 +940,13 @@ const Campaigns = ({ clients, campaigns, setCampaigns }) => {
                         {campaigns.map((campaign) => (
                             <li
                                 key={campaign._id}
-                                className="flex flex-col md:flex-row md:items-center justify-between p-4 bg-gray-50 rounded-lg shadow-sm"
+                                className="flex flex-col md:flex-row md:items-center justify-between p-6 bg-slate-50 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300"
                             >
                                 <div className="flex-1">
                                     <p className="text-lg font-medium text-gray-700">
                                         {campaign.campaignName}
                                     </p>
-                                    <p className="text-sm text-gray-500">
+                                    <p className="text-sm text-gray-500 mt-1">
                                         Created:{' '}
                                         {new Date(
                                             campaign.createdAt
@@ -953,7 +958,7 @@ const Campaigns = ({ clients, campaigns, setCampaigns }) => {
                                             ).toLocaleDateString()}`}
                                     </p>
                                     <p
-                                        className={`text-sm font-semibold mt-1 ${
+                                        className={`text-sm font-semibold mt-2 ${
                                             campaign.status === 'sent'
                                                 ? 'text-teal-600'
                                                 : 'text-orange-500'
@@ -966,12 +971,12 @@ const Campaigns = ({ clients, campaigns, setCampaigns }) => {
                                             campaign.status.slice(1)}
                                     </p>
                                 </div>
-                                <div className="flex space-x-2 mt-2 md:mt-0">
+                                <div className="flex space-x-2 mt-4 md:mt-0">
                                     <button
                                         onClick={() =>
                                             handleEditClick(campaign)
                                         }
-                                        className="px-3 py-1 text-sm rounded-lg font-semibold text-indigo-600 bg-indigo-100 hover:bg-indigo-200 transition-colors"
+                                        className="px-4 py-2 text-sm rounded-lg font-semibold text-indigo-600 bg-indigo-100 hover:bg-indigo-200 transition-colors"
                                     >
                                         Edit
                                     </button>
@@ -979,7 +984,7 @@ const Campaigns = ({ clients, campaigns, setCampaigns }) => {
                                         onClick={() =>
                                             handleDeleteClick(campaign._id)
                                         }
-                                        className="px-3 py-1 text-sm rounded-lg font-semibold text-red-600 bg-red-100 hover:bg-red-200 transition-colors"
+                                        className="px-4 py-2 text-sm rounded-lg font-semibold text-red-600 bg-red-100 hover:bg-red-200 transition-colors"
                                     >
                                         Delete
                                     </button>
