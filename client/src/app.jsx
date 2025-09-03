@@ -22,7 +22,9 @@ export default function App() {
         const fetchData = async () => {
             try {
                 // Fetch clients data from the backend API
-                const clientsRes = await fetch(`/api/clients`);
+                const clientsRes = await fetch(
+                    `https://crm-backend-theta-three.vercel.app/api/clients`
+                );
                 const clientsData = await clientsRes.json();
                 // Sort clients by creation date in descending order
                 setClients(
@@ -32,7 +34,9 @@ export default function App() {
                 );
 
                 // Fetch campaigns data from the backend API
-                const campaignsRes = await fetch(`/api/campaigns`);
+                const campaignsRes = await fetch(
+                    `https://crm-backend-theta-three.vercel.app/api/campaigns`
+                );
                 const campaignsData = await campaignsRes.json();
                 // Sort campaigns by creation date in descending order
                 setCampaigns(
@@ -219,11 +223,14 @@ const Clients = ({ clients, setClients }) => {
         try {
             if (editingClientId) {
                 // Handle update logic
-                const res = await fetch(`/api/clients/${editingClientId}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, email, phone }),
-                });
+                const res = await fetch(
+                    `https://crm-backend-theta-three.vercel.app/api/clients/${editingClientId}`,
+                    {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name, email, phone }),
+                    }
+                );
                 if (!res.ok) throw new Error('Failed to update client.');
                 const updatedClient = await res.json();
                 setClients((prevClients) =>
@@ -234,11 +241,14 @@ const Clients = ({ clients, setClients }) => {
                 setMessage('Client updated successfully!');
             } else {
                 // Handle add logic
-                const res = await fetch(`/api/clients`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, email, phone }),
-                });
+                const res = await fetch(
+                    `https://crm-backend-theta-three.vercel.app/api/clients`,
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name, email, phone }),
+                    }
+                );
                 if (!res.ok) throw new Error('Failed to add client.');
                 const newClient = await res.json();
                 setClients((prevClients) => [newClient, ...prevClients]);
@@ -304,11 +314,14 @@ const Clients = ({ clients, setClients }) => {
                 }
 
                 const uploadPromises = clientsToUpload.map((client) =>
-                    fetch(`/api/clients`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(client),
-                    })
+                    fetch(
+                        `https://crm-backend-theta-three.vercel.app/api/clients`,
+                        {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(client),
+                        }
+                    )
                 );
                 const results = await Promise.allSettled(uploadPromises);
                 const successfulUploads = results.filter(
@@ -320,7 +333,9 @@ const Clients = ({ clients, setClients }) => {
                 );
 
                 // Re-fetch all clients to update the list
-                const res = await fetch(`/api/clients`);
+                const res = await fetch(
+                    `https://crm-backend-theta-three.vercel.app/api/clients`
+                );
                 const updatedClientsData = await res.json();
                 setClients(
                     updatedClientsData.sort(
@@ -353,9 +368,12 @@ const Clients = ({ clients, setClients }) => {
 
     const confirmDelete = async () => {
         try {
-            const res = await fetch(`/api/clients/${clientToDeleteId}`, {
-                method: 'DELETE',
-            });
+            const res = await fetch(
+                `https://crm-backend-theta-three.vercel.app/api/clients/${clientToDeleteId}`,
+                {
+                    method: 'DELETE',
+                }
+            );
             if (!res.ok) throw new Error('Failed to delete client.');
 
             setClients((prevClients) =>
@@ -636,16 +654,19 @@ const Campaigns = ({ clients, campaigns, setCampaigns }) => {
         try {
             if (editingCampaignId) {
                 // Update existing campaign
-                const res = await fetch(`/api/campaigns/${editingCampaignId}`, {
-                    method: 'PUT',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        campaignName,
-                        advertTitle,
-                        message,
-                        imageUrl,
-                    }),
-                });
+                const res = await fetch(
+                    `https://crm-backend-theta-three.vercel.app/api/campaigns/${editingCampaignId}`,
+                    {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            campaignName,
+                            advertTitle,
+                            message,
+                            imageUrl,
+                        }),
+                    }
+                );
                 if (!res.ok) throw new Error('Failed to update campaign.');
 
                 const updatedCampaign = await res.json();
@@ -657,16 +678,19 @@ const Campaigns = ({ clients, campaigns, setCampaigns }) => {
                 setCampaignMessage('Campaign updated successfully!');
             } else {
                 // Create new campaign
-                const res = await fetch(`/api/campaigns`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        campaignName,
-                        advertTitle,
-                        message,
-                        imageUrl,
-                    }),
-                });
+                const res = await fetch(
+                    `https://crm-backend-theta-three.vercel.app/api/campaigns`,
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            campaignName,
+                            advertTitle,
+                            message,
+                            imageUrl,
+                        }),
+                    }
+                );
                 if (!res.ok) throw new Error('Failed to create campaign.');
 
                 const newCampaign = await res.json();
@@ -702,9 +726,12 @@ const Campaigns = ({ clients, campaigns, setCampaigns }) => {
 
     const confirmDelete = async () => {
         try {
-            const res = await fetch(`/api/campaigns/${campaignToDeleteId}`, {
-                method: 'DELETE',
-            });
+            const res = await fetch(
+                `https://crm-backend-theta-three.vercel.app/api/campaigns/${campaignToDeleteId}`,
+                {
+                    method: 'DELETE',
+                }
+            );
             if (!res.ok) throw new Error('Failed to delete campaign.');
 
             setCampaigns((prev) =>
@@ -734,11 +761,14 @@ const Campaigns = ({ clients, campaigns, setCampaigns }) => {
         setIsSending(true);
 
         try {
-            const res = await fetch(`api/send/ad`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ campaignId: campaign._id }),
-            });
+            const res = await fetch(
+                `https://crm-backend-theta-three.vercel.app/api/send/ad`,
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ campaignId: campaign._id }),
+                }
+            );
 
             if (!res.ok) throw new Error('Failed to send campaign.');
 
