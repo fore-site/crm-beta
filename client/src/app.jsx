@@ -10,6 +10,23 @@ export default function App() {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState('dashboard');
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isBannerVisible, setIsBannerVisible] = useState(true);
+
+  // Scroll logic for the mobile banner
+  useEffect(() => {
+    let lastScrollY = window.scrollY;
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        setIsBannerVisible(false);
+      } else {
+        setIsBannerVisible(true);
+      }
+      lastScrollY = currentScrollY;
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -33,7 +50,7 @@ export default function App() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-gray-900 text-white font-sans">
+      <div className="flex items-center justify-center min-h-screen bg-gray-900 text-white font-['Roboto']">
         <p className="text-xl animate-pulse">Crafting a beautiful experience...</p>
       </div>
     );
@@ -70,9 +87,9 @@ export default function App() {
   );
 
   return (
-    <div className="flex flex-col md:flex-row min-h-screen font-['Plus_Jakarta_Sans'] antialiased bg-gray-100 text-gray-800">
+    <div className="flex flex-col md:flex-row min-h-screen font-['Roboto'] antialiased bg-gray-100 text-gray-800">
       {/* Fixed Header Banner for Mobile */}
-      <header className="md:hidden fixed top-0 left-0 right-0 z-40 bg-white shadow-md p-4 flex justify-between items-center">
+      <header className={`md:hidden fixed top-0 left-0 right-0 z-40 bg-white shadow-md p-4 flex justify-between items-center transition-transform duration-300 ${isBannerVisible ? 'translate-y-0' : '-translate-y-full'}`}>
         <div className="text-2xl font-extrabold text-blue-600">Roware</div>
         <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-2 text-gray-600">
           <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -95,7 +112,7 @@ export default function App() {
             </svg>
           </button>
         </div>
-        <div className="md:hidden mb-12 h-16"></div> {/* Spacer for mobile header */}
+        <div className="md:hidden mb-16 h-16"></div> {/* Spacer for mobile header */}
         <nav className="flex flex-col space-y-4">
           <NavButton page="dashboard" label="Dashboard" icon="📈" />
           <NavButton page="clients" label="Clients" icon="👥" />
@@ -299,13 +316,13 @@ const Clients = ({ clients, setClients }) => {
       <div className="flex space-x-2 mt-4 sm:mt-0">
         <button
           onClick={() => handleEditClick(client)}
-          className="px-4 py-2 text-sm rounded-full font-semibold text-blue-600 bg-blue-100 hover:bg-blue-200 transition-colors"
+          className="px-4 py-2 text-sm rounded-full font-semibold bg-white text-blue-600 border border-blue-600 hover:bg-blue-50 transition-colors"
         >
           Edit
         </button>
         <button
           onClick={() => handleDeleteClick(client._id)}
-          className="px-4 py-2 text-sm rounded-full font-semibold text-red-600 bg-red-100 hover:bg-red-200 transition-colors"
+          className="px-4 py-2 text-sm rounded-full font-semibold bg-white text-red-600 border border-red-600 hover:bg-red-50 transition-colors"
         >
           Delete
         </button>
@@ -357,7 +374,7 @@ const Clients = ({ clients, setClients }) => {
           <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
             <button
               type="submit"
-              className="flex-1 bg-blue-600 text-white px-8 py-3 rounded-full font-semibold hover:bg-blue-700 transition-colors shadow-md"
+              className="flex-1 bg-white text-blue-600 border border-blue-600 px-8 py-3 rounded-full font-semibold hover:bg-blue-50 transition-colors shadow-md"
             >
               {editingClientId ? 'Update Client' : 'Add Client'}
             </button>
@@ -365,7 +382,7 @@ const Clients = ({ clients, setClients }) => {
               <button
                 type="button"
                 onClick={resetForm}
-                className="flex-1 bg-gray-400 text-white px-8 py-3 rounded-full font-semibold hover:bg-gray-500 transition-colors"
+                className="flex-1 bg-white text-gray-600 border border-gray-400 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors"
               >
                 Cancel
               </button>
@@ -557,13 +574,13 @@ const Campaigns = ({ clients, campaigns, setCampaigns }) => {
       <div className="flex space-x-2 mt-4 sm:mt-0">
         <button
           onClick={() => handleEditClick(campaign)}
-          className="px-4 py-2 text-sm rounded-full font-semibold text-blue-600 bg-blue-100 hover:bg-blue-200 transition-colors"
+          className="px-4 py-2 text-sm rounded-full font-semibold bg-white text-blue-600 border border-blue-600 hover:bg-blue-50 transition-colors"
         >
           Edit
         </button>
         <button
           onClick={() => handleDeleteClick(campaign._id)}
-          className="px-4 py-2 text-sm rounded-full font-semibold text-red-600 bg-red-100 hover:bg-red-200 transition-colors"
+          className="px-4 py-2 text-sm rounded-full font-semibold bg-white text-red-600 border border-red-600 hover:bg-red-50 transition-colors"
         >
           Delete
         </button>
@@ -573,7 +590,7 @@ const Campaigns = ({ clients, campaigns, setCampaigns }) => {
           className={`px-4 py-2 rounded-full font-semibold transition-colors ${
             isSending || campaign.status === 'sent'
               ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-              : 'bg-blue-600 text-white hover:bg-blue-700'
+              : 'bg-white text-blue-600 border border-blue-600 hover:bg-blue-50'
           }`}
         >
           {isSending ? 'Sending...' : 'Send Ad'}
@@ -643,7 +660,7 @@ const Campaigns = ({ clients, campaigns, setCampaigns }) => {
           <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
             <button
               type="submit"
-              className="flex-1 bg-blue-600 text-white px-8 py-3 rounded-full font-semibold hover:bg-blue-700 transition-colors shadow-md"
+              className="flex-1 bg-white text-blue-600 border border-blue-600 px-8 py-3 rounded-full font-semibold hover:bg-blue-50 transition-colors shadow-md"
             >
               {editingCampaignId ? 'Update Campaign' : 'Create Campaign'}
             </button>
@@ -652,7 +669,7 @@ const Campaigns = ({ clients, campaigns, setCampaigns }) => {
             <button
               type="button"
               onClick={resetForm}
-              className="w-full mt-4 bg-gray-400 text-white px-8 py-3 rounded-full font-semibold hover:bg-gray-500 transition-colors"
+              className="w-full mt-4 bg-white text-gray-600 border border-gray-400 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors"
             >
               Cancel
             </button>
@@ -703,14 +720,14 @@ const Modal = ({ title, message, onConfirm, onCancel, confirmText = 'Confirm' })
         {onCancel && (
           <button
             onClick={onCancel}
-            className="px-6 py-3 rounded-full font-semibold text-gray-700 bg-gray-200 hover:bg-gray-300 transition-colors"
+            className="px-6 py-3 rounded-full font-semibold bg-white text-gray-700 border border-gray-400 hover:bg-gray-100 transition-colors"
           >
             Cancel
           </button>
         )}
         <button
           onClick={onConfirm}
-          className={`px-6 py-3 rounded-full font-semibold text-white ${onCancel ? 'bg-red-600 hover:bg-red-700' : 'bg-blue-600 hover:bg-blue-700'} transition-colors`}
+          className={`px-6 py-3 rounded-full font-semibold ${onCancel ? 'bg-white text-red-600 border border-red-600 hover:bg-red-50' : 'bg-white text-blue-600 border border-blue-600 hover:bg-blue-50'} transition-colors`}
         >
           {confirmText}
         </button>
