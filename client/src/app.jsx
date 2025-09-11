@@ -51,7 +51,7 @@ export default function App() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-900 text-white font-['Roboto']">
-        <p className="text-xl animate-pulse">Crafting a beautiful experience...</p>
+        <p className="text-xl animate-pulse">Loading CRM...</p>
       </div>
     );
   }
@@ -98,9 +98,18 @@ export default function App() {
         </button>
       </header>
       
+      {/* Sidebar Overlay */}
+      {isSidebarOpen && (
+        <div
+          className="fixed inset-0 bg-gray-900 bg-opacity-70 z-40 md:hidden"
+          onClick={() => setIsSidebarOpen(false)}
+        ></div>
+      )}
+
       {/* Sidebar */}
       <aside
         className={`fixed inset-y-0 left-0 z-50 transform md:relative md:translate-x-0 w-72 bg-gray-900 text-white p-8 shadow-2xl transition-transform duration-500 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
+        onClick={(e) => e.stopPropagation()}
       >
         <div className="hidden md:flex items-center justify-between mb-12">
           <div className="text-3xl font-extrabold text-blue-500 tracking-wider">
@@ -112,8 +121,7 @@ export default function App() {
             </svg>
           </button>
         </div>
-        <div className="md:hidden mb-16 h-16"></div> {/* Spacer for mobile header */}
-        <nav className="flex flex-col space-y-4">
+        <nav className="flex flex-col space-y-4 pt-10 md:pt-0">
           <NavButton page="dashboard" label="Dashboard" icon="📈" />
           <NavButton page="clients" label="Clients" icon="👥" />
           <NavButton page="campaigns" label="Campaigns" icon="📧" />
