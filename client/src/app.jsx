@@ -90,12 +90,12 @@ export default function App() {
     <div className="flex flex-col md:flex-row min-h-screen font-['Roboto'] antialiased bg-gray-100 text-gray-800">
       {/* Fixed Header Banner for Mobile */}
       <header className={`md:hidden fixed top-0 left-0 right-0 z-40 bg-white shadow-md p-4 flex justify-between items-center transition-transform duration-300 ${isBannerVisible ? 'translate-y-0' : '-translate-y-full'}`}>
-        <div className="text-2xl font-extrabold text-blue-600">Roware</div>
         <button onClick={() => setIsSidebarOpen(!isSidebarOpen)} className="p-2 text-gray-600">
           <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7"></path>
           </svg>
         </button>
+        <div className="text-2xl font-extrabold text-blue-600">Roware</div>
       </header>
       
       {/* Sidebar Overlay */}
@@ -111,8 +111,8 @@ export default function App() {
         className={`fixed inset-y-0 left-0 z-50 transform md:relative md:translate-x-0 w-72 bg-gray-900 text-white p-8 shadow-2xl transition-transform duration-500 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="hidden md:flex items-center justify-between mb-12">
-          <div className="text-3xl font-extrabold text-blue-500 tracking-wider">
+        <div className="flex items-center justify-between mb-12">
+          <div className="hidden md:block text-3xl font-extrabold text-blue-500 tracking-wider">
             <span className="font-light text-white">Roware.</span>
           </div>
           <button onClick={() => setIsSidebarOpen(false)} className="md:hidden text-gray-400 hover:text-white">
@@ -582,20 +582,20 @@ const Campaigns = ({ clients, campaigns, setCampaigns }) => {
       <div className="flex space-x-2 mt-4 sm:mt-0">
         <button
           onClick={() => handleEditClick(campaign)}
-          className="px-4 py-2 text-sm rounded-full font-semibold bg-white text-blue-600 border border-blue-600 hover:bg-blue-50 transition-colors"
+          className="px-2 py-1 text-xs rounded-xl font-semibold bg-white text-blue-600 border border-blue-600 hover:bg-blue-50 transition-colors"
         >
           Edit
         </button>
         <button
           onClick={() => handleDeleteClick(campaign._id)}
-          className="px-4 py-2 text-sm rounded-full font-semibold bg-white text-red-600 border border-red-600 hover:bg-red-50 transition-colors"
+          className="px-2 py-1 text-xs rounded-xl font-semibold bg-white text-red-600 border border-red-600 hover:bg-red-50 transition-colors"
         >
           Delete
         </button>
         <button
           onClick={() => handleSendAd(campaign)}
           disabled={isSending || campaign.status === 'sent'}
-          className={`px-4 py-2 rounded-full font-semibold transition-colors ${
+          className={`px-2 py-1 text-xs rounded-xl font-semibold transition-colors ${
             isSending || campaign.status === 'sent'
               ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
               : 'bg-white text-blue-600 border border-blue-600 hover:bg-blue-50'
