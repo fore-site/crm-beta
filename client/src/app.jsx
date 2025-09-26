@@ -1,1461 +1,1256 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import {
-    DndContext,
-    closestCenter,
-    PointerSensor,
-    useSensor,
-    useSensors,
-    useDroppable,
-    useDraggable,
-} from '@dnd-kit/core';
-import {
-    SortableContext,
-    verticalListSortingStrategy,
-    arrayMove,
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+    Clock,
+    Users,
+    Send,
+    ListChecks,
+    DollarSign,
+    Calendar,
+} from 'lucide-react';
 
-// Define the base URL for API calls. Use an empty string for relative paths
-const API_BASE_URL = 'https://crm-backend-theta-three.vercel.app';
-
-// Main App component
-export default function App() {
-    const [clients, setClients] = useState([]);
-    const [campaigns, setCampaigns] = useState([]);
-    const [projects, setProjects] = useState([]);
-    const [salesPipeline, setSalesPipeline] = useState(null);
-    const [analytics, setAnalytics] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [currentPage, setCurrentPage] = useState('dashboard');
-    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-    const [isBannerVisible, setIsBannerVisible] = useState(true);
-
-    // Scroll logic for the mobile banner
-    useEffect(() => {
-        let lastScrollY = window.scrollY;
-        const handleScroll = () => {
-            const currentScrollY = window.scrollY;
-            if (currentScrollY > lastScrollY && currentScrollY > 100) {
-                setIsBannerVisible(false);
-            } else {
-                setIsBannerVisible(true);
-            }
-            lastScrollY = currentScrollY;
-        };
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const clientsRes = await fetch(`${API_BASE_URL}/api/clients`);
-                const clientsData = await clientsRes.json();
-                setClients(
-                    clientsData.sort(
-                        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-                    )
-                );
-
-                const campaignsRes = await fetch(
-                    `${API_BASE_URL}/api/campaigns`
-                );
-                const campaignsData = await campaignsRes.json();
-                setCampaigns(
-                    campaignsData.sort(
-                        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-                    )
-                );
-
-                const projectsRes = await fetch(`${API_BASE_URL}/api/projects`);
-                const projectsData = await projectsRes.json();
-                setProjects(
-                    projectsData.sort(
-                        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-                    )
-                );
-
-                const pipelineRes = await fetch(
-                    `${API_BASE_URL}/api/sales-pipeline`
-                );
-                const pipelineData = await pipelineRes.json();
-                setSalesPipeline(pipelineData);
-
-                const analyticsRes = await fetch(
-                    `${API_BASE_URL}/api/analytics`
-                );
-                const analyticsData = await analyticsRes.json();
-                setAnalytics(analyticsData);
-
-                setLoading(false);
-            } catch (error) {
-                console.error('Error fetching data:', error);
-                setLoading(false);
-            }
-        };
-        fetchData();
-    }, []);
-
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center min-h-screen bg-gray-900 text-white font-['Roboto']">
-                <p className="text-xl animate-pulse">Loading CRM...</p>
-            </div>
-        );
-    }
-
-    const renderPage = () => {
-        switch (currentPage) {
-            case 'dashboard':
-                return (
-                    <Dashboard
-                        analytics={analytics}
-                        salesPipeline={salesPipeline}
-                    />
-                );
-            case 'clients':
-                return <Clients clients={clients} setClients={setClients} />;
-            case 'campaigns':
-                return (
-                    <Campaigns
-                        clients={clients}
-                        campaigns={campaigns}
-                        setCampaigns={setCampaigns}
-                    />
-                );
-            case 'sales':
-                return (
-                    <SalesPipeline
-                        clients={clients}
-                        salesPipeline={salesPipeline}
-                        setSalesPipeline={setSalesPipeline}
-                    />
-                );
-            case 'projects':
-                return (
-                    <Projects projects={projects} setProjects={setProjects} />
-                );
-            default:
-                return (
-                    <Dashboard
-                        analytics={analytics}
-                        salesPipeline={salesPipeline}
-                    />
-                );
-        }
-    };
-
-    const NavButton = ({ page, label, icon }) => (
-        <button
-            onClick={() => {
-                setCurrentPage(page);
-                setIsSidebarOpen(false);
-            }}
-            className={`flex items-center w-full px-6 py-4 rounded-xl font-medium transition-all duration-300 transform
-        ${
-            currentPage === page
-                ? 'bg-blue-600 text-white shadow-lg scale-105'
-                : 'text-gray-400 hover:bg-gray-700 hover:text-gray-100'
-        }`}
-        >
-            <span className="mr-4 text-xl">{icon}</span>
-            <span>{label}</span>
-        </button>
-    );
+// --- Chart Component (Enhanced) ---
+const PerformanceChart = ({ data }) => {
+    const chartHeight = 220; // Fixed height for chart area
+    const max = Math.max(...data.map((item) => item.value), 0);
+    // Calculate scale factor, ensuring it's not divided by zero
+    const scale = max > 0 ? chartHeight / max : 0;
 
     return (
-        <div className="flex flex-col md:flex-row min-h-screen font-['Roboto'] antialiased bg-gray-100 text-gray-800">
-            {/* Fixed Header Banner for Mobile */}
-            <header
-                className={`md:hidden fixed top-0 left-0 right-0 z-40 bg-white shadow-md p-4 flex justify-between items-center transition-transform duration-300 ${
-                    isBannerVisible ? 'translate-y-0' : '-translate-y-full'
-                }`}
+        <div className="bg-white p-6 rounded-2xl shadow-xl border border-gray-100 w-full transition-all duration-300 hover:shadow-2xl">
+            <h3 className="text-xl font-extrabold text-[#130F0F] mb-2">
+                Campaigns Sent Over Last 7 Days
+            </h3>
+            <p className="text-sm text-gray-500 mb-6">
+                Tracking outreach efficiency by volume.
+            </p>
+
+            {/* Chart Area Container */}
+            <div
+                className="flex items-end justify-between space-x-3 p-2 bg-gradient-to-t from-gray-50 to-white rounded-xl relative"
+                style={{ height: `${chartHeight}px` }}
+            >
+                {/* Helper Line (Max Value) */}
+                <div
+                    className="absolute top-0 left-0 right-0 h-[1px] bg-red-400/50 dashed border-t border-dashed"
+                    style={{ marginTop: '10px' }}
+                >
+                    <span className="absolute -left-10 text-xs text-red-500 font-bold -top-2">
+                        Max: {max}
+                    </span>
+                </div>
+
+                {data.map((item, index) => {
+                    // Calculate bar height, minimum 5px for visibility if value > 0
+                    const barHeight = item.value * scale;
+                    const actualHeight = Math.max(0, barHeight);
+
+                    return (
+                        <div
+                            key={index}
+                            className="flex flex-col items-center justify-end h-full flex-grow group relative"
+                        >
+                            {/* Bar Container and Animation */}
+                            <div
+                                className="w-full rounded-t-xl transition-all duration-700 ease-out 
+                           bg-gradient-to-t from-[#26A248] to-[#60D394] 
+                           hover:from-[#1F813A] hover:to-[#50B880] 
+                           cursor-pointer shadow-lg transform hover:scale-y-[1.05] hover:shadow-xl"
+                                style={{
+                                    height: `${actualHeight}px`,
+                                    minHeight: actualHeight > 0 ? '5px' : '0',
+                                }}
+                                title={`${item.label}: ${item.value}`}
+                            ></div>
+
+                            {/* Tooltip for value */}
+                            <span className="absolute top-0 mt-[-25px] p-1 px-2 bg-[#130F0F] text-white text-xs font-semibold rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none whitespace-nowrap shadow-xl">
+                                {item.value} Sent
+                            </span>
+
+                            {/* Label */}
+                            <span className="text-sm text-gray-700 mt-2 font-medium">
+                                {item.label}
+                            </span>
+                        </div>
+                    );
+                })}
+            </div>
+            <div className="border-t border-gray-200 mt-8 pt-4 text-center">
+                <p className="text-xs text-gray-500">
+                    Historical view: {data.length} data points.
+                </p>
+            </div>
+        </div>
+    );
+};
+
+// Reusable Contact Card component (used in list view)
+const ContactCard = ({ name, date }) => {
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const menuRef = useRef(null);
+
+    // Simple click-outside handler
+    React.useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (menuRef.current && !menuRef.current.contains(event.target)) {
+                setIsMenuOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [menuRef]);
+
+    const handleEdit = () => {
+        console.log(`ACTION: Opening edit modal for: ${name}`);
+        setIsMenuOpen(false);
+    };
+
+    const handleDelete = () => {
+        // In a real application, this would open a custom confirmation modal
+        console.log(
+            `ACTION: Request to delete contact: ${name}. (Confirmation step skipped for demo)`
+        );
+        setIsMenuOpen(false);
+    };
+
+    return (
+        <div className="bg-white p-4 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-200 flex items-start relative border border-[#DEE2E6]">
+            <div
+                className="flex justify-end absolute top-2 right-2 z-10"
+                ref={menuRef}
             >
                 <button
-                    onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                    className="p-2 text-gray-600"
+                    className="p-1 rounded-full text-[#868281] hover:bg-[#E7F7EB] transition-colors"
+                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                    aria-label="Contact actions menu"
                 >
                     <svg
-                        className="w-8 h-8"
-                        fill="none"
-                        stroke="currentColor"
+                        className="h-6 w-6"
                         viewBox="0 0 24 24"
-                        xmlns="http://www.w3.org/2000/svg"
+                        fill="currentColor"
                     >
-                        <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="M4 6h16M4 12h16m-7 6h7"
-                        ></path>
+                        <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
                     </svg>
                 </button>
-                <div className="text-2xl font-extrabold text-blue-600">
-                    Roware
-                </div>
-            </header>
-
-            {/* Sidebar Overlay */}
-            {isSidebarOpen && (
-                <div
-                    className="fixed inset-0 bg-gray-900 bg-opacity-70 z-40 md:hidden"
-                    onClick={() => setIsSidebarOpen(false)}
-                ></div>
-            )}
-
-            {/* Sidebar */}
-            <aside
-                className={`fixed inset-y-0 left-0 z-50 transform md:relative md:translate-x-0 w-72 bg-gray-900 text-white p-8 shadow-2xl transition-transform duration-500 ease-in-out ${
-                    isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-                }`}
-                onClick={(e) => e.stopPropagation()}
-            >
-                <div className="flex items-center justify-between mb-12">
-                    <div className="hidden md:block text-3xl font-extrabold text-blue-500 tracking-wider">
-                        <span className="font-light text-white">Roware.</span>
+                {isMenuOpen && (
+                    <div className="absolute z-20 right-0 mt-8 w-40 rounded-lg shadow-2xl bg-white ring-1 ring-black ring-opacity-5">
+                        <div className="py-1">
+                            <button
+                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                                onClick={handleEdit}
+                            >
+                                Edit Details
+                            </button>
+                            <button
+                                className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                                onClick={handleDelete}
+                            >
+                                Delete Contact
+                            </button>
+                        </div>
                     </div>
-                    <button
-                        onClick={() => setIsSidebarOpen(false)}
-                        className="md:hidden text-gray-400 hover:text-white"
-                    >
+                )}
+            </div>
+
+            {/* Contact Content */}
+            <div className="h-10 w-10 bg-[#DEE2E6] rounded-full flex-shrink-0 mr-3 mt-1"></div>
+            <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-[#130F0F]">{name}</h3>
+                <p className="text-xs text-[#868281]">{date}</p>
+                <div className="mt-2 text-sm text-[#868281] space-y-1">
+                    {/* Phone */}
+                    <div className="flex items-start">
                         <svg
-                            className="w-8 h-8"
+                            className="h-4 w-4 flex-shrink-0 mr-2"
                             fill="none"
-                            stroke="currentColor"
                             viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg"
+                            stroke="currentColor"
                         >
                             <path
                                 strokeLinecap="round"
                                 strokeLinejoin="round"
                                 strokeWidth="2"
-                                d="M6 18L18 6M6 6l12 12"
-                            ></path>
-                        </svg>
-                    </button>
-                </div>
-                <nav className="flex flex-col space-y-4 pt-10 md:pt-0">
-                    <NavButton page="dashboard" label="Dashboard" icon="📈" />
-                    <NavButton page="clients" label="Clients" icon="👥" />
-                    <NavButton page="campaigns" label="Campaigns" icon="📧" />
-                    <NavButton page="sales" label="Sales Pipeline" icon="💰" />
-                    <NavButton page="projects" label="Projects" icon="📋" />
-                </nav>
-            </aside>
-
-            {/* Main Content Area */}
-            <main className="flex-1 p-6 md:p-12 transition-all duration-300 mt-16 md:mt-0">
-                <header className="flex items-center justify-between mb-8 md:mb-12">
-                    <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight">
-                        {currentPage.charAt(0).toUpperCase() +
-                            currentPage.slice(1)}
-                    </h1>
-                </header>
-                {renderPage()}
-            </main>
-        </div>
-    );
-}
-
-const Dashboard = ({ analytics, salesPipeline }) => {
-    const StatCard = ({ title, value, detail }) => (
-        <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-200 hover:shadow-2xl transition-shadow duration-300">
-            <h3 className="text-xl font-semibold text-gray-600">{title}</h3>
-            <p className="mt-2 text-5xl font-bold text-gray-900">{value}</p>
-            {detail && <p className="mt-2 text-sm text-gray-500">{detail}</p>}
-        </div>
-    );
-
-    const PipelineSummary = ({ salesPipeline }) => (
-        <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-200">
-            <h3 className="text-2xl font-bold text-gray-800 mb-6">
-                Sales Pipeline Summary
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                {salesPipeline &&
-                    Object.entries(salesPipeline)
-                        .filter(([key]) => key !== '_id' && key !== '__v')
-                        .map(([status, clients]) => (
-                            <div
-                                key={status}
-                                className="bg-gray-50 p-6 rounded-2xl border border-gray-200"
-                            >
-                                <h4 className="font-semibold text-gray-700 text-lg mb-2">
-                                    {status}
-                                </h4>
-                                <p className="text-4xl font-bold text-gray-900">
-                                    {clients.length}
-                                </p>
-                            </div>
-                        ))}
-            </div>
-        </div>
-    );
-
-    if (!analytics || !salesPipeline) {
-        return (
-            <div className="flex items-center justify-center p-8">
-                <p className="text-xl text-gray-500">
-                    Analytics data not available.
-                </p>
-            </div>
-        );
-    }
-
-    return (
-        <div className="space-y-12">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                <StatCard
-                    title="Total Clients"
-                    value={analytics.totalClients}
-                />
-                <StatCard
-                    title="Total Campaigns"
-                    value={analytics.totalCampaigns}
-                />
-                <StatCard
-                    title="Sent Campaigns"
-                    value={analytics.sentCampaigns}
-                />
-            </div>
-
-            <PipelineSummary salesPipeline={salesPipeline} />
-        </div>
-    );
-};
-
-const Clients = ({ clients, setClients }) => {
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [phone, setPhone] = useState('');
-    const [industry, setIndustry] = useState('');
-    const [notes, setNotes] = useState('');
-    const [message, setMessage] = useState('');
-    const [editingClientId, setEditingClientId] = useState(null);
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [clientToDeleteId, setClientToDeleteId] = useState(null);
-    const [showHistoryModal, setShowHistoryModal] = useState(false);
-    const [selectedClient, setSelectedClient] = useState(null);
-    const [searchTerm, setSearchTerm] = useState('');
-
-    const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-
-    const handleFormSubmit = async (e) => {
-        e.preventDefault();
-        if (!name || !email) {
-            setMessage('Please fill in required fields (Name, Email).');
-            return;
-        }
-        if (!validateEmail(email)) {
-            setMessage('Please enter a valid email address.');
-            return;
-        }
-
-        try {
-            const payload = { name, email, phone, industry, notes };
-            const res = await fetch(
-                `${API_BASE_URL}/api/clients${
-                    editingClientId ? `/${editingClientId}` : ''
-                }`,
-                {
-                    method: editingClientId ? 'PUT' : 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
-                }
-            );
-            if (!res.ok) throw new Error('Failed to submit client data.');
-            const clientData = await res.json();
-
-            if (editingClientId) {
-                setClients((prevClients) =>
-                    prevClients.map((c) =>
-                        c._id === clientData._id ? clientData : c
-                    )
-                );
-                setMessage('Client updated successfully!');
-            } else {
-                setClients((prevClients) => [clientData, ...prevClients]);
-                setMessage('Client added successfully!');
-            }
-            resetForm();
-        } catch (error) {
-            console.error('Error submitting client data:', error);
-            setMessage(
-                `Failed to ${editingClientId ? 'update' : 'add'} client.`
-            );
-        }
-    };
-
-    const handleFileUpload = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = async (event) => {
-            const content = event.target.result;
-            const fileType = file.name.split('.').pop().toLowerCase();
-            let clientsToUpload = [];
-            try {
-                if (fileType === 'json') {
-                    clientsToUpload = JSON.parse(content);
-                } else if (fileType === 'csv') {
-                    const lines = content
-                        .split('\n')
-                        .filter((line) => line.trim() !== '');
-                    const headers = lines[0]
-                        .split(',')
-                        .map((h) => h.trim().toLowerCase());
-                    for (let i = 1; i < lines.length; i++) {
-                        const values = lines[i].split(',').map((v) => v.trim());
-                        const client = {};
-                        headers.forEach((header, index) => {
-                            client[header] = values[index];
-                        });
-                        clientsToUpload.push(client);
-                    }
-                } else {
-                    setMessage('Unsupported file type.');
-                    return;
-                }
-                const uploadPromises = clientsToUpload.map((client) =>
-                    fetch(`${API_BASE_URL}/api/clients`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(client),
-                    })
-                );
-                const results = await Promise.allSettled(uploadPromises);
-                const successfulUploads = results.filter(
-                    (res) => res.status === 'fulfilled' && res.value.ok
-                ).length;
-                setMessage(
-                    `${successfulUploads} out of ${clientsToUpload.length} clients uploaded successfully.`
-                );
-                const res = await fetch(`${API_BASE_URL}/api/clients`);
-                const updatedClientsData = await res.json();
-                setClients(
-                    updatedClientsData.sort(
-                        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-                    )
-                );
-            } catch (error) {
-                console.error('Error uploading clients:', error);
-                setMessage(
-                    'Failed to upload clients. Please check file format.'
-                );
-            }
-        };
-        reader.readAsText(file);
-    };
-
-    const handleEditClick = (client) => {
-        setName(client.name);
-        setEmail(client.email);
-        setPhone(client.phone);
-        setIndustry(client.industry || '');
-        setNotes(client.notes || '');
-        setEditingClientId(client._id);
-    };
-
-    const handleDeleteClick = (clientId) => {
-        setClientToDeleteId(clientId);
-        setShowDeleteModal(true);
-    };
-
-    const confirmDelete = async () => {
-        try {
-            const res = await fetch(
-                `${API_BASE_URL}/api/clients/${clientToDeleteId}`,
-                { method: 'DELETE' }
-            );
-            if (!res.ok) throw new Error('Failed to delete client.');
-            setClients((prevClients) =>
-                prevClients.filter((c) => c._id !== clientToDeleteId)
-            );
-            setMessage('Client deleted successfully!');
-            setShowDeleteModal(false);
-            setClientToDeleteId(null);
-        } catch (error) {
-            console.error('Error deleting client:', error);
-            setMessage('Failed to delete client.');
-        }
-    };
-
-    const resetForm = () => {
-        setName('');
-        setEmail('');
-        setPhone('');
-        setIndustry('');
-        setNotes('');
-        setEditingClientId(null);
-    };
-
-    const showCommunicationHistory = (client) => {
-        setSelectedClient(client);
-        setShowHistoryModal(true);
-    };
-
-    const filteredClients = clients.filter(
-        (client) =>
-            client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            client.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (client.industry &&
-                client.industry
-                    .toLowerCase()
-                    .includes(searchTerm.toLowerCase()))
-    );
-
-    const ClientItem = ({ client }) => (
-        <li className="flex flex-col sm:flex-row sm:items-center justify-between p-6 bg-gray-50 rounded-2xl border border-gray-200">
-            <div className="flex-1">
-                <p className="text-lg font-semibold text-gray-800">
-                    {client.name}
-                </p>
-                <p className="text-sm text-gray-500 mt-1">
-                    Email: {client.email}
-                </p>
-                {client.phone && (
-                    <p className="text-sm text-gray-500">
-                        Phone: {client.phone}
-                    </p>
-                )}
-                {client.industry && (
-                    <p className="text-sm text-gray-500">
-                        Industry: {client.industry}
-                    </p>
-                )}
-                {client.leadStatus && (
-                    <p className="text-sm text-gray-500 font-medium">
-                        Status: {client.leadStatus}
-                    </p>
-                )}
-            </div>
-            <div className="flex space-x-2 mt-4 sm:mt-0">
-                <button
-                    onClick={() => handleEditClick(client)}
-                    className="px-2 py-1 text-xs rounded-xl font-semibold bg-white text-blue-600 border border-blue-600 hover:bg-blue-50 transition-colors"
-                >
-                    Edit
-                </button>
-                <button
-                    onClick={() => handleDeleteClick(client._id)}
-                    className="px-2 py-1 text-xs rounded-xl font-semibold bg-white text-red-600 border border-red-600 hover:bg-red-50 transition-colors"
-                >
-                    Delete
-                </button>
-                <button
-                    onClick={() => showCommunicationHistory(client)}
-                    className="px-2 py-1 text-xs rounded-xl font-semibold bg-white text-gray-600 border border-gray-400 hover:bg-gray-100 transition-colors"
-                >
-                    History
-                </button>
-            </div>
-        </li>
-    );
-
-    return (
-        <div className="space-y-12">
-            {message && (
-                <div
-                    className="bg-blue-50 border border-blue-200 text-blue-700 p-6 rounded-2xl shadow-md"
-                    role="alert"
-                >
-                    <p>{message}</p>
-                </div>
-            )}
-
-            {showDeleteModal && (
-                <Modal
-                    title="Confirm Delete"
-                    message="Are you sure you want to delete this client? This action cannot be undone."
-                    onConfirm={confirmDelete}
-                    onCancel={() => setShowDeleteModal(false)}
-                />
-            )}
-
-            {showHistoryModal && selectedClient && (
-                <Modal
-                    title={`History for ${selectedClient.name}`}
-                    onConfirm={() => setShowHistoryModal(false)}
-                    confirmText="Close"
-                >
-                    {selectedClient.communicationHistory &&
-                    selectedClient.communicationHistory.length > 0 ? (
-                        <div className="space-y-4 max-h-96 overflow-y-auto">
-                            {selectedClient.communicationHistory.map(
-                                (item, index) => (
-                                    <div
-                                        key={index}
-                                        className="bg-gray-100 p-4 rounded-xl"
-                                    >
-                                        <p className="text-sm font-semibold">
-                                            {item.type} on{' '}
-                                            {new Date(
-                                                item.date
-                                            ).toLocaleString()}
-                                        </p>
-                                        <p className="text-xs text-gray-600 mt-1">
-                                            {item.message}
-                                        </p>
-                                    </div>
-                                )
-                            )}
-                        </div>
-                    ) : (
-                        <p className="text-gray-500">
-                            No communication history found.
-                        </p>
-                    )}
-                </Modal>
-            )}
-
-            <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-200">
-                <h3 className="text-2xl font-bold text-gray-800 mb-6">
-                    {editingClientId ? 'Edit Client' : 'Add Client Manually'}
-                </h3>
-                <form onSubmit={handleFormSubmit} className="space-y-6">
-                    <input
-                        type="text"
-                        placeholder="Name *"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-                    />
-                    <input
-                        type="email"
-                        placeholder="Email *"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-                    />
-                    <input
-                        type="tel"
-                        placeholder="Phone"
-                        value={phone}
-                        onChange={(e) => setPhone(e.target.value)}
-                        className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-                    />
-                    <input
-                        type="text"
-                        placeholder="Industry (e.g., Tech, Finance)"
-                        value={industry}
-                        onChange={(e) => setIndustry(e.target.value)}
-                        className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-                    />
-                    <textarea
-                        placeholder="Notes"
-                        value={notes}
-                        onChange={(e) => setNotes(e.target.value)}
-                        rows="3"
-                        className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-                    ></textarea>
-                    <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                        <button
-                            type="submit"
-                            className="flex-1 bg-white text-blue-600 border border-blue-600 px-8 py-3 rounded-full font-semibold hover:bg-blue-50 transition-colors shadow-md"
-                        >
-                            {editingClientId ? 'Update Client' : 'Add Client'}
-                        </button>
-                        {editingClientId && (
-                            <button
-                                type="button"
-                                onClick={resetForm}
-                                className="flex-1 bg-white text-gray-600 border border-gray-400 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors"
-                            >
-                                Cancel
-                            </button>
-                        )}
-                    </div>
-                </form>
-            </div>
-
-            <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-200">
-                <h3 className="text-2xl font-bold text-gray-800 mb-6">
-                    Upload Clients (JSON or CSV)
-                </h3>
-                <input
-                    type="file"
-                    accept=".json, .csv"
-                    onChange={handleFileUpload}
-                    className="w-full text-gray-700 border border-gray-300 rounded-xl p-3 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 transition-colors"
-                />
-            </div>
-
-            <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-200">
-                <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
-                    <h3 className="text-2xl font-bold text-gray-800 mb-4 sm:mb-0">
-                        All Clients
-                    </h3>
-                    <input
-                        type="text"
-                        placeholder="Search clients..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full sm:w-1/2 p-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-                    />
-                </div>
-                {filteredClients.length > 0 ? (
-                    <ul className="space-y-4">
-                        {filteredClients.map((client) => (
-                            <ClientItem key={client._id} client={client} />
-                        ))}
-                    </ul>
-                ) : (
-                    <p className="text-gray-500 text-lg">
-                        No clients found. Add one above!
-                    </p>
-                )}
-            </div>
-        </div>
-    );
-};
-
-const Campaigns = ({ clients, campaigns, setCampaigns }) => {
-    const [campaignName, setCampaignName] = useState('');
-    const [advertTitle, setAdvertTitle] = useState('');
-    const [message, setMessage] = useState('');
-    const [imageUrl, setImageUrl] = useState('');
-    const [campaignMessage, setCampaignMessage] = useState('');
-    const [isSending, setIsSending] = useState(false);
-    const [editingCampaignId, setEditingCampaignId] = useState(null);
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [campaignToDeleteId, setCampaignToDeleteId] = useState(null);
-    const [emailPreview, setEmailPreview] = useState(null);
-    const [sendConfirmation, setSendConfirmation] = useState(null);
-
-    // Automatically generate previews when relevant state changes
-    useEffect(() => {
-        if (
-            advertTitle.trim() !== '' ||
-            message.trim() !== '' ||
-            imageUrl.trim() !== ''
-        ) {
-            generatePreviews();
-        } else {
-            setEmailPreview(null);
-        }
-    }, [advertTitle, message, imageUrl]);
-
-    const generatePreviews = () => {
-        // A simple preview with placeholders
-        const personalizedMessage = message
-            .replace(/\[client\.name\]/g, 'John Doe')
-            .replace(/\[client\.email\]/g, 'john.doe@example.com');
-
-        setEmailPreview(
-            <div className="bg-gray-100 p-6 rounded-lg border border-gray-200">
-                <h4 className="text-xl font-bold text-gray-800 mb-2">
-                    {advertTitle}
-                </h4>
-                {imageUrl && (
-                    <img
-                        src={imageUrl}
-                        alt="Advert"
-                        className="w-full h-auto object-cover rounded-lg mb-4"
-                    />
-                )}
-                <p className="text-gray-600 leading-relaxed whitespace-pre-wrap">
-                    {personalizedMessage}
-                </p>
-            </div>
-        );
-    };
-
-    const resetForm = () => {
-        setCampaignName('');
-        setAdvertTitle('');
-        setMessage('');
-        setImageUrl('');
-        setEmailPreview(null);
-        setEditingCampaignId(null);
-    };
-
-    const handleCreateCampaign = async (e) => {
-        e.preventDefault();
-        if (!campaignName || !advertTitle || !message) {
-            setCampaignMessage('Please fill in all required fields.');
-            return;
-        }
-        try {
-            const payload = { campaignName, advertTitle, message, imageUrl };
-            const res = await fetch(
-                `${API_BASE_URL}/api/campaigns${
-                    editingCampaignId ? `/${editingCampaignId}` : ''
-                }`,
-                {
-                    method: editingCampaignId ? 'PUT' : 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
-                }
-            );
-            if (!res.ok) throw new Error('Failed to submit campaign.');
-            const campaignData = await res.json();
-            if (editingCampaignId) {
-                setCampaigns((prev) =>
-                    prev.map((c) =>
-                        c._id === campaignData._id ? campaignData : c
-                    )
-                );
-                setCampaignMessage('Campaign updated successfully!');
-            } else {
-                setCampaigns((prev) => [campaignData, ...prev]);
-                setCampaignMessage('Campaign created successfully!');
-            }
-            resetForm();
-        } catch (error) {
-            console.error('Error submitting campaign:', error);
-            setCampaignMessage(
-                `Failed to ${editingCampaignId ? 'update' : 'create'} campaign.`
-            );
-        }
-    };
-
-    const handleEditClick = (campaign) => {
-        setEditingCampaignId(campaign._id);
-        setCampaignName(campaign.campaignName);
-        setAdvertTitle(campaign.advertTitle);
-        setMessage(campaign.message);
-        setImageUrl(campaign.imageUrl);
-        generatePreviews();
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
-
-    const handleDeleteClick = (campaignId) => {
-        setCampaignToDeleteId(campaignId);
-        setShowDeleteModal(true);
-    };
-
-    const confirmDelete = async () => {
-        try {
-            const res = await fetch(
-                `${API_BASE_URL}/api/campaigns/${campaignToDeleteId}`,
-                { method: 'DELETE' }
-            );
-            if (!res.ok) throw new Error('Failed to delete campaign.');
-            setCampaigns((prev) =>
-                prev.filter((c) => c._id !== campaignToDeleteId)
-            );
-            setCampaignMessage('Campaign deleted successfully!');
-            setShowDeleteModal(false);
-            setCampaignToDeleteId(null);
-        } catch (error) {
-            console.error('Error deleting campaign:', error);
-            setCampaignMessage('Failed to delete campaign.');
-        }
-    };
-
-    const handleSendAd = async (campaign) => {
-        if (clients.length === 0) {
-            setSendConfirmation({
-                message: 'Cannot send. There are no clients to send to.',
-            });
-            return;
-        }
-        setIsSending(true);
-        try {
-            const res = await fetch(`${API_BASE_URL}/api/send/ad`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ campaignId: campaign._id }),
-            });
-            if (!res.ok) throw new Error('Failed to send campaign.');
-            const updatedCampaignData = await res.json();
-            setCampaigns((prev) =>
-                prev.map((c) =>
-                    c._id === updatedCampaignData.campaign._id
-                        ? updatedCampaignData.campaign
-                        : c
-                )
-            );
-            setSendConfirmation({
-                message: `Campaign "${campaign.campaignName}" successfully sent to all clients.`,
-            });
-        } catch (error) {
-            console.error('Error sending campaign:', error);
-            setSendConfirmation({
-                message: 'An error occurred while sending the campaign.',
-            });
-        } finally {
-            setIsSending(false);
-        }
-    };
-
-    const CampaignItem = ({ campaign }) => (
-        <li className="flex flex-col sm:flex-row sm:items-center justify-between p-6 bg-gray-50 rounded-2xl border border-gray-200">
-            <div className="flex-1">
-                <p className="text-lg font-semibold text-gray-800">
-                    {campaign.campaignName}
-                </p>
-                <p className="text-sm text-gray-500 mt-1">
-                    Created: {new Date(campaign.createdAt).toLocaleDateString()}
-                    {campaign.status === 'sent' &&
-                        campaign.sentAt &&
-                        ` | Sent: ${new Date(
-                            campaign.sentAt
-                        ).toLocaleDateString()}`}
-                </p>
-                <p
-                    className={`text-sm font-semibold mt-2 ${
-                        campaign.status === 'sent'
-                            ? 'text-green-700'
-                            : 'text-orange-700'
-                    }`}
-                >
-                    Status:{' '}
-                    {campaign.status.charAt(0).toUpperCase() +
-                        campaign.status.slice(1)}
-                </p>
-            </div>
-            <div className="flex space-x-2 mt-4 sm:mt-0">
-                <button
-                    onClick={() => handleEditClick(campaign)}
-                    className="px-2 py-1 text-xs rounded-xl font-semibold bg-white text-blue-600 border border-blue-600 hover:bg-blue-50 transition-colors"
-                >
-                    Edit
-                </button>
-                <button
-                    onClick={() => handleDeleteClick(campaign._id)}
-                    className="px-2 py-1 text-xs rounded-xl font-semibold bg-white text-red-600 border border-red-600 hover:bg-red-50 transition-colors"
-                >
-                    Delete
-                </button>
-                <button
-                    onClick={() => handleSendAd(campaign)}
-                    disabled={isSending || campaign.status === 'sent'}
-                    className={`px-2 py-1 text-xs rounded-xl font-semibold transition-colors ${
-                        isSending || campaign.status === 'sent'
-                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                            : 'bg-white text-blue-600 border border-blue-600 hover:bg-blue-50'
-                    }`}
-                >
-                    {isSending ? 'Sending...' : 'Send Ad'}
-                </button>
-            </div>
-        </li>
-    );
-
-    return (
-        <div className="space-y-12">
-            {campaignMessage && (
-                <div
-                    className="bg-blue-50 border border-blue-200 text-blue-700 p-6 rounded-2xl shadow-md"
-                    role="alert"
-                >
-                    <p>{campaignMessage}</p>
-                </div>
-            )}
-
-            {sendConfirmation && (
-                <Modal
-                    title="Campaign Status"
-                    message={sendConfirmation.message}
-                    onConfirm={() => setSendConfirmation(null)}
-                    confirmText="Close"
-                />
-            )}
-
-            {showDeleteModal && (
-                <Modal
-                    title="Confirm Delete"
-                    message="Are you sure you want to delete this campaign? This action cannot be undone."
-                    onConfirm={confirmDelete}
-                    onCancel={() => setShowDeleteModal(false)}
-                />
-            )}
-
-            <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-200">
-                <h3 className="text-2xl font-bold text-gray-800 mb-6">
-                    {editingCampaignId
-                        ? 'Edit Campaign'
-                        : 'Create a New Campaign'}
-                </h3>
-                <p className="text-sm text-gray-500 mb-6">
-                    Use placeholders like{' '}
-                    <code className="bg-gray-200 p-1 rounded text-gray-700">
-                        [client.name]
-                    </code>{' '}
-                    and{' '}
-                    <code className="bg-gray-200 p-1 rounded text-gray-700">
-                        [client.email]
-                    </code>{' '}
-                    in your message to personalize it.
-                </p>
-                <form onSubmit={handleCreateCampaign} className="space-y-6">
-                    <input
-                        type="text"
-                        placeholder="Campaign Name *"
-                        value={campaignName}
-                        onChange={(e) => setCampaignName(e.target.value)}
-                        className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-                    />
-                    <input
-                        type="text"
-                        placeholder="Advert Title *"
-                        value={advertTitle}
-                        onChange={(e) => setAdvertTitle(e.target.value)}
-                        className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-                    />
-                    <textarea
-                        placeholder="Advert Message *"
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                        rows="5"
-                        className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-                    ></textarea>
-                    <input
-                        type="url"
-                        placeholder="Image URL (optional)"
-                        value={imageUrl}
-                        onChange={(e) => setImageUrl(e.target.value)}
-                        className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-                    />
-
-                    <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                        <button
-                            type="submit"
-                            className="flex-1 bg-white text-blue-600 border border-blue-600 px-8 py-3 rounded-full font-semibold hover:bg-blue-50 transition-colors shadow-md"
-                        >
-                            {editingCampaignId
-                                ? 'Update Campaign'
-                                : 'Create Campaign'}
-                        </button>
-                    </div>
-                    {editingCampaignId && (
-                        <button
-                            type="button"
-                            onClick={resetForm}
-                            className="w-full mt-4 bg-white text-gray-600 border border-gray-400 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors"
-                        >
-                            Cancel
-                        </button>
-                    )}
-                </form>
-            </div>
-
-            {emailPreview && (
-                <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-200 space-y-8">
-                    <h3 className="text-2xl font-bold text-gray-800">
-                        Advert Preview
-                    </h3>
-                    {emailPreview}
-                </div>
-            )}
-
-            <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-200">
-                <h3 className="text-2xl font-bold text-gray-800 mb-6">
-                    Saved Campaigns
-                </h3>
-                {campaigns.length > 0 ? (
-                    <ul className="space-y-4">
-                        {campaigns.map((campaign) => (
-                            <CampaignItem
-                                key={campaign._id}
-                                campaign={campaign}
+                                d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-3.961a18.06 18.06 0 01-13.486-13.486V5a2 2 0 012-2z"
                             />
-                        ))}
-                    </ul>
-                ) : (
-                    <p className="text-gray-500 text-lg">
-                        No campaigns found. Create a new one above!
-                    </p>
-                )}
-            </div>
-        </div>
-    );
-};
-
-const SalesPipeline = ({ salesPipeline, setSalesPipeline }) => {
-    const sensors = useSensors(
-        useSensor(PointerSensor, {
-            activationConstraint: {
-                distance: 8,
-            },
-        })
-    );
-
-    const onDragEnd = async (event) => {
-        const { active, over } = event;
-        const fromStatus = active.data.current.status;
-        const toStatus = over?.id;
-
-        if (!over || fromStatus === toStatus) {
-            return;
-        }
-
-        const clientId = active.id;
-        const clientToMove = salesPipeline[fromStatus].find(
-            (c) => c.id === clientId
-        );
-
-        const fromIndex = salesPipeline[fromStatus].indexOf(clientToMove);
-        const toIndex = over.data.current.sortable.index;
-
-        // Optimistically update the UI
-        const newPipeline = { ...salesPipeline };
-        newPipeline[fromStatus] = salesPipeline[fromStatus].filter(
-            (c) => c.id !== clientId
-        );
-        newPipeline[toStatus] = [
-            ...newPipeline[toStatus].slice(0, toIndex),
-            clientToMove,
-            ...newPipeline[toStatus].slice(toIndex),
-        ];
-        setSalesPipeline(newPipeline);
-
-        try {
-            await fetch(`${API_BASE_URL}/api/sales-pipeline/update`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ clientId, fromStatus, toStatus }),
-            });
-        } catch (error) {
-            console.error('Failed to update sales pipeline:', error);
-            // Revert the UI on error
-            const originalPipeline = { ...salesPipeline };
-            setSalesPipeline(originalPipeline);
-        }
-    };
-
-    const ClientCard = ({ client }) => {
-        const { attributes, listeners, setNodeRef, transform, transition } =
-            useDraggable({
-                id: client.id,
-                data: { status: client.leadStatus },
-            });
-
-        const style = {
-            transform: CSS.Transform.toString(transform),
-            transition,
-        };
-
-        return (
-            <div
-                ref={setNodeRef}
-                style={style}
-                {...listeners}
-                {...attributes}
-                className="p-4 bg-white rounded-xl shadow-md border border-gray-200 mb-4 cursor-grab active:cursor-grabbing transition-all duration-200 hover:shadow-lg"
-            >
-                <h4 className="font-semibold text-gray-800">{client.name}</h4>
-                <p className="text-sm text-gray-500">{client.email}</p>
-            </div>
-        );
-    };
-
-    const Column = ({ status, clients }) => {
-        const { setNodeRef } = useDroppable({
-            id: status,
-        });
-
-        const clientIds = clients.map((c) => c.id);
-
-        return (
-            <div className="flex-1 bg-gray-200 p-4 rounded-3xl shadow-inner min-w-[280px]">
-                <h3 className="text-lg font-bold text-gray-700 mb-4">
-                    {status} ({clients.length})
-                </h3>
-                <div ref={setNodeRef} className="min-h-[200px]">
-                    <SortableContext
-                        items={clientIds}
-                        strategy={verticalListSortingStrategy}
-                    >
-                        {clients.map((client) => (
-                            <ClientCard key={client.id} client={client} />
-                        ))}
-                    </SortableContext>
-                </div>
-            </div>
-        );
-    };
-
-    return (
-        <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-200">
-            <h2 className="text-3xl font-bold text-gray-900 mb-8">
-                Sales Pipeline
-            </h2>
-            <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={onDragEnd}
-            >
-                <div className="flex flex-col md:flex-row gap-6 overflow-x-auto pb-4">
-                    {salesPipeline &&
-                        Object.entries(salesPipeline)
-                            .filter(([key]) => key !== '_id' && key !== '__v')
-                            .map(([status, clients]) => (
-                                <Column
-                                    key={status}
-                                    status={status}
-                                    clients={clients}
-                                />
-                            ))}
-                </div>
-            </DndContext>
-        </div>
-    );
-};
-
-const Projects = ({ projects, setProjects }) => {
-    const [projectName, setProjectName] = useState('');
-    const [projectDescription, setProjectDescription] = useState('');
-    const [tasks, setTasks] = useState('');
-    const [message, setMessage] = useState('');
-    const [editingProjectId, setEditingProjectId] = useState(null);
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [projectToDeleteId, setProjectToDeleteId] = useState(null);
-
-    const handleFormSubmit = async (e) => {
-        e.preventDefault();
-        if (!projectName) {
-            setMessage('Please enter a project name.');
-            return;
-        }
-        const taskList = tasks.split('\n').filter((t) => t.trim() !== '');
-
-        try {
-            const payload = {
-                projectName,
-                projectDescription,
-                tasks: taskList,
-            };
-            const res = await fetch(
-                `${API_BASE_URL}/api/projects${
-                    editingProjectId ? `/${editingProjectId}` : ''
-                }`,
-                {
-                    method: editingProjectId ? 'PUT' : 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload),
-                }
-            );
-            if (!res.ok) throw new Error('Failed to submit project data.');
-            const projectData = await res.json();
-
-            if (editingProjectId) {
-                setProjects((prev) =>
-                    prev.map((p) =>
-                        p._id === projectData._id ? projectData : p
-                    )
-                );
-                setMessage('Project updated successfully!');
-            } else {
-                setProjects((prev) => [projectData, ...prev]);
-                setMessage('Project created successfully!');
-            }
-            resetForm();
-        } catch (error) {
-            console.error('Error submitting project data:', error);
-            setMessage(
-                `Failed to ${editingProjectId ? 'update' : 'create'} project.`
-            );
-        }
-    };
-
-    const handleEditClick = (project) => {
-        setProjectName(project.projectName);
-        setProjectDescription(project.projectDescription);
-        setTasks(project.tasks.join('\n'));
-        setEditingProjectId(project._id);
-    };
-
-    const handleDeleteClick = (projectId) => {
-        setProjectToDeleteId(projectId);
-        setShowDeleteModal(true);
-    };
-
-    const confirmDelete = async () => {
-        try {
-            const res = await fetch(
-                `${API_BASE_URL}/api/projects/${projectToDeleteId}`,
-                { method: 'DELETE' }
-            );
-            if (!res.ok) throw new Error('Failed to delete project.');
-            setProjects((prev) =>
-                prev.filter((p) => p._id !== projectToDeleteId)
-            );
-            setMessage('Project deleted successfully!');
-            setShowDeleteModal(false);
-            setProjectToDeleteId(null);
-        } catch (error) {
-            console.error('Error deleting project:', error);
-            setMessage('Failed to delete project.');
-        }
-    };
-
-    const resetForm = () => {
-        setProjectName('');
-        setProjectDescription('');
-        setTasks('');
-        setEditingProjectId(null);
-    };
-
-    const ProjectItem = ({ project }) => (
-        <li className="p-6 bg-gray-50 rounded-2xl border border-gray-200">
-            <div className="flex justify-between items-start">
-                <div className="flex-1 pr-4">
-                    <p className="text-xl font-semibold text-gray-800">
-                        {project.projectName}
-                    </p>
-                    {project.projectDescription && (
-                        <p className="text-sm text-gray-500 mt-1">
-                            {project.projectDescription}
+                        </svg>
+                        <p className="flex-1 min-w-0 break-words">
+                            [555] 123 5674
                         </p>
-                    )}
-                    <div className="mt-4">
-                        <h4 className="text-sm font-semibold text-gray-600 mb-2">
-                            Tasks
-                        </h4>
-                        {project.tasks && project.tasks.length > 0 ? (
-                            <ul className="list-disc list-inside space-y-1 text-sm text-gray-700">
-                                {project.tasks.map((task, index) => (
-                                    <li key={index}>{task}</li>
-                                ))}
-                            </ul>
-                        ) : (
-                            <p className="text-sm text-gray-500">
-                                No tasks defined.
-                            </p>
-                        )}
+                    </div>
+                    {/* Email */}
+                    <div className="flex items-start">
+                        <svg
+                            className="h-4 w-4 flex-shrink-0 mr-2"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8m-17 4v7a2 2 0 002 2h14a2 2 0 002-2v-7"
+                            />
+                        </svg>
+                        <p className="flex-1 min-w-0 break-words">
+                            mj19@gmail.com
+                        </p>
                     </div>
                 </div>
-                <div className="flex flex-col space-y-2">
-                    <button
-                        onClick={() => handleEditClick(project)}
-                        className="px-2 py-1 text-xs rounded-xl font-semibold bg-white text-blue-600 border border-blue-600 hover:bg-blue-50 transition-colors"
-                    >
-                        Edit
-                    </button>
-                    <button
-                        onClick={() => handleDeleteClick(project._id)}
-                        className="px-2 py-1 text-xs rounded-xl font-semibold bg-white text-red-600 border border-red-600 hover:bg-red-50 transition-colors"
-                    >
-                        Delete
-                    </button>
-                </div>
-            </div>
-        </li>
-    );
-
-    return (
-        <div className="space-y-12">
-            {message && (
-                <div
-                    className="bg-blue-50 border border-blue-200 text-blue-700 p-6 rounded-2xl shadow-md"
-                    role="alert"
-                >
-                    <p>{message}</p>
-                </div>
-            )}
-
-            {showDeleteModal && (
-                <Modal
-                    title="Confirm Delete"
-                    message="Are you sure you want to delete this project? This action cannot be undone."
-                    onConfirm={confirmDelete}
-                    onCancel={() => setShowDeleteModal(false)}
-                />
-            )}
-
-            <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-200">
-                <h3 className="text-2xl font-bold text-gray-800 mb-6">
-                    {editingProjectId ? 'Edit Project' : 'Create a New Project'}
-                </h3>
-                <form onSubmit={handleFormSubmit} className="space-y-6">
-                    <input
-                        type="text"
-                        placeholder="Project Name *"
-                        value={projectName}
-                        onChange={(e) => setProjectName(e.target.value)}
-                        className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-                    />
-                    <textarea
-                        placeholder="Project Description"
-                        value={projectDescription}
-                        onChange={(e) => setProjectDescription(e.target.value)}
-                        rows="3"
-                        className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-                    ></textarea>
-                    <textarea
-                        placeholder="Tasks (one per line)"
-                        value={tasks}
-                        onChange={(e) => setTasks(e.target.value)}
-                        rows="5"
-                        className="w-full p-4 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
-                    ></textarea>
-                    <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
-                        <button
-                            type="submit"
-                            className="flex-1 bg-white text-blue-600 border border-blue-600 px-8 py-3 rounded-full font-semibold hover:bg-blue-50 transition-colors shadow-md"
-                        >
-                            {editingProjectId
-                                ? 'Update Project'
-                                : 'Create Project'}
-                        </button>
-                    </div>
-                    {editingProjectId && (
-                        <button
-                            type="button"
-                            onClick={resetForm}
-                            className="w-full mt-4 bg-white text-gray-600 border border-gray-400 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors"
-                        >
-                            Cancel
-                        </button>
-                    )}
-                </form>
-            </div>
-
-            <div className="bg-white p-8 rounded-3xl shadow-xl border border-gray-200">
-                <h3 className="text-2xl font-bold text-gray-800 mb-6">
-                    All Projects
-                </h3>
-                {projects.length > 0 ? (
-                    <ul className="space-y-4">
-                        {projects.map((project) => (
-                            <ProjectItem key={project._id} project={project} />
-                        ))}
-                    </ul>
-                ) : (
-                    <p className="text-gray-500 text-lg">
-                        No projects found. Create one above!
-                    </p>
-                )}
             </div>
         </div>
     );
 };
 
-const Modal = ({
-    title,
-    message,
-    onConfirm,
-    onCancel,
-    confirmText = 'Confirm',
-    children,
-}) => (
-    <div className="fixed inset-0 bg-gray-900 bg-opacity-70 flex items-center justify-center p-4 z-50">
-        <div className="bg-white p-8 rounded-2xl shadow-2xl max-w-sm w-full text-center">
-            <h3 className="text-2xl font-bold text-gray-800 mb-4">{title}</h3>
-            {message && <p className="text-gray-600 mb-6">{message}</p>}
-            {children}
-            <div className="flex justify-center space-x-4 mt-6">
-                {onCancel && (
-                    <button
-                        onClick={onCancel}
-                        className="px-6 py-3 rounded-full font-semibold bg-white text-gray-700 border border-gray-400 hover:bg-gray-100 transition-colors"
-                    >
-                        Cancel
-                    </button>
-                )}
-                <button
-                    onClick={onConfirm}
-                    className={`px-6 py-3 rounded-full font-semibold ${
-                        onCancel
-                            ? 'bg-white text-red-600 border border-red-600 hover:bg-red-50'
-                            : 'bg-white text-blue-600 border border-blue-600 hover:bg-blue-50'
-                    } transition-colors`}
-                >
-                    {confirmText}
-                </button>
+// Reusable Summary Card component (used in summary view)
+const SummaryCard = ({ title, count, description, onClick }) => (
+    <div
+        className="bg-white p-6 rounded-2xl shadow-lg border border-[#DEE2E6] hover:shadow-xl transition-all duration-300 w-full cursor-pointer transform hover:scale-[1.02]"
+        onClick={onClick}
+    >
+        <div className="flex justify-between items-start mb-4">
+            <h2 className="text-xl font-bold text-[#130F0F]">{title}</h2>
+            <div className="text-3xl font-extrabold text-[#26A248] bg-[#E7F7EB] px-4 py-2 rounded-xl shadow-inner min-w-16 text-center">
+                {count}
             </div>
+        </div>
+        <p className="text-sm text-[#868281] mt-2">{description}</p>
+        <div className="border-t border-gray-200 mt-4 pt-4 flex justify-between items-center">
+            <span className="text-sm font-medium text-[#26A248] hover:text-[#1F813A] transition-colors">
+                View Details &rarr;
+            </span>
         </div>
     </div>
 );
+
+// --- New Quick Action Card Component ---
+const QuickActionCard = ({ title, subtitle, items, icon, colorClass }) => (
+    <div
+        className={`p-6 rounded-2xl shadow-xl border-l-4 ${colorClass} bg-white transition-all duration-300 hover:shadow-2xl`}
+    >
+        <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center">
+                <div className="mr-3">{icon}</div>
+                <div>
+                    <h3 className="text-xl font-extrabold text-[#130F0F]">
+                        {title}
+                    </h3>
+                    <p className="text-sm text-gray-500">{subtitle}</p>
+                </div>
+            </div>
+            <span className="text-2xl font-extrabold text-gray-800 bg-gray-100 px-3 py-1 rounded-lg">
+                {items.length}
+            </span>
+        </div>
+
+        <ul className="space-y-3 mt-4">
+            {items.map((item, index) => (
+                <li
+                    key={index}
+                    className="flex justify-between items-center p-3 bg-white rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer"
+                >
+                    <div className="min-w-0 flex-1 mr-3">
+                        <p className="font-semibold text-sm truncate text-[#130F0F]">
+                            {item.title || item.name}
+                        </p>
+                        {item.lastContact && (
+                            <p className="text-xs text-red-500 flex items-center mt-1">
+                                <Clock size={12} className="mr-1" />
+                                Last contact: {item.lastContact}
+                            </p>
+                        )}
+                        {item.campaign && (
+                            <p className="text-xs text-gray-500 mt-1">
+                                Campaign:{' '}
+                                <span className="font-medium text-gray-700">
+                                    {item.campaign}
+                                </span>
+                            </p>
+                        )}
+                    </div>
+                    <button
+                        className="text-sm text-[#26A248] hover:text-[#1F813A] font-medium flex-shrink-0"
+                        onClick={() =>
+                            console.log(
+                                `ACTION: Quick action for ${
+                                    item.name || item.title
+                                }`
+                            )
+                        }
+                    >
+                        Go &rarr;
+                    </button>
+                </li>
+            ))}
+            {items.length === 0 && (
+                <li className="text-center py-4 text-gray-500 italic text-sm">
+                    All clear! No urgent actions needed.
+                </li>
+            )}
+        </ul>
+    </div>
+);
+
+// Main App component
+export default function App() {
+    // Page state: 'Dashboard' (new default), 'Summary' (Sales Center Summary), or 'List'
+    const [page, setPage] = useState('Dashboard');
+    // List states
+    const [activeCategory, setActiveCategory] = useState('Contacts');
+    const [viewMode, setViewMode] = useState('recents');
+    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [isModalOpen, setIsModalOpen] = useState(false); // State for New Contact Modal
+    const contactsPerPage = 13;
+
+    // Modal handlers
+    const openModal = () => setIsModalOpen(true);
+    const closeModal = () => setIsModalOpen(false);
+
+    // --- Dummy Data ---
+    const allContacts = [
+        { name: 'Mandevo', date: 'Jan 5, 2025' },
+        { name: 'Mike Wong', date: 'Jan 5, 2025' },
+        { name: 'Esther Howard', date: 'Jan 5, 2025' },
+        { name: 'Mark Henry', date: 'Jan 5, 2025' },
+        { name: 'Peter Klaven', date: 'Jan 5, 2025' },
+        { name: 'Blemix Koko', date: 'Jan 5, 2025' },
+        { name: 'Anita Capul', date: 'Jan 5, 2025' },
+        { name: 'John Paul', date: 'Jan 5, 2025' },
+        { name: 'Adeola Fry', date: 'Jan 5, 2025' },
+        { name: 'Cuppy Lane', date: 'Jan 5, 2025' },
+        { name: 'Jerry Maxwell', date: 'Jan 5, 2025' },
+        { name: 'Jessica Smith', date: 'Jan 6, 2025' },
+        { name: 'David Johnson', date: 'Jan 6, 2025' },
+        { name: 'Emily Davis', date: 'Jan 7, 2025' },
+        { name: 'Michael Brown', date: 'Jan 7, 2025' },
+        { name: 'Sarah Wilson', date: 'Jan 8, 2025' },
+        { name: 'Chris Miller', date: 'Jan 8, 2025' },
+        { name: 'Laura Garcia', date: 'Jan 9, 2025' },
+        { name: 'Daniel Martinez', date: 'Jan 9, 2025' },
+        { name: 'Maria Rodriguez', date: 'Jan 10, 2025' },
+        { name: 'Kevin Hernandez', date: 'Jan 10, 2025' },
+        { name: 'Linda Lopez', date: 'Jan 11, 2025' },
+        { name: 'James Perez', date: 'Jan 11, 2025' },
+        { name: 'Susan Torres', date: 'Jan 12, 2025' },
+        { name: 'Paul Rivera', date: 'Jan 12, 2025' },
+        { name: 'Nancy Hill', date: 'Jan 13, 2025' },
+        { name: 'Jason Scott', date: 'Jan 13, 2025' },
+    ];
+    const totalContacts = allContacts.length;
+
+    const allLeads = [
+        { name: 'John Doe', date: 'Dec 15, 2024' },
+        { name: 'Jane Smith', date: 'Dec 16, 2024' },
+        { name: 'Bob Johnson', date: 'Dec 17, 2024' },
+        { name: 'Alice Williams', date: 'Dec 18, 2024' },
+        { name: 'Charlie Brown', date: 'Dec 19, 2024' },
+        { name: 'Diana Prince', date: 'Dec 20, 2024' },
+        { name: 'Clark Kent', date: 'Dec 21, 2024' },
+        { name: 'Bruce Wayne', date: 'Dec 22, 2024' },
+        { name: 'Peter Parker', date: 'Dec 23, 2024' },
+        { name: 'Tony Stark', date: 'Dec 24, 2024' },
+        { name: 'Steve Rogers', date: 'Dec 25, 2024' },
+        { name: 'Thor Odinson', date: 'Dec 26, 2024' },
+        { name: 'Loki Laufeyson', date: 'Dec 27, 2024' },
+        { name: 'Natasha Romanoff', date: 'Dec 28, 2024' },
+        { name: 'Clint Barton', date: 'Dec 29, 2024' },
+    ];
+    const totalLeads = allLeads.length;
+
+    const totalCampaigns = 12;
+    const sentCampaigns = 9;
+
+    // --- Quick Action Dummy Data (NEW) ---
+    const contactsNeedingFollowUp = [
+        // Contacts untouched for 60+ days (simulated data)
+        {
+            id: 1,
+            name: 'Jessica Smith',
+            lastContact: 'Oct 20, 2024',
+            daysOverdue: 65,
+        },
+        {
+            id: 2,
+            name: 'David Johnson',
+            lastContact: 'Sep 25, 2024',
+            daysOverdue: 90,
+        },
+        // Removed Emily Davis as her simulated overdue days were < 60
+    ];
+
+    const pendingCampaignTasks = [
+        // Tasks related to open campaigns
+        {
+            id: 101,
+            title: 'Review Q1 Newsletter Draft',
+            campaign: 'Q1 Newsletter',
+            priority: 'High',
+        },
+        {
+            id: 102,
+            title: 'Finalize A/B Test Landing Page',
+            campaign: 'Holiday Promo',
+            priority: 'Medium',
+        },
+        {
+            id: 103,
+            title: 'Approve 5 new Lead submissions',
+            campaign: 'LinkedIn Ad',
+            priority: 'High',
+        },
+    ];
+    // --- END Quick Action Dummy Data ---
+
+    // --- DYNAMIC CHART DATA (Now for Campaigns Sent) ---
+    const campaignChartData = [
+        { label: 'Sun', value: 45 },
+        { label: 'Mon', value: 78 },
+        { label: 'Tue', value: 121 },
+        { label: 'Wed', value: 92 },
+        { label: 'Thu', value: 165 }, // Highest value
+        { label: 'Fri', value: 60 },
+        { label: 'Sat', value: 33 },
+    ];
+
+    // --- Helper Functions for List View ---
+
+    const dataToDisplay =
+        activeCategory === 'Contacts' ? allContacts : allLeads;
+    const totalPages = Math.ceil(dataToDisplay.length / contactsPerPage);
+    const startIndex = (currentPage - 1) * contactsPerPage;
+    const endIndex = startIndex + contactsPerPage;
+    const paginatedData = dataToDisplay.slice(startIndex, endIndex);
+
+    const handleDropdownSelect = (option) => {
+        setViewMode(option);
+        setIsDropdownOpen(false);
+        if (option === 'all') {
+            setCurrentPage(1); // Reset to first page when switching to 'All' view
+        }
+    };
+
+    // --- Context/Title Logic ---
+
+    const getPageContext = () => {
+        if (page === 'Dashboard') {
+            return {
+                title: 'Dashboard',
+                description: 'Key business metrics and campaign overview.',
+                breadcrumb: 'Dashboard',
+            };
+        }
+
+        if (page === 'Summary') {
+            return {
+                title: 'Sales Center',
+                description: 'Contacts and Leads management center',
+                breadcrumb: 'Sales Center',
+            };
+        }
+
+        // List view context (page === 'List')
+        const categoryContent =
+            activeCategory === 'Contacts'
+                ? {
+                      title: 'Contacts',
+                      description:
+                          'List of people or organizations for communication',
+                  }
+                : {
+                      title: 'Leads',
+                      description:
+                          'List of people or organizations that have been targeted for advertising',
+                  };
+
+        return {
+            title: categoryContent.title,
+            description: categoryContent.description,
+            breadcrumb: `${categoryContent.title}`,
+        };
+    };
+
+    const { title, description, breadcrumb } = getPageContext();
+
+    // --- Render Functions for different pages ---
+
+    const renderDashboard = () => (
+        <>
+            {/* Title/Description for Dashboard Page */}
+            <div className="mb-6">
+                <h1 className="text-3xl font-bold mb-1">{title}</h1>
+                <p className="text-md text-[#2F2F2F]">{description}</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-6">
+                <SummaryCard
+                    title="Total Contacts"
+                    count={totalContacts}
+                    description="All individuals and organizations in your communication network."
+                    onClick={() => {
+                        setActiveCategory('Contacts');
+                        setPage('List');
+                        setViewMode('all');
+                    }}
+                />
+                <SummaryCard
+                    title="Active Leads"
+                    count={totalLeads}
+                    description="Potential customers targeted by ongoing marketing campaigns."
+                    onClick={() => {
+                        setActiveCategory('Leads');
+                        setPage('List');
+                        setViewMode('all');
+                    }}
+                />
+                <SummaryCard
+                    title="Total Campaigns"
+                    count={totalCampaigns}
+                    description="The total number of marketing initiatives defined and tracked."
+                    onClick={() => console.log('ACTION: View Total Campaigns')}
+                />
+                <SummaryCard
+                    title="Sent Campaigns"
+                    count={sentCampaigns}
+                    description="Campaigns that have been deployed and delivered to customers/leads."
+                    onClick={() => console.log('ACTION: View Sent Campaigns')}
+                />
+            </div>
+
+            {/* Quick Action / Follow-up Tasks (NEW SECTION) */}
+            <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <QuickActionCard
+                    title="Contacts Requiring Follow-up"
+                    subtitle="Untouched for 60+ days (Critical Priority)"
+                    items={contactsNeedingFollowUp}
+                    icon={<Users className="h-6 w-6 text-red-500" />}
+                    colorClass="border-red-400 bg-red-50"
+                />
+                <QuickActionCard
+                    title="Pending Campaign Tasks"
+                    subtitle="Urgent actions for open campaigns"
+                    items={pendingCampaignTasks}
+                    icon={<ListChecks className="h-6 w-6 text-indigo-500" />}
+                    colorClass="border-indigo-400 bg-indigo-50"
+                />
+            </div>
+
+            {/* Performance Chart */}
+            <div className="mt-10">
+                <PerformanceChart data={campaignChartData} />
+            </div>
+
+            {/* Recent Activity Feed Placeholder */}
+            <div className="mt-10 p-6 bg-gray-100 rounded-2xl shadow-inner border border-gray-200">
+                <h2 className="text-xl font-bold text-[#130F0F] mb-3">
+                    Recent Activity Feed
+                </h2>
+                <p className="text-gray-500 text-sm italic">
+                    [Activity items would appear here, showing recent contact
+                    additions, campaign sends, and pipeline changes.]
+                </p>
+            </div>
+        </>
+    );
+
+    const renderSalesCenterSummary = () => (
+        <>
+            {/* Title/Description for Summary Page */}
+            <div className="mb-6">
+                <h1 className="text-3xl font-bold mb-1">{title}</h1>
+                <p className="text-md text-[#2F2F2F]">{description}</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-6">
+                <SummaryCard
+                    title="Total Contacts"
+                    count={totalContacts}
+                    description="All individuals and organizations currently in your communication network."
+                    onClick={() => {
+                        setActiveCategory('Contacts');
+                        setPage('List');
+                        setViewMode('all');
+                    }}
+                />
+                <SummaryCard
+                    title="Active Leads"
+                    count={totalLeads}
+                    description="Individuals or organizations identified as potential customers targeted by campaigns."
+                    onClick={() => {
+                        setActiveCategory('Leads');
+                        setPage('List');
+                        setViewMode('all');
+                    }}
+                />
+            </div>
+        </>
+    );
+
+    const renderContactsLeadsList = () => (
+        <>
+            {/* Categories section - Only visible in List view */}
+            <div className="flex items-center space-x-4 mt-6 mb-6 text-[#868281] font-medium">
+                <div className="flex items-center space-x-2">
+                    <a
+                        href="#"
+                        onClick={() => {
+                            setActiveCategory('Contacts');
+                            setViewMode('recents');
+                        }}
+                        className={`font-medium text-lg ${
+                            activeCategory === 'Contacts'
+                                ? 'text-[#26A248]'
+                                : 'text-[#130F0F] hover:text-[#2A2625]'
+                        } transition-colors duration-200`}
+                    >
+                        Contacts
+                    </a>
+                    <span className="text-sm text-[#868281]">
+                        {totalContacts}
+                    </span>
+                </div>
+                <div className="flex items-center space-x-2">
+                    <a
+                        href="#"
+                        onClick={() => {
+                            setActiveCategory('Leads');
+                            setViewMode('recents');
+                        }}
+                        className={`font-medium text-lg ${
+                            activeCategory === 'Leads'
+                                ? 'text-[#26A248]'
+                                : 'text-[#130F0F] hover:text-[#2A2625]'
+                        } transition-colors duration-200`}
+                    >
+                        Leads
+                    </a>
+                    <span className="text-sm text-[#868281]">{totalLeads}</span>
+                </div>
+            </div>
+            <div className="border-t border-[#2A2625] mb-6"></div>
+
+            {/* Category Title and Description (moved here from main App component) */}
+            <div className="mb-6">
+                <h1 className="text-3xl font-bold mb-1">{title}</h1>
+                <p className="text-md text-[#2F2F2F]">{description}</p>
+            </div>
+
+            {/* Category Controls (Action Buttons) - Positioned to the left */}
+            <div className="flex flex-col md:flex-row md:justify-start md:items-center mb-6 space-y-4 md:space-y-0">
+                <div className="flex items-center space-x-3">
+                    {/* Conditional "New Contact" button with white color, black text, no border */}
+                    {activeCategory === 'Contacts' && (
+                        <button
+                            className="flex items-center p-2 rounded-lg bg-white text-[#130F0F] font-semibold shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.01]"
+                            onClick={openModal}
+                        >
+                            <svg
+                                className="h-5 w-5 mr-1 text-[#26A248]"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M12 4v16m8-8H4"
+                                />
+                            </svg>
+                            New Contact
+                        </button>
+                    )}
+
+                    {/* Recents/All Dropdown */}
+                    <div className="relative">
+                        <button
+                            className="flex items-center p-2 rounded-lg bg-white border-2 border-[#DEE2E6] text-[#130F0F] shadow-md hover:shadow-lg transition-shadow duration-200"
+                            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                        >
+                            {viewMode === 'recents' ? 'Recents' : 'All'}
+                            <svg
+                                className="h-5 w-5 ml-1"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M19 9l-7 7-7-7"
+                                />
+                            </svg>
+                        </button>
+                        {isDropdownOpen && (
+                            <div className="absolute z-10 top-full mt-2 w-40 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+                                <div className="py-1">
+                                    <a
+                                        href="#"
+                                        className={`block px-4 py-2 text-sm ${
+                                            viewMode === 'recents'
+                                                ? 'bg-gray-100 text-gray-900'
+                                                : 'text-gray-700 hover:bg-gray-100'
+                                        }`}
+                                        onClick={() =>
+                                            handleDropdownSelect('recents')
+                                        }
+                                    >
+                                        Recents
+                                    </a>
+                                    <a
+                                        href="#"
+                                        className={`block px-4 py-2 text-sm ${
+                                            viewMode === 'all'
+                                                ? 'bg-gray-100 text-gray-900'
+                                                : 'text-gray-700 hover:bg-gray-100'
+                                        }`}
+                                        onClick={() =>
+                                            handleDropdownSelect('all')
+                                        }
+                                    >
+                                        All {activeCategory}
+                                    </a>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {/* Conditional View Rendering */}
+            {viewMode === 'recents' ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {/* Leads View - New Lead Section */}
+                    {activeCategory === 'Leads' && (
+                        <div className="bg-[#EBE5E5] rounded-xl p-4">
+                            <h2 className="text-lg font-bold mb-4">
+                                New Lead{' '}
+                                <span className="font-normal text-[#868281]">
+                                    8
+                                </span>
+                            </h2>
+                            <div className="space-y-4">
+                                {/* Dummy cards for recents */}
+                                <ContactCard
+                                    name="Mandevo"
+                                    date="Jan 5, 2025"
+                                />
+                                <ContactCard
+                                    name="Mike Wong"
+                                    date="Jan 5, 2025"
+                                />
+                                <ContactCard
+                                    name="Esther Howard"
+                                    date="Jan 5, 2025"
+                                />
+                                <ContactCard
+                                    name="Mark Henry"
+                                    date="Jan 5, 2025"
+                                />
+                            </div>
+                        </div>
+                    )}
+                    {/* Contacts View - Recently Added Section */}
+                    {activeCategory === 'Contacts' && (
+                        <div className="bg-[#EBE5E5] rounded-xl p-4">
+                            <h2 className="text-lg font-bold mb-4">
+                                Recently added{' '}
+                                <span className="font-normal text-[#868281]">
+                                    5
+                                </span>
+                            </h2>
+                            <div className="space-y-4">
+                                {/* Dummy cards for recents */}
+                                <ContactCard
+                                    name="Peter Klaven"
+                                    date="Jan 5, 2025"
+                                />
+                                <ContactCard
+                                    name="Blemix Koko"
+                                    date="Jan 5, 2025"
+                                />
+                                <ContactCard
+                                    name="Anita Capul"
+                                    date="Jan 5, 2025"
+                                />
+                            </div>
+                        </div>
+                    )}
+                </div>
+            ) : (
+                <div className="flex flex-col items-center">
+                    {paginatedData.length > 0 ? (
+                        <div className="bg-[#EBE5E5] rounded-xl p-6 w-full">
+                            <h2 className="text-lg font-bold mb-4">
+                                {activeCategory === 'Contacts'
+                                    ? 'All contacts'
+                                    : 'All leads'}
+                                <span className="font-normal text-[#868281]">{` (${dataToDisplay.length})`}</span>
+                            </h2>
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                {paginatedData.map((data, index) => (
+                                    <ContactCard
+                                        key={index}
+                                        name={data.name}
+                                        date={data.date}
+                                    />
+                                ))}
+                            </div>
+                            <div className="flex justify-center mt-6 space-x-4">
+                                <button
+                                    className={`px-4 py-2 rounded-lg border-2 border-[#DEE2E6] ${
+                                        currentPage === 1
+                                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                            : 'bg-white text-[#130F0F] hover:bg-gray-100'
+                                    } transition-colors duration-200`}
+                                    onClick={() =>
+                                        setCurrentPage((prev) =>
+                                            Math.max(prev - 1, 1)
+                                        )
+                                    }
+                                    disabled={currentPage === 1}
+                                >
+                                    Prev
+                                </button>
+                                <button
+                                    className={`px-4 py-2 rounded-lg border-2 border-[#DEE2E6] ${
+                                        currentPage === totalPages
+                                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                            : 'bg-white text-[#130F0F] hover:bg-gray-100'
+                                    } transition-colors duration-200`}
+                                    onClick={() =>
+                                        setCurrentPage((prev) =>
+                                            Math.min(prev + 1, totalPages)
+                                        )
+                                    }
+                                    disabled={currentPage === totalPages}
+                                >
+                                    Next
+                                </button>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="text-center p-12 text-[#868281]">
+                            <p>No more {activeCategory.toLowerCase()}</p>
+                        </div>
+                    )}
+                </div>
+            )}
+        </>
+    );
+
+    // --- New Contact Modal Component ---
+    const NewContactModal = ({ isOpen, onClose }) => {
+        const [tab, setTab] = useState('manual');
+        // Removed 'type' field from state
+        const [contactData, setContactData] = useState({
+            name: '',
+            email: '',
+            phone: '',
+        });
+        const [bulkFile, setBulkFile] = useState(null);
+
+        if (!isOpen) return null;
+
+        const handleManualChange = (e) => {
+            const { name, value } = e.target;
+            setContactData((prev) => ({ ...prev, [name]: value }));
+        };
+
+        const handleManualSubmit = (e) => {
+            e.preventDefault();
+            console.log('MANUAL SUBMIT:', contactData);
+            // In a real app, logic to save the new contact to Firestore goes here
+            onClose();
+        };
+
+        const handleFileChange = (e) => {
+            setBulkFile(e.target.files[0]);
+        };
+
+        const handleBulkUpload = (e) => {
+            e.preventDefault();
+            if (!bulkFile) {
+                console.log('BULK UPLOAD FAILED: Please select a file.');
+                return;
+            }
+            console.log(
+                `BULK UPLOAD INITIATED: Processing file ${bulkFile.name} (${bulkFile.type}).`
+            );
+            // In a real app, file parsing and bulk write to Firestore goes here
+            onClose();
+        };
+
+        const InputField = ({
+            label,
+            name,
+            type = 'text',
+            value,
+            onChange,
+            placeholder,
+        }) => (
+            <div className="mb-4">
+                <label
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                    htmlFor={name}
+                >
+                    {label}
+                </label>
+                <input
+                    type={type}
+                    id={name}
+                    name={name}
+                    value={value}
+                    onChange={onChange}
+                    placeholder={placeholder}
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:ring-[#26A248] focus:border-[#26A248] transition duration-150"
+                    required={name !== 'phone'} // Phone is optional
+                />
+            </div>
+        );
+
+        // SelectField is removed as it's no longer needed for contact type
+
+        const renderManualForm = () => (
+            <form onSubmit={handleManualSubmit}>
+                <h3 className="text-xl font-semibold text-[#130F0F] mb-4">
+                    New Contact Details
+                </h3>
+                <InputField
+                    label="Full Name"
+                    name="name"
+                    value={contactData.name}
+                    onChange={handleManualChange}
+                    placeholder="e.g., Jane Doe"
+                />
+                <InputField
+                    label="Email Address"
+                    name="email"
+                    type="email"
+                    value={contactData.email}
+                    onChange={handleManualChange}
+                    placeholder="e.g., jane@example.com"
+                />
+                <InputField
+                    label="Phone Number (Optional)"
+                    name="phone"
+                    value={contactData.phone}
+                    onChange={handleManualChange}
+                    placeholder="e.g., (555) 123-4567"
+                />
+                {/* Removed SelectField for Contact Type */}
+                <button
+                    type="submit"
+                    className="w-full mt-4 p-3 bg-[#26A248] text-white font-bold rounded-lg hover:bg-[#1F813A] transition duration-150 shadow-md"
+                >
+                    Add Contact
+                </button>
+            </form>
+        );
+
+        const renderBulkUpload = () => (
+            <form onSubmit={handleBulkUpload}>
+                <h3 className="text-xl font-semibold text-[#130F0F] mb-4">
+                    Bulk Contact Import
+                </h3>
+                <div className="p-6 border-2 border-dashed border-gray-300 rounded-lg text-center bg-gray-50 mb-4">
+                    <input
+                        type="file"
+                        id="bulk-file-upload"
+                        onChange={handleFileChange}
+                        accept=".json,.csv"
+                        className="hidden"
+                    />
+                    <label
+                        htmlFor="bulk-file-upload"
+                        className="cursor-pointer inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-[#26A248] hover:bg-[#1F813A]"
+                    >
+                        <svg
+                            className="h-5 w-5 mr-2"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"
+                            />
+                        </svg>
+                        Select JSON or CSV File
+                    </label>
+                    <p className="mt-3 text-sm text-gray-500">
+                        {bulkFile
+                            ? bulkFile.name
+                            : 'Max 5MB (Requires Name, Email columns/fields)'}
+                    </p>
+                </div>
+
+                <button
+                    type="submit"
+                    className={`w-full p-3 font-bold rounded-lg transition duration-150 shadow-md ${
+                        bulkFile
+                            ? 'bg-[#26A248] text-white hover:bg-[#1F813A]'
+                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    }`}
+                    disabled={!bulkFile}
+                >
+                    Import Contacts
+                </button>
+                <p className="text-xs text-gray-500 mt-2 text-center">
+                    *This is a placeholder action. Data will be logged to the
+                    console.*
+                </p>
+            </form>
+        );
+
+        return (
+            // Modal Backdrop
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                {/* Modal Content */}
+                <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+                    <div className="p-6 md:p-8">
+                        <div className="flex justify-between items-center mb-6 border-b pb-4">
+                            <h2 className="text-2xl font-bold text-[#130F0F]">
+                                Add New Contact(s)
+                            </h2>
+                            <button
+                                onClick={onClose}
+                                className="text-gray-400 hover:text-gray-600 transition-colors"
+                                aria-label="Close modal"
+                            >
+                                <svg
+                                    className="h-6 w-6"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth="2"
+                                        d="M6 18L18 6M6 6l12 12"
+                                    />
+                                </svg>
+                            </button>
+                        </div>
+
+                        {/* Tab Navigation */}
+                        <div className="flex mb-6 space-x-2 border-b">
+                            <button
+                                className={`py-2 px-4 text-sm font-medium rounded-t-lg transition-colors ${
+                                    tab === 'manual'
+                                        ? 'border-b-2 border-[#26A248] text-[#26A248]'
+                                        : 'text-gray-500 hover:text-gray-700'
+                                }`}
+                                onClick={() => setTab('manual')}
+                            >
+                                Manual Entry
+                            </button>
+                            <button
+                                className={`py-2 px-4 text-sm font-medium rounded-t-lg transition-colors ${
+                                    tab === 'bulk'
+                                        ? 'border-b-2 border-[#26A248] text-[#26A248]'
+                                        : 'text-gray-500 hover:text-gray-700'
+                                }`}
+                                onClick={() => setTab('bulk')}
+                            >
+                                Bulk Upload (.json, .csv)
+                            </button>
+                        </div>
+
+                        {/* Tab Content */}
+                        {tab === 'manual'
+                            ? renderManualForm()
+                            : renderBulkUpload()}
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
+    return (
+        <div className="flex bg-[#F8F9FA] min-h-screen text-[#130F0F] antialiased font-sans">
+            {/* Sidebar */}
+            <aside className="w-64 bg-[#E7E3E2] p-6 flex flex-col justify-between shadow-lg">
+                <div>
+                    <div className="flex items-center">
+                        <div className="h-10 w-10 bg-[#E9ECEF] rounded-full"></div>
+                        <div className="ml-3">
+                            {/* UPDATED PROFILE INFORMATION */}
+                            <h2 className="text-lg font-semibold text-[#130F0F]">
+                                Roware Admin
+                            </h2>
+                            <p className="text-sm text-[#130F0F]">
+                                admin@roware.xyz
+                            </p>
+                        </div>
+                    </div>
+                    <div className="border-t border-[#B7B1B1] my-6"></div>
+                    <div className="relative">
+                        <input
+                            type="text"
+                            placeholder="Search..."
+                            className="w-full p-2 pl-10 rounded-lg border-2 border-[#DEE2E6] bg-white text-[#130F0F] placeholder-[#868281] shadow-md focus:outline-none focus:ring-2 focus:ring-[#868281] transition-shadow duration-200"
+                        />
+                        <svg
+                            className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-[#868281]"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                            />
+                        </svg>
+                    </div>
+                    <div className="border-t border-[#B7B1B1] my-6"></div>
+                    <nav>
+                        <h3 className="text-xs font-semibold uppercase text-[#868281] mb-2">
+                            Main Menu
+                        </h3>
+                        <ul className="space-y-1">
+                            {/* Dashboard Link - Now sets page to 'Dashboard' */}
+                            <li
+                                className={`flex items-center p-3 rounded-lg text-[#130F0F] cursor-pointer transition-all duration-200 ${
+                                    page === 'Dashboard'
+                                        ? 'border border-[#B7B1B1] bg-white shadow-md'
+                                        : 'hover:bg-[#FFFFFF] hover:shadow-md'
+                                }`}
+                                onClick={() => setPage('Dashboard')}
+                            >
+                                <svg
+                                    className="h-5 w-5 mr-3"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth="2"
+                                        d="M4 6h16M4 12h16M4 18h16"
+                                    />
+                                </svg>
+                                Dashboard
+                            </li>
+                            <li className="flex items-center p-3 rounded-lg text-[#130F0F] hover:bg-[#FFFFFF] hover:shadow-md cursor-pointer transition-colors duration-200">
+                                <svg
+                                    className="h-5 w-5 mr-3"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth="2"
+                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.5-1.5a2.25 2.25 0 013 3L11.5 21l-4.5 1 1-4.5L18 8.5z"
+                                    />
+                                </svg>
+                                Campaigns
+                            </li>
+                        </ul>
+                        <h3 className="text-xs font-semibold uppercase text-[#868281] mt-6 mb-2">
+                            Team Management
+                        </h3>
+                        <ul className="space-y-1">
+                            {/* Sales Center Link - Now sets page to 'Summary' */}
+                            <li
+                                className={`flex items-center p-3 rounded-lg text-[#130F0F] cursor-pointer transition-all duration-200 ${
+                                    page === 'Summary' || page === 'List'
+                                        ? 'border border-[#B7B1B1] bg-white shadow-md'
+                                        : 'hover:bg-[#FFFFFF] hover:shadow-md'
+                                }`}
+                                onClick={() => setPage('Summary')}
+                            >
+                                <svg
+                                    className="h-5 w-5 mr-3"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth="2"
+                                        d="M12 8c1.657 0 3 1.343 3 3s-1.343 3-3 3-3-1.343-3-3 1.343-3 3-3zM12 18h.01M17 7a2 2 0 012 2v11a2 2 0 01-2 2H7a2 2 0 01-2-2V9a2 2 0 012-2h10z"
+                                    />
+                                </svg>
+                                Sales Center
+                            </li>
+                            <li className="flex items-center p-3 rounded-lg text-[#130F0F] hover:bg-[#FFFFFF] hover:shadow-md cursor-pointer transition-colors duration-200">
+                                <svg
+                                    className="h-5 w-5 mr-3"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                >
+                                    <path
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                        strokeWidth="2"
+                                        d="M9 19V6l12-3v13M9 19c-3.314 0-6-2.686-6-6s2.686-6 6-6m12 12c-3.314 0-6-2.686-6-6s2.686-6 6-6m-6 6v3"
+                                    />
+                                </svg>
+                                Sales Pipeline
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </aside>
+
+            {/* Main Content Area */}
+            <main className="flex-1 p-8 bg-white">
+                {/* Top Navigation Links (Breadcrumbs) - Simplified to handle Dashboard/Sales Center/List */}
+                <div className="flex items-center justify-start mb-6 text-[#A4A2A3]">
+                    <div className="flex items-center space-x-2 text-sm">
+                        {/* Home Icon */}
+                        <a
+                            href="#"
+                            onClick={() => setPage('Dashboard')}
+                            className="flex items-center hover:text-[#130F0F] transition-colors duration-200"
+                        >
+                            <svg
+                                className="h-4 w-4"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-10l2-2m-2 2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                                />
+                            </svg>
+                        </a>
+                        <span className="text-[#A4A2A3]">/</span>
+
+                        {/* Current Page Text (Dashboard, Sales Center, or Contacts/Leads) */}
+                        <span className="text-[#130F0F] font-semibold transition-colors duration-200">
+                            {breadcrumb}
+                        </span>
+                    </div>
+                </div>
+
+                <div className="border-t border-[#2A2625] mb-6"></div>
+
+                {/* Render content based on page state */}
+                {page === 'Dashboard'
+                    ? renderDashboard()
+                    : page === 'Summary'
+                    ? renderSalesCenterSummary()
+                    : renderContactsLeadsList()}
+            </main>
+
+            {/* New Contact Modal */}
+            <NewContactModal isOpen={isModalOpen} onClose={closeModal} />
+        </div>
+    );
+}
