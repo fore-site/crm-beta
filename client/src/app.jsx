@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import {
     Clock,
     Users,
@@ -6,7 +6,472 @@ import {
     ListChecks,
     DollarSign,
     Calendar,
+    X,
+    ArrowLeft,
+    Mail,
+    MessageSquare,
+    Phone,
+    CalendarCheck,
+    User,
+    ClipboardList,
 } from 'lucide-react';
+
+// --- Helper Component: Last Contacted Status Card ---
+const LastContactedCard = ({ date }) => {
+    // Logic based on user request: show date or "No campaign yet"
+    const displayValue = date
+        ? new Date(date).toLocaleDateString()
+        : 'No campaign yet';
+    const subText = date
+        ? `Last outreach was on ${displayValue}.`
+        : `This contact has not yet been targeted by a campaign.`;
+
+    return (
+        <div className="p-4 bg-white rounded-xl shadow-lg border border-gray-100 min-h-[120px] w-full">
+            <div className="flex items-center text-indigo-600 mb-2">
+                <CalendarCheck className="w-5 h-5 mr-2" />
+                <h3 className="font-bold text-sm uppercase tracking-wider">
+                    Last Contacted
+                </h3>
+            </div>
+            {/* FONT SIZE CHANGED FROM text-3xl to text-2xl */}
+            <p
+                className={`text-2xl font-extrabold ${
+                    date ? 'text-gray-900' : 'text-orange-500'
+                }`}
+            >
+                {displayValue}
+            </p>
+            <p className="text-xs text-gray-500 mt-1">{subText}</p>
+        </div>
+    );
+};
+
+// --- Helper Component: Follow-up Action Button ---
+const ActionButton = ({ icon: Icon, label, onClick }) => (
+    <button
+        onClick={onClick}
+        className="flex items-center justify-center p-3 text-sm font-semibold transition-all duration-200 bg-white border border-gray-200 rounded-lg hover:bg-indigo-50 hover:border-indigo-400 text-gray-700 shadow-sm flex-1 min-w-[120px]"
+        aria-label={`Action: ${label}`}
+    >
+        <Icon className="w-5 h-5 mr-2 text-indigo-500" />
+        {label}
+    </button>
+);
+
+// --- Updated Detailed Contact Profile View ---
+const ContactProfileView = ({ contact, onClose }) => {
+    // Mock detailed data setup based on the passed contact object
+    const detailedData = useMemo(
+        () => ({
+            name: contact.name,
+            email: contact.email || 'N/A',
+            phone: contact.phone || 'N/A',
+            lastContactDate: contact.lastContactDate || null,
+            category: contact.category || 'Contact',
+            notes: contact.notes || 'No notes available for this contact.',
+            campaignHistory: [
+                {
+                    id: 1,
+                    name: 'Q4 2024 Newsletter',
+                    date: 'Dec 1, 2024',
+                    status: 'Opened',
+                },
+                {
+                    id: 2,
+                    name: 'Service Announcement',
+                    date: 'Oct 15, 2024',
+                    status: 'Bounced',
+                },
+            ],
+        }),
+        [contact]
+    );
+
+    const statusBadgeClass =
+        detailedData.category === 'Lead'
+            ? 'bg-yellow-100 text-yellow-800'
+            : 'bg-indigo-100 text-indigo-800';
+
+    return (
+        <div className="p-6 bg-gray-50 min-h-[80vh] rounded-2xl shadow-xl w-full">
+            <div className="flex justify-between items-center border-b pb-4 mb-6">
+                <h1 className="text-3xl font-bold text-[#130F0F] flex items-center">
+                    <button
+                        onClick={onClose}
+                        className="p-2 mr-3 rounded-full hover:bg-gray-200 transition-colors"
+                        aria-label="Go back to dashboard"
+                    >
+                        <ArrowLeft size={24} />
+                    </button>
+                    {detailedData.name} Profile
+                </h1>
+                <button
+                    onClick={onClose}
+                    className="text-gray-400 hover:text-red-500 transition-colors"
+                >
+                    <X size={24} />
+                </button>
+            </div>
+
+            {/* Status and Action Buttons */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                {/* Last Contacted Card (only one card now) */}
+                <LastContactedCard date={detailedData.lastContactDate} />
+
+                {/* Follow-up Actions (E-mail and SMS) */}
+                <div className="md:col-span-2 flex space-x-4">
+                    <ActionButton
+                        icon={Mail}
+                        label="E-mail"
+                        onClick={() =>
+                            console.log(`ACTION: Emailing ${detailedData.name}`)
+                        }
+                    />
+                    <ActionButton
+                        icon={MessageSquare}
+                        label="SMS"
+                        onClick={() =>
+                            console.log(`ACTION: SMSing ${detailedData.name}`)
+                        }
+                    />
+                </div>
+            </div>
+
+            {/* Contact Details & Notes/History */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-1 space-y-4 p-6 bg-white rounded-xl shadow-md border border-gray-100">
+                    <h2 className="text-2xl font-bold text-[#130F0F] mb-4">
+                        Contact Info
+                    </h2>
+                    <span
+                        className={`px-3 py-1 text-xs font-semibold rounded-full ${statusBadgeClass}`}
+                    >
+                        {detailedData.category}
+                    </span>
+
+                    {/* Email */}
+                    <div className="flex items-start pt-3">
+                        <Mail className="w-5 h-5 text-gray-500 mt-1 flex-shrink-0" />
+                        <div className="ml-3 min-w-0">
+                            <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Email
+                            </p>
+                            <p className="text-base font-semibold text-indigo-600 truncate">
+                                {detailedData.email}
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* Phone */}
+                    <div className="flex items-start">
+                        <Phone className="w-5 h-5 text-gray-500 mt-1 flex-shrink-0" />
+                        <div className="ml-3">
+                            <p className="text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Phone
+                            </p>
+                            <p className="text-base font-semibold text-gray-700">
+                                {detailedData.phone}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Notes and History */}
+                <div className="lg:col-span-2 space-y-6">
+                    {/* Notes */}
+                    <div className="p-6 bg-white rounded-xl shadow-md border border-gray-100">
+                        <h2 className="text-2xl font-bold text-[#130F0F] mb-4 flex items-center">
+                            <ClipboardList className="w-5 h-5 mr-2" />
+                            Internal Notes
+                        </h2>
+                        <div className="space-y-3 bg-gray-50 p-4 rounded-lg border border-gray-200 h-32 overflow-y-auto">
+                            <div className="border-l-4 border-yellow-500 pl-3">
+                                <p className="text-xs text-gray-500 font-medium">
+                                    Jan 1, 2025
+                                </p>
+                                <p className="text-sm text-[#130F0F]">
+                                    {detailedData.notes}
+                                </p>
+                            </div>
+                        </div>
+                        <textarea
+                            placeholder="Add a new note..."
+                            rows="3"
+                            className="w-full mt-3 p-3 border border-gray-300 rounded-lg focus:ring-[#26A248] focus:border-[#26A248] transition duration-150"
+                        ></textarea>
+                    </div>
+
+                    {/* Campaign History */}
+                    <div className="p-6 bg-white rounded-xl shadow-md border border-gray-100">
+                        <h2 className="text-2xl font-bold text-[#130F0F] mb-4">
+                            Campaign History
+                        </h2>
+                        <ul className="space-y-3">
+                            {detailedData.campaignHistory.map((campaign) => (
+                                <li
+                                    key={campaign.id}
+                                    className="flex justify-between items-center p-3 bg-white border border-gray-200 rounded-lg shadow-sm"
+                                >
+                                    <span className="font-medium text-[#130F0F]">
+                                        {campaign.name}
+                                    </span>
+                                    <div className="text-sm">
+                                        <span
+                                            className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                                                campaign.status === 'Opened'
+                                                    ? 'bg-green-100 text-green-700'
+                                                    : 'bg-red-100 text-red-700'
+                                            }`}
+                                        >
+                                            {campaign.status}
+                                        </span>
+                                        <span className="ml-3 text-gray-500">
+                                            {campaign.date}
+                                        </span>
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// Reusable Contact Card component (used in list view)
+const ContactCard = ({ contact, onClick }) => {
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+    const menuRef = useRef(null);
+
+    // Determine last contact status for display
+    const lastContactDisplay = contact.lastContactDate
+        ? `Last Contact: ${new Date(
+              contact.lastContactDate
+          ).toLocaleDateString()}`
+        : 'No campaign yet';
+
+    const contactTextColor = contact.lastContactDate
+        ? 'text-[#868281]'
+        : 'text-orange-500 font-semibold';
+
+    // Simple click-outside handler
+    React.useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (menuRef.current && !menuRef.current.contains(event.target)) {
+                setIsMenuOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [menuRef]);
+
+    const handleEdit = () => {
+        console.log(`ACTION: Opening edit modal for: ${contact.name}`);
+        setIsMenuOpen(false);
+    };
+
+    const handleDelete = () => {
+        // In a real application, this would open a custom confirmation modal
+        console.log(
+            `ACTION: Request to delete contact: ${contact.name}. (Confirmation step skipped for demo)`
+        );
+        setIsMenuOpen(false);
+    };
+
+    return (
+        <div
+            className="bg-white p-4 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-200 flex items-start relative border border-[#DEE2E6] cursor-pointer"
+            onClick={() => onClick(contact)} // Make the whole card clickable to view profile
+        >
+            <div
+                className="flex justify-end absolute top-2 right-2 z-10"
+                ref={menuRef}
+                onClick={(e) => e.stopPropagation()}
+            >
+                <button
+                    className="p-1 rounded-full text-[#868281] hover:bg-[#E7F7EB] transition-colors"
+                    onClick={() => setIsMenuOpen(!isMenuOpen)}
+                    aria-label="Contact actions menu"
+                >
+                    <svg
+                        className="h-6 w-6"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                    >
+                        <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
+                    </svg>
+                </button>
+                {isMenuOpen && (
+                    <div className="absolute z-20 right-0 mt-8 w-40 rounded-lg shadow-2xl bg-white ring-1 ring-black ring-opacity-5">
+                        <div className="py-1">
+                            <button
+                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
+                                onClick={handleEdit}
+                            >
+                                Edit Details
+                            </button>
+                            <button
+                                className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                                onClick={handleDelete}
+                            >
+                                Delete Contact
+                            </button>
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            {/* Contact Content */}
+            <div className="h-10 w-10 bg-[#DEE2E6] rounded-full flex-shrink-0 mr-3 mt-1"></div>
+            <div className="flex-1 min-w-0">
+                <h3 className="font-semibold text-[#130F0F]">{contact.name}</h3>
+                <p className={`text-xs ${contactTextColor} flex items-center`}>
+                    <Clock size={12} className="mr-1" />
+                    {lastContactDisplay}
+                </p>
+                <div className="mt-2 text-sm text-[#868281] space-y-1">
+                    {/* Phone */}
+                    <div className="flex items-start">
+                        <svg
+                            className="h-4 w-4 flex-shrink-0 mr-2"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-3.961a18.06 18.06 0 01-13.486-13.486V5a2 2 0 012-2z"
+                            />
+                        </svg>
+                        <p className="flex-1 min-w-0 break-words">
+                            {contact.phone || 'N/A'}
+                        </p>
+                    </div>
+                    {/* Email */}
+                    <div className="flex items-start">
+                        <svg
+                            className="h-4 w-4 flex-shrink-0 mr-2"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth="2"
+                                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8m-17 4v7a2 2 0 002 2h14a2 2 0 002-2v-7"
+                            />
+                        </svg>
+                        <p className="flex-1 min-w-0 break-words">
+                            {contact.email || 'N/A'}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// Reusable Summary Card component (used in summary view)
+const SummaryCard = ({ title, count, description, onClick }) => (
+    <div
+        className="bg-white p-6 rounded-2xl shadow-lg border border-[#DEE2E6] hover:shadow-xl transition-all duration-300 w-full cursor-pointer transform hover:scale-[1.02]"
+        onClick={onClick}
+    >
+        <div className="flex justify-between items-start mb-4">
+            <h2 className="text-xl font-bold text-[#130F0F]">{title}</h2>
+            <div className="text-3xl font-extrabold text-[#26A248] bg-[#E7F7EB] px-4 py-2 rounded-xl shadow-inner min-w-16 text-center">
+                {count}
+            </div>
+        </div>
+        <p className="text-sm text-[#868281] mt-2">{description}</p>
+        <div className="border-t border-gray-200 mt-4 pt-4 flex justify-between items-center">
+            <span className="text-sm font-medium text-[#26A248] hover:text-[#1F813A] transition-colors">
+                View Details &rarr;
+            </span>
+        </div>
+    </div>
+);
+
+// --- Quick Action Card Component (Updated to handle action prop) ---
+const QuickActionCard = ({
+    title,
+    subtitle,
+    items,
+    icon,
+    colorClass,
+    handleAction,
+}) => (
+    <div
+        className={`p-6 rounded-2xl shadow-xl border-l-4 ${colorClass} bg-white transition-all duration-300 hover:shadow-2xl`}
+    >
+        <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center">
+                <div className="mr-3">{icon}</div>
+                <div>
+                    <h3 className="text-xl font-extrabold text-[#130F0F]">
+                        {title}
+                    </h3>
+                    <p className="text-sm text-gray-500">{subtitle}</p>
+                </div>
+            </div>
+            <span className="text-2xl font-extrabold text-gray-800 bg-gray-100 px-3 py-1 rounded-lg">
+                {items.length}
+            </span>
+        </div>
+
+        <ul className="space-y-3 mt-4">
+            {items.map((item, index) => (
+                <li
+                    key={index}
+                    className="flex justify-between items-center p-3 bg-white rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer"
+                    onClick={() => handleAction && handleAction(item)} // Handle click on the list item itself
+                >
+                    <div className="min-w-0 flex-1 mr-3">
+                        <p className="font-semibold text-sm truncate text-[#130F0F]">
+                            {item.title || item.name}
+                        </p>
+                        {item.lastContact && (
+                            <p className="text-xs text-red-500 flex items-center mt-1">
+                                <Clock size={12} className="mr-1" />
+                                Last contact: {item.lastContact}
+                            </p>
+                        )}
+                        {item.campaign && (
+                            <p className="text-xs text-gray-500 mt-1">
+                                Campaign:{' '}
+                                <span className="font-medium text-gray-700">
+                                    {item.campaign}
+                                </span>
+                            </p>
+                        )}
+                    </div>
+                    {/* The button is now a secondary click target, or we can remove it */}
+                    <button
+                        className="text-sm text-[#26A248] hover:text-[#1F813A] font-medium flex-shrink-0"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            handleAction && handleAction(item);
+                        }}
+                    >
+                        Go &rarr;
+                    </button>
+                </li>
+            ))}
+            {items.length === 0 && (
+                <li className="text-center py-4 text-gray-500 italic text-sm">
+                    All clear! No urgent actions needed.
+                </li>
+            )}
+        </ul>
+    </div>
+);
 
 // --- Chart Component (Enhanced) ---
 const PerformanceChart = ({ data }) => {
@@ -52,9 +517,9 @@ const PerformanceChart = ({ data }) => {
                             {/* Bar Container and Animation */}
                             <div
                                 className="w-full rounded-t-xl transition-all duration-700 ease-out 
-                           bg-gradient-to-t from-[#26A248] to-[#60D394] 
-                           hover:from-[#1F813A] hover:to-[#50B880] 
-                           cursor-pointer shadow-lg transform hover:scale-y-[1.05] hover:shadow-xl"
+                            bg-gradient-to-t from-[#26A248] to-[#60D394] 
+                            hover:from-[#1F813A] hover:to-[#50B880] 
+                            cursor-pointer shadow-lg transform hover:scale-y-[1.05] hover:shadow-xl"
                                 style={{
                                     height: `${actualHeight}px`,
                                     minHeight: actualHeight > 0 ? '5px' : '0',
@@ -84,219 +549,13 @@ const PerformanceChart = ({ data }) => {
     );
 };
 
-// Reusable Contact Card component (used in list view)
-const ContactCard = ({ name, date }) => {
-    const [isMenuOpen, setIsMenuOpen] = useState(false);
-    const menuRef = useRef(null);
-
-    // Simple click-outside handler
-    React.useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (menuRef.current && !menuRef.current.contains(event.target)) {
-                setIsMenuOpen(false);
-            }
-        };
-        document.addEventListener('mousedown', handleClickOutside);
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, [menuRef]);
-
-    const handleEdit = () => {
-        console.log(`ACTION: Opening edit modal for: ${name}`);
-        setIsMenuOpen(false);
-    };
-
-    const handleDelete = () => {
-        // In a real application, this would open a custom confirmation modal
-        console.log(
-            `ACTION: Request to delete contact: ${name}. (Confirmation step skipped for demo)`
-        );
-        setIsMenuOpen(false);
-    };
-
-    return (
-        <div className="bg-white p-4 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-200 flex items-start relative border border-[#DEE2E6]">
-            <div
-                className="flex justify-end absolute top-2 right-2 z-10"
-                ref={menuRef}
-            >
-                <button
-                    className="p-1 rounded-full text-[#868281] hover:bg-[#E7F7EB] transition-colors"
-                    onClick={() => setIsMenuOpen(!isMenuOpen)}
-                    aria-label="Contact actions menu"
-                >
-                    <svg
-                        className="h-6 w-6"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                    >
-                        <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
-                    </svg>
-                </button>
-                {isMenuOpen && (
-                    <div className="absolute z-20 right-0 mt-8 w-40 rounded-lg shadow-2xl bg-white ring-1 ring-black ring-opacity-5">
-                        <div className="py-1">
-                            <button
-                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
-                                onClick={handleEdit}
-                            >
-                                Edit Details
-                            </button>
-                            <button
-                                className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
-                                onClick={handleDelete}
-                            >
-                                Delete Contact
-                            </button>
-                        </div>
-                    </div>
-                )}
-            </div>
-
-            {/* Contact Content */}
-            <div className="h-10 w-10 bg-[#DEE2E6] rounded-full flex-shrink-0 mr-3 mt-1"></div>
-            <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-[#130F0F]">{name}</h3>
-                <p className="text-xs text-[#868281]">{date}</p>
-                <div className="mt-2 text-sm text-[#868281] space-y-1">
-                    {/* Phone */}
-                    <div className="flex items-start">
-                        <svg
-                            className="h-4 w-4 flex-shrink-0 mr-2"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-3.961a18.06 18.06 0 01-13.486-13.486V5a2 2 0 012-2z"
-                            />
-                        </svg>
-                        <p className="flex-1 min-w-0 break-words">
-                            [555] 123 5674
-                        </p>
-                    </div>
-                    {/* Email */}
-                    <div className="flex items-start">
-                        <svg
-                            className="h-4 w-4 flex-shrink-0 mr-2"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                        >
-                            <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth="2"
-                                d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8m-17 4v7a2 2 0 002 2h14a2 2 0 002-2v-7"
-                            />
-                        </svg>
-                        <p className="flex-1 min-w-0 break-words">
-                            mj19@gmail.com
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-// Reusable Summary Card component (used in summary view)
-const SummaryCard = ({ title, count, description, onClick }) => (
-    <div
-        className="bg-white p-6 rounded-2xl shadow-lg border border-[#DEE2E6] hover:shadow-xl transition-all duration-300 w-full cursor-pointer transform hover:scale-[1.02]"
-        onClick={onClick}
-    >
-        <div className="flex justify-between items-start mb-4">
-            <h2 className="text-xl font-bold text-[#130F0F]">{title}</h2>
-            <div className="text-3xl font-extrabold text-[#26A248] bg-[#E7F7EB] px-4 py-2 rounded-xl shadow-inner min-w-16 text-center">
-                {count}
-            </div>
-        </div>
-        <p className="text-sm text-[#868281] mt-2">{description}</p>
-        <div className="border-t border-gray-200 mt-4 pt-4 flex justify-between items-center">
-            <span className="text-sm font-medium text-[#26A248] hover:text-[#1F813A] transition-colors">
-                View Details &rarr;
-            </span>
-        </div>
-    </div>
-);
-
-// --- New Quick Action Card Component ---
-const QuickActionCard = ({ title, subtitle, items, icon, colorClass }) => (
-    <div
-        className={`p-6 rounded-2xl shadow-xl border-l-4 ${colorClass} bg-white transition-all duration-300 hover:shadow-2xl`}
-    >
-        <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center">
-                <div className="mr-3">{icon}</div>
-                <div>
-                    <h3 className="text-xl font-extrabold text-[#130F0F]">
-                        {title}
-                    </h3>
-                    <p className="text-sm text-gray-500">{subtitle}</p>
-                </div>
-            </div>
-            <span className="text-2xl font-extrabold text-gray-800 bg-gray-100 px-3 py-1 rounded-lg">
-                {items.length}
-            </span>
-        </div>
-
-        <ul className="space-y-3 mt-4">
-            {items.map((item, index) => (
-                <li
-                    key={index}
-                    className="flex justify-between items-center p-3 bg-white rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors cursor-pointer"
-                >
-                    <div className="min-w-0 flex-1 mr-3">
-                        <p className="font-semibold text-sm truncate text-[#130F0F]">
-                            {item.title || item.name}
-                        </p>
-                        {item.lastContact && (
-                            <p className="text-xs text-red-500 flex items-center mt-1">
-                                <Clock size={12} className="mr-1" />
-                                Last contact: {item.lastContact}
-                            </p>
-                        )}
-                        {item.campaign && (
-                            <p className="text-xs text-gray-500 mt-1">
-                                Campaign:{' '}
-                                <span className="font-medium text-gray-700">
-                                    {item.campaign}
-                                </span>
-                            </p>
-                        )}
-                    </div>
-                    <button
-                        className="text-sm text-[#26A248] hover:text-[#1F813A] font-medium flex-shrink-0"
-                        onClick={() =>
-                            console.log(
-                                `ACTION: Quick action for ${
-                                    item.name || item.title
-                                }`
-                            )
-                        }
-                    >
-                        Go &rarr;
-                    </button>
-                </li>
-            ))}
-            {items.length === 0 && (
-                <li className="text-center py-4 text-gray-500 italic text-sm">
-                    All clear! No urgent actions needed.
-                </li>
-            )}
-        </ul>
-    </div>
-);
-
 // Main App component
 export default function App() {
     // Page state: 'Dashboard' (new default), 'Summary' (Sales Center Summary), or 'List'
     const [page, setPage] = useState('Dashboard');
+    // State for showing the detailed profile view
+    const [selectedContact, setSelectedContact] = useState(null);
+
     // List states
     const [activeCategory, setActiveCategory] = useState('Contacts');
     const [viewMode, setViewMode] = useState('recents');
@@ -305,80 +564,209 @@ export default function App() {
     const [isModalOpen, setIsModalOpen] = useState(false); // State for New Contact Modal
     const contactsPerPage = 13;
 
+    // Handler for viewing a detailed contact profile
+    const handleViewContact = (contact) => {
+        // A simplified contact object from the Quick Action card might need to be resolved
+        // to the full contact object for the detailed view.
+        const fullContact =
+            [...allContacts, ...allLeads].find((c) => c.id === contact.id) ||
+            contact;
+
+        setSelectedContact(fullContact);
+        setPage(null); // Clear the page state when viewing a profile
+    };
+
+    // Handler to close the contact profile view and return to the dashboard
+    const handleCloseProfile = () => {
+        setSelectedContact(null);
+        setPage('Dashboard');
+    };
+
     // Modal handlers
     const openModal = () => setIsModalOpen(true);
     const closeModal = () => setIsModalOpen(false);
 
-    // --- Dummy Data ---
+    // --- Unified Rich Mock Data ---
     const allContacts = [
-        { name: 'Mandevo', date: 'Jan 5, 2025' },
-        { name: 'Mike Wong', date: 'Jan 5, 2025' },
-        { name: 'Esther Howard', date: 'Jan 5, 2025' },
-        { name: 'Mark Henry', date: 'Jan 5, 2025' },
-        { name: 'Peter Klaven', date: 'Jan 5, 2025' },
-        { name: 'Blemix Koko', date: 'Jan 5, 2025' },
-        { name: 'Anita Capul', date: 'Jan 5, 2025' },
-        { name: 'John Paul', date: 'Jan 5, 2025' },
-        { name: 'Adeola Fry', date: 'Jan 5, 2025' },
-        { name: 'Cuppy Lane', date: 'Jan 5, 2025' },
-        { name: 'Jerry Maxwell', date: 'Jan 5, 2025' },
-        { name: 'Jessica Smith', date: 'Jan 6, 2025' },
-        { name: 'David Johnson', date: 'Jan 6, 2025' },
-        { name: 'Emily Davis', date: 'Jan 7, 2025' },
-        { name: 'Michael Brown', date: 'Jan 7, 2025' },
-        { name: 'Sarah Wilson', date: 'Jan 8, 2025' },
-        { name: 'Chris Miller', date: 'Jan 8, 2025' },
-        { name: 'Laura Garcia', date: 'Jan 9, 2025' },
-        { name: 'Daniel Martinez', date: 'Jan 9, 2025' },
-        { name: 'Maria Rodriguez', date: 'Jan 10, 2025' },
-        { name: 'Kevin Hernandez', date: 'Jan 10, 2025' },
-        { name: 'Linda Lopez', date: 'Jan 11, 2025' },
-        { name: 'James Perez', date: 'Jan 11, 2025' },
-        { name: 'Susan Torres', date: 'Jan 12, 2025' },
-        { name: 'Paul Rivera', date: 'Jan 12, 2025' },
-        { name: 'Nancy Hill', date: 'Jan 13, 2025' },
-        { name: 'Jason Scott', date: 'Jan 13, 2025' },
+        // Contacts requiring follow-up (id 1, 2)
+        {
+            id: 1,
+            name: 'Jessica Smith',
+            category: 'Contact',
+            date: 'Jan 6, 2025',
+            email: 'j.smith@corp.com',
+            phone: '555-1011',
+            lastContactDate: '2024-10-20',
+            notes: 'Was unresponsive to Q4 email follow-up. Try SMS outreach next week.',
+        },
+        {
+            id: 2,
+            name: 'David Johnson',
+            category: 'Contact',
+            date: 'Jan 6, 2025',
+            email: 'd.johnson@example.net',
+            phone: '555-1012',
+            lastContactDate: '2024-09-25',
+            notes: 'High priority client. Overdue follow-up (90 days). Needs an urgent call logged.',
+        },
+        // Regular contacts
+        {
+            id: 3,
+            name: 'Emily Davis',
+            category: 'Contact',
+            date: 'Jan 7, 2025',
+            email: 'e.davis@webco.org',
+            phone: '555-1013',
+            lastContactDate: '2024-11-15',
+            notes: 'Recently closed a deal. Mark for 6-month check-in.',
+        },
+        {
+            id: 4,
+            name: 'Mandevo',
+            category: 'Contact',
+            date: 'Jan 5, 2025',
+            email: 'm.dev@test.dev',
+            phone: '555-1014',
+            lastContactDate: '2024-12-01',
+            notes: 'Standard client.',
+        },
+        {
+            id: 5,
+            name: 'Mike Wong',
+            category: 'Contact',
+            date: 'Jan 5, 2025',
+            email: 'mike.wong@mail.com',
+            phone: '555-1015',
+            lastContactDate: '2024-12-15',
+            notes: 'Standard client.',
+        },
+        {
+            id: 6,
+            name: 'New Lead Z',
+            category: 'Contact',
+            date: 'Jan 5, 2025',
+            email: 'new@example.com',
+            phone: '555-0000',
+            lastContactDate: null,
+            notes: 'New inbound contact from website, no initial outreach yet.',
+        },
+        {
+            id: 7,
+            name: 'Esther Howard',
+            category: 'Contact',
+            date: 'Jan 5, 2025',
+            email: 'esther.h@mail.com',
+            phone: '555-1016',
+            lastContactDate: '2024-12-24',
+            notes: 'Standard client.',
+        },
+        {
+            id: 8,
+            name: 'Mark Henry',
+            category: 'Contact',
+            date: 'Jan 5, 2025',
+            email: 'mark.h@mail.com',
+            phone: '555-1017',
+            lastContactDate: '2024-12-25',
+            notes: 'Standard client.',
+        },
+        {
+            id: 9,
+            name: 'Peter Klaven',
+            category: 'Contact',
+            date: 'Jan 5, 2025',
+            email: 'peter.k@mail.com',
+            phone: '555-1018',
+            lastContactDate: '2024-12-26',
+            notes: 'Standard client.',
+        },
+        {
+            id: 10,
+            name: 'Blemix Koko',
+            category: 'Contact',
+            date: 'Jan 5, 2025',
+            email: 'blemix.k@mail.com',
+            phone: '555-1019',
+            lastContactDate: '2024-12-27',
+            notes: 'Standard client.',
+        },
+        {
+            id: 11,
+            name: 'Anita Capul',
+            category: 'Contact',
+            date: 'Jan 5, 2025',
+            email: 'anita.c@mail.com',
+            phone: '555-1020',
+            lastContactDate: '2024-12-28',
+            notes: 'Standard client.',
+        },
     ];
     const totalContacts = allContacts.length;
 
     const allLeads = [
-        { name: 'John Doe', date: 'Dec 15, 2024' },
-        { name: 'Jane Smith', date: 'Dec 16, 2024' },
-        { name: 'Bob Johnson', date: 'Dec 17, 2024' },
-        { name: 'Alice Williams', date: 'Dec 18, 2024' },
-        { name: 'Charlie Brown', date: 'Dec 19, 2024' },
-        { name: 'Diana Prince', date: 'Dec 20, 2024' },
-        { name: 'Clark Kent', date: 'Dec 21, 2024' },
-        { name: 'Bruce Wayne', date: 'Dec 22, 2024' },
-        { name: 'Peter Parker', date: 'Dec 23, 2024' },
-        { name: 'Tony Stark', date: 'Dec 24, 2024' },
-        { name: 'Steve Rogers', date: 'Dec 25, 2024' },
-        { name: 'Thor Odinson', date: 'Dec 26, 2024' },
-        { name: 'Loki Laufeyson', date: 'Dec 27, 2024' },
-        { name: 'Natasha Romanoff', date: 'Dec 28, 2024' },
-        { name: 'Clint Barton', date: 'Dec 29, 2024' },
+        {
+            id: 101,
+            name: 'John Doe',
+            category: 'Lead',
+            date: 'Dec 15, 2024',
+            email: 'john@lead.io',
+            phone: '555-2001',
+            lastContactDate: '2024-12-28',
+            notes: 'Clicked through on Holiday Promo ad. Low-mid qualification score.',
+        },
+        {
+            id: 102,
+            name: 'Jane Smith',
+            category: 'Lead',
+            date: 'Dec 16, 2024',
+            email: 'jane@lead.io',
+            phone: '555-2002',
+            lastContactDate: null,
+            notes: 'Website form submission. Needs qualification.',
+        },
+        {
+            id: 103,
+            name: 'Bob Johnson',
+            category: 'Lead',
+            date: 'Dec 17, 2024',
+            email: 'bob@lead.io',
+            phone: '555-2003',
+            lastContactDate: '2025-01-01',
+            notes: 'Engaged with LinkedIn content.',
+        },
+        {
+            id: 104,
+            name: 'Alice Williams',
+            category: 'Lead',
+            date: 'Dec 18, 2024',
+            email: 'alice@lead.io',
+            phone: '555-2004',
+            lastContactDate: '2025-01-02',
+            notes: 'Responded to cold email.',
+        },
     ];
     const totalLeads = allLeads.length;
 
     const totalCampaigns = 12;
     const sentCampaigns = 9;
 
-    // --- Quick Action Dummy Data (NEW) ---
+    // --- Quick Action Dummy Data (Uses rich data IDs) ---
     const contactsNeedingFollowUp = [
-        // Contacts untouched for 60+ days (simulated data)
+        // Contacts untouched for 60+ days (simulated data) - using IDs to reference rich data
         {
             id: 1,
             name: 'Jessica Smith',
             lastContact: 'Oct 20, 2024',
             daysOverdue: 65,
+            type: 'contact',
         },
         {
             id: 2,
             name: 'David Johnson',
             lastContact: 'Sep 25, 2024',
             daysOverdue: 90,
+            type: 'contact',
         },
-        // Removed Emily Davis as her simulated overdue days were < 60
     ];
 
     const pendingCampaignTasks = [
@@ -404,7 +792,7 @@ export default function App() {
     ];
     // --- END Quick Action Dummy Data ---
 
-    // --- DYNAMIC CHART DATA (Now for Campaigns Sent) ---
+    // --- DYNAMIC CHART DATA ---
     const campaignChartData = [
         { label: 'Sun', value: 45 },
         { label: 'Mon', value: 78 },
@@ -526,6 +914,7 @@ export default function App() {
                     items={contactsNeedingFollowUp}
                     icon={<Users className="h-6 w-6 text-red-500" />}
                     colorClass="border-red-400 bg-red-50"
+                    handleAction={handleViewContact} // <-- Handler to open profile
                 />
                 <QuickActionCard
                     title="Pending Campaign Tasks"
@@ -533,13 +922,16 @@ export default function App() {
                     items={pendingCampaignTasks}
                     icon={<ListChecks className="h-6 w-6 text-indigo-500" />}
                     colorClass="border-indigo-400 bg-indigo-50"
+                    handleAction={(item) =>
+                        console.log(
+                            `ACTION: Navigating to Campaign Task: ${item.title}`
+                        )
+                    }
                 />
             </div>
 
             {/* Performance Chart */}
-            <div className="mt-10">
-                <PerformanceChart data={campaignChartData} />
-            </div>
+            <div className="mt-10">{/* Passed chart data */}</div>
 
             {/* Recent Activity Feed Placeholder */}
             <div className="mt-10 p-6 bg-gray-100 rounded-2xl shadow-inner border border-gray-200">
@@ -551,6 +943,7 @@ export default function App() {
                     additions, campaign sends, and pipeline changes.]
                 </p>
             </div>
+            <PerformanceChart data={campaignChartData} />
         </>
     );
 
@@ -725,29 +1118,20 @@ export default function App() {
                     {activeCategory === 'Leads' && (
                         <div className="bg-[#EBE5E5] rounded-xl p-4">
                             <h2 className="text-lg font-bold mb-4">
-                                New Lead{' '}
+                                Recent Leads{' '}
                                 <span className="font-normal text-[#868281]">
-                                    8
+                                    {allLeads.length}
                                 </span>
                             </h2>
                             <div className="space-y-4">
-                                {/* Dummy cards for recents */}
-                                <ContactCard
-                                    name="Mandevo"
-                                    date="Jan 5, 2025"
-                                />
-                                <ContactCard
-                                    name="Mike Wong"
-                                    date="Jan 5, 2025"
-                                />
-                                <ContactCard
-                                    name="Esther Howard"
-                                    date="Jan 5, 2025"
-                                />
-                                <ContactCard
-                                    name="Mark Henry"
-                                    date="Jan 5, 2025"
-                                />
+                                {/* Dummy cards for recents - Using rich data */}
+                                {allLeads.slice(0, 4).map((contact) => (
+                                    <ContactCard
+                                        key={contact.id}
+                                        contact={contact}
+                                        onClick={handleViewContact}
+                                    />
+                                ))}
                             </div>
                         </div>
                     )}
@@ -757,23 +1141,18 @@ export default function App() {
                             <h2 className="text-lg font-bold mb-4">
                                 Recently added{' '}
                                 <span className="font-normal text-[#868281]">
-                                    5
+                                    {allContacts.length}
                                 </span>
                             </h2>
                             <div className="space-y-4">
-                                {/* Dummy cards for recents */}
-                                <ContactCard
-                                    name="Peter Klaven"
-                                    date="Jan 5, 2025"
-                                />
-                                <ContactCard
-                                    name="Blemix Koko"
-                                    date="Jan 5, 2025"
-                                />
-                                <ContactCard
-                                    name="Anita Capul"
-                                    date="Jan 5, 2025"
-                                />
+                                {/* Dummy cards for recents - Using rich data */}
+                                {allContacts.slice(0, 4).map((contact) => (
+                                    <ContactCard
+                                        key={contact.id}
+                                        contact={contact}
+                                        onClick={handleViewContact}
+                                    />
+                                ))}
                             </div>
                         </div>
                     )}
@@ -789,11 +1168,12 @@ export default function App() {
                                 <span className="font-normal text-[#868281]">{` (${dataToDisplay.length})`}</span>
                             </h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                {/* Full List - Using rich data */}
                                 {paginatedData.map((data, index) => (
                                     <ContactCard
-                                        key={index}
-                                        name={data.name}
-                                        date={data.date}
+                                        key={data.id}
+                                        contact={data}
+                                        onClick={handleViewContact}
                                     />
                                 ))}
                             </div>
@@ -840,10 +1220,9 @@ export default function App() {
         </>
     );
 
-    // --- New Contact Modal Component ---
+    // --- New Contact Modal Component (Unchanged) ---
     const NewContactModal = ({ isOpen, onClose }) => {
         const [tab, setTab] = useState('manual');
-        // Removed 'type' field from state
         const [contactData, setContactData] = useState({
             name: '',
             email: '',
@@ -910,8 +1289,6 @@ export default function App() {
             </div>
         );
 
-        // SelectField is removed as it's no longer needed for contact type
-
         const renderManualForm = () => (
             <form onSubmit={handleManualSubmit}>
                 <h3 className="text-xl font-semibold text-[#130F0F] mb-4">
@@ -939,7 +1316,6 @@ export default function App() {
                     onChange={handleManualChange}
                     placeholder="e.g., (555) 123-4567"
                 />
-                {/* Removed SelectField for Contact Type */}
                 <button
                     type="submit"
                     className="w-full mt-4 p-3 bg-[#26A248] text-white font-bold rounded-lg hover:bg-[#1F813A] transition duration-150 shadow-md"
@@ -1073,7 +1449,7 @@ export default function App() {
 
     return (
         <div className="flex bg-[#F8F9FA] min-h-screen text-[#130F0F] antialiased font-sans">
-            {/* Sidebar */}
+            {/* Sidebar (Unchanged) */}
             <aside className="w-64 bg-[#E7E3E2] p-6 flex flex-col justify-between shadow-lg">
                 <div>
                     <div className="flex items-center">
@@ -1118,11 +1494,12 @@ export default function App() {
                             {/* Dashboard Link - Now sets page to 'Dashboard' */}
                             <li
                                 className={`flex items-center p-3 rounded-lg text-[#130F0F] cursor-pointer transition-all duration-200 ${
-                                    page === 'Dashboard'
+                                    page === 'Dashboard' &&
+                                    selectedContact === null
                                         ? 'border border-[#B7B1B1] bg-white shadow-md'
                                         : 'hover:bg-[#FFFFFF] hover:shadow-md'
                                 }`}
-                                onClick={() => setPage('Dashboard')}
+                                onClick={() => handleCloseProfile()}
                             >
                                 <svg
                                     className="h-5 w-5 mr-3"
@@ -1167,7 +1544,10 @@ export default function App() {
                                         ? 'border border-[#B7B1B1] bg-white shadow-md'
                                         : 'hover:bg-[#FFFFFF] hover:shadow-md'
                                 }`}
-                                onClick={() => setPage('Summary')}
+                                onClick={() => {
+                                    setPage('Summary');
+                                    setSelectedContact(null);
+                                }}
                             >
                                 <svg
                                     className="h-5 w-5 mr-3"
@@ -1206,14 +1586,14 @@ export default function App() {
             </aside>
 
             {/* Main Content Area */}
-            <main className="flex-1 p-8 bg-white">
+            <main className="flex-1 p-8 bg-[#F8F9FA]">
                 {/* Top Navigation Links (Breadcrumbs) - Simplified to handle Dashboard/Sales Center/List */}
                 <div className="flex items-center justify-start mb-6 text-[#A4A2A3]">
                     <div className="flex items-center space-x-2 text-sm">
                         {/* Home Icon */}
                         <a
                             href="#"
-                            onClick={() => setPage('Dashboard')}
+                            onClick={() => handleCloseProfile()}
                             className="flex items-center hover:text-[#130F0F] transition-colors duration-200"
                         >
                             <svg
@@ -1232,9 +1612,11 @@ export default function App() {
                         </a>
                         <span className="text-[#A4A2A3]">/</span>
 
-                        {/* Current Page Text (Dashboard, Sales Center, or Contacts/Leads) */}
+                        {/* Current Page Text */}
                         <span className="text-[#130F0F] font-semibold transition-colors duration-200">
-                            {breadcrumb}
+                            {selectedContact
+                                ? `${selectedContact.name} Profile`
+                                : breadcrumb}
                         </span>
                     </div>
                 </div>
@@ -1242,11 +1624,19 @@ export default function App() {
                 <div className="border-t border-[#2A2625] mb-6"></div>
 
                 {/* Render content based on page state */}
-                {page === 'Dashboard'
-                    ? renderDashboard()
-                    : page === 'Summary'
-                    ? renderSalesCenterSummary()
-                    : renderContactsLeadsList()}
+                {selectedContact ? (
+                    // If a contact is selected, show the profile view
+                    <ContactProfileView
+                        contact={selectedContact}
+                        onClose={handleCloseProfile}
+                    />
+                ) : page === 'Dashboard' ? (
+                    renderDashboard()
+                ) : page === 'Summary' ? (
+                    renderSalesCenterSummary()
+                ) : (
+                    renderContactsLeadsList()
+                )}
             </main>
 
             {/* New Contact Modal */}
