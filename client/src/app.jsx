@@ -14,6 +14,7 @@ import {
     CalendarCheck,
     User,
     ClipboardList,
+    Send as SendIcon,
 } from 'lucide-react';
 
 // --- Helper Component: Last Contacted Status Card ---
@@ -34,7 +35,7 @@ const LastContactedCard = ({ date }) => {
                     Last Contacted
                 </h3>
             </div>
-            {/* FONT SIZE CHANGED FROM text-3xl to text-2xl */}
+            {/* Date font size adjusted from text-3xl to text-2xl */}
             <p
                 className={`text-2xl font-extrabold ${
                     date ? 'text-gray-900' : 'text-orange-500'
@@ -59,7 +60,7 @@ const ActionButton = ({ icon: Icon, label, onClick }) => (
     </button>
 );
 
-// --- Updated Detailed Contact Profile View ---
+// --- Detailed Contact Profile View ---
 const ContactProfileView = ({ contact, onClose }) => {
     // Mock detailed data setup based on the passed contact object
     const detailedData = useMemo(
@@ -97,10 +98,11 @@ const ContactProfileView = ({ contact, onClose }) => {
         <div className="p-6 bg-gray-50 min-h-[80vh] rounded-2xl shadow-xl w-full">
             <div className="flex justify-between items-center border-b pb-4 mb-6">
                 <h1 className="text-3xl font-bold text-[#130F0F] flex items-center">
+                    {/* The back button now calls the dynamic onClose handler */}
                     <button
                         onClick={onClose}
                         className="p-2 mr-3 rounded-full hover:bg-gray-200 transition-colors"
-                        aria-label="Go back to dashboard"
+                        aria-label="Go back to previous page"
                     >
                         <ArrowLeft size={24} />
                     </button>
@@ -116,7 +118,7 @@ const ContactProfileView = ({ contact, onClose }) => {
 
             {/* Status and Action Buttons */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                {/* Last Contacted Card (only one card now) */}
+                {/* Last Contacted Card */}
                 <LastContactedCard date={detailedData.lastContactDate} />
 
                 {/* Follow-up Actions (E-mail and SMS) */}
@@ -549,9 +551,321 @@ const PerformanceChart = ({ data }) => {
     );
 };
 
+// --- NEW CAMPAIGNS PAGE COMPONENT ---
+const CampaignsPage = ({ allContacts }) => {
+    // State for the campaign form
+    const [campaign, setCampaign] = useState({
+        name: '',
+        subject: '',
+        bodyEmail:
+            'Hi [Contact Name], we hope you are having a great day! Check out our latest offer.\n\nThanks,\n[Admin Name]',
+        bodySms:
+            'Hi [Contact Name], check out our latest offer. Reply STOP to unsubscribe.',
+        imageUrl: '',
+    });
+    const [isSending, setIsSending] = useState(false);
+
+    // Handler for all input changes
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setCampaign((prev) => ({ ...prev, [name]: value }));
+    };
+
+    // Handler for simulating sending
+    const handleSend = () => {
+        if (
+            !campaign.name ||
+            !campaign.subject ||
+            !campaign.bodyEmail ||
+            !campaign.bodySms
+        ) {
+            // Use a custom modal/alert component in a real app, but for this context, use console error and simple alert.
+            console.error(
+                'Validation failed: Please fill out all required fields.'
+            );
+            window.alert(
+                'Please fill out Name, Subject, Email Body, and SMS Body before sending.'
+            );
+            return;
+        }
+
+        setIsSending(true);
+        console.log(
+            `Sending campaign "${campaign.name}" to ${allContacts.length} contacts...`
+        );
+        console.log('Campaign Details:', campaign);
+
+        // Simulate API call delay
+        setTimeout(() => {
+            setIsSending(false);
+            window.alert(
+                `SUCCESS! Campaign "${campaign.name}" simulated send to ${allContacts.length} contacts.`
+            );
+            // Reset form
+            setCampaign({
+                name: '',
+                subject: '',
+                bodyEmail: '',
+                bodySms: '',
+                imageUrl: '',
+            });
+        }, 2000);
+    };
+
+    // Preview Component Logic - EMAIL
+    const EmailPreview = () => (
+        <div className="border border-gray-300 rounded-xl overflow-hidden bg-gray-50 shadow-lg h-full">
+            <div className="bg-gray-200 p-4 text-sm border-b border-gray-300 text-gray-700 font-bold flex items-center justify-between">
+                Email Preview <Mail className="w-4 h-4" />
+            </div>
+            <div className="p-6 space-y-4">
+                <p className="text-xs font-medium text-gray-500">
+                    To: All Contacts ({allContacts.length})
+                </p>
+                <h4 className="text-base font-bold text-gray-900 border-b pb-2">
+                    Subject: {campaign.subject || '[No Subject Entered]'}
+                </h4>
+                {campaign.imageUrl && (
+                    <img
+                        src={campaign.imageUrl}
+                        alt="Email attachment preview"
+                        className="w-full max-h-48 object-cover rounded-lg shadow-md"
+                        onError={(e) => {
+                            e.target.onerror = null;
+                            e.target.src =
+                                'https://placehold.co/400x150/ef4444/ffffff?text=Image+Load+Failed';
+                        }}
+                    />
+                )}
+                <p className="whitespace-pre-wrap text-gray-800 text-sm leading-relaxed">
+                    {campaign.bodyEmail ||
+                        'The body of your email campaign will appear here. Use [Contact Name] for personalization.'}
+                </p>
+                <div className="text-center text-xs text-gray-400 pt-4">
+                    --- Footer/Unsubscribe Link ---
+                </div>
+            </div>
+        </div>
+    );
+
+    // Preview Component Logic - SMS
+    const SmsPreview = () => (
+        <div className="border border-gray-300 rounded-xl overflow-hidden bg-gray-50 shadow-lg h-full">
+            <div className="bg-gray-200 p-4 text-sm border-b border-gray-300 text-gray-700 font-bold flex items-center justify-between">
+                SMS Preview <MessageSquare className="w-4 h-4" />
+            </div>
+            <div className="p-6 flex justify-center items-center h-full">
+                <div className="w-64 border-8 border-gray-900 rounded-[3rem] p-2 bg-black shadow-2xl">
+                    <div className="bg-white h-96 rounded-[2.5rem] p-4 flex flex-col items-start space-y-2">
+                        <div className="w-full flex justify-between text-xs text-gray-600 mb-2">
+                            <span>Carrier</span>
+                            <span>9:41 AM</span>
+                        </div>
+                        <div className="max-w-[85%] bg-[#E7F7EB] p-3 rounded-xl rounded-bl-none shadow-sm ml-auto">
+                            <p className="text-xs whitespace-pre-wrap text-gray-800">
+                                {campaign.bodySms ||
+                                    'Your SMS will appear here. Keep it concise. (Image not supported)'}
+                            </p>
+                        </div>
+                        {campaign.imageUrl && (
+                            <p className="text-red-500 text-xs mt-2 font-medium text-center w-full">
+                                (Image URL ignored for SMS)
+                            </p>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+
+    return (
+        <div className="space-y-8">
+            <div className="p-4 border-l-4 border-[#26A248] bg-[#E7F7EB] rounded-lg shadow-md">
+                <p className="font-semibold text-gray-800">
+                    Target Audience: All Contacts ({allContacts.length})
+                </p>
+                <p className="text-sm text-gray-600">
+                    The current campaign will be sent in bulk to every contact
+                    and lead loaded in the app.
+                </p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Campaign Creation Form (Left Side) */}
+                <div className="bg-white p-6 rounded-2xl shadow-xl border border-gray-100">
+                    <h3 className="text-2xl font-bold text-[#130F0F] mb-6">
+                        Campaign Details
+                    </h3>
+                    <div className="space-y-5">
+                        {/* Campaign Name */}
+                        <div>
+                            <label
+                                htmlFor="name"
+                                className="block text-sm font-medium text-gray-700"
+                            >
+                                Campaign Name (Internal)
+                            </label>
+                            <input
+                                type="text"
+                                name="name"
+                                id="name"
+                                value={campaign.name}
+                                onChange={handleChange}
+                                placeholder="e.g., Q1 Welcome Offer"
+                                className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-[#26A248] focus:border-[#26A248] transition duration-150"
+                                required
+                            />
+                        </div>
+
+                        {/* Email Subject */}
+                        <div>
+                            <label
+                                htmlFor="subject"
+                                className="block text-sm font-medium text-gray-700"
+                            >
+                                Email Subject Line
+                            </label>
+                            <input
+                                type="text"
+                                name="subject"
+                                id="subject"
+                                value={campaign.subject}
+                                onChange={handleChange}
+                                placeholder="e.g., Don't Miss Out! Exclusive 20% Discount Inside"
+                                className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-[#26A248] focus:border-[#26A248] transition duration-150"
+                                required
+                            />
+                        </div>
+
+                        {/* Image URL (For Email Only) */}
+                        <div>
+                            <label
+                                htmlFor="imageUrl"
+                                className="block text-sm font-medium text-gray-700"
+                            >
+                                Image URL (Optional, for Email)
+                            </label>
+                            <input
+                                type="url"
+                                name="imageUrl"
+                                id="imageUrl"
+                                value={campaign.imageUrl}
+                                onChange={handleChange}
+                                placeholder="https://example.com/promo-image.jpg"
+                                className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500 transition duration-150"
+                            />
+                            <p className="text-xs text-gray-500 mt-1">
+                                Note: Use a public image link. Direct file
+                                uploads are complex and often fail in real email
+                                clients.
+                            </p>
+                        </div>
+
+                        {/* Email Body */}
+                        <div>
+                            <label
+                                htmlFor="bodyEmail"
+                                className="block text-sm font-medium text-gray-700"
+                            >
+                                Email Body Content
+                            </label>
+                            <textarea
+                                name="bodyEmail"
+                                id="bodyEmail"
+                                value={campaign.bodyEmail}
+                                onChange={handleChange}
+                                rows="6"
+                                placeholder="Write your full email content here. Use [Contact Name] for personalization."
+                                className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-[#26A248] focus:border-[#26A248] transition duration-150"
+                                required
+                            ></textarea>
+                        </div>
+
+                        {/* SMS Body */}
+                        <div>
+                            <label
+                                htmlFor="bodySms"
+                                className="block text-sm font-medium text-gray-700"
+                            >
+                                SMS Body Content
+                            </label>
+                            <textarea
+                                name="bodySms"
+                                id="bodySms"
+                                value={campaign.bodySms}
+                                onChange={handleChange}
+                                rows="3"
+                                maxLength="320"
+                                placeholder="Keep it short and concise for SMS. Max 320 characters."
+                                className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-[#26A248] focus:border-[#26A248] transition duration-150"
+                                required
+                            ></textarea>
+                            <p className="text-xs text-gray-500 mt-1">
+                                Characters: {campaign.bodySms.length}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Campaign Previews (Right Side) */}
+                <div className="space-y-8">
+                    <h3 className="text-2xl font-bold text-[#130F0F]">
+                        Live Previews
+                    </h3>
+                    <EmailPreview />
+                    <SmsPreview />
+                </div>
+            </div>
+
+            {/* Send Button */}
+            <div className="flex justify-end pt-6 border-t border-gray-200 mt-8">
+                <button
+                    onClick={handleSend}
+                    disabled={isSending}
+                    className="flex items-center p-4 rounded-xl bg-[#26A248] text-white text-lg font-bold shadow-xl hover:bg-[#1F813A] transition-all duration-200 transform hover:scale-[1.01] disabled:bg-gray-400 disabled:cursor-not-allowed"
+                >
+                    {isSending ? (
+                        <>
+                            <svg
+                                className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                            >
+                                <circle
+                                    className="opacity-25"
+                                    cx="12"
+                                    cy="12"
+                                    r="10"
+                                    stroke="currentColor"
+                                    strokeWidth="4"
+                                ></circle>
+                                <path
+                                    className="opacity-75"
+                                    fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                ></path>
+                            </svg>
+                            Sending...
+                        </>
+                    ) : (
+                        <>
+                            <SendIcon className="h-6 w-6 mr-3" />
+                            Send Campaign to {allContacts.length} Contacts
+                        </>
+                    )}
+                </button>
+            </div>
+        </div>
+    );
+};
+
 // Main App component
 export default function App() {
-    // Page state: 'Dashboard' (new default), 'Summary' (Sales Center Summary), or 'List'
+    // === 1. Navigation State for Dynamic Back Button ===
+    // Tracks the path of main views visited: ['Dashboard', 'Summary', 'List', 'Campaigns']
+    const [navigationHistory, setNavigationHistory] = useState(['Dashboard']);
+    // Page state: 'Dashboard', 'Summary', 'List', 'Campaigns', or null (for profile view)
     const [page, setPage] = useState('Dashboard');
     // State for showing the detailed profile view
     const [selectedContact, setSelectedContact] = useState(null);
@@ -564,22 +878,49 @@ export default function App() {
     const [isModalOpen, setIsModalOpen] = useState(false); // State for New Contact Modal
     const contactsPerPage = 13;
 
+    // --- Centralized Navigation Handler ---
+    const handleNavigate = (newPage) => {
+        // Only push the current page onto history if we are moving to a different main page
+        if (page !== newPage && newPage && page !== null) {
+            // Include check for page !== null (when profile is open)
+            setNavigationHistory((prev) => [...prev, page]);
+        }
+        setPage(newPage);
+        setSelectedContact(null); // Always clear contact when changing main page
+    };
+
     // Handler for viewing a detailed contact profile
     const handleViewContact = (contact) => {
-        // A simplified contact object from the Quick Action card might need to be resolved
-        // to the full contact object for the detailed view.
         const fullContact =
             [...allContacts, ...allLeads].find((c) => c.id === contact.id) ||
             contact;
 
+        // 1. Save the current page to history before going to profile view
+        setNavigationHistory((prev) => [...prev, page]);
+
+        // 2. Open the profile view
         setSelectedContact(fullContact);
-        setPage(null); // Clear the page state when viewing a profile
+        setPage(null); // Set page to null to trigger ContactProfileView rendering
     };
 
-    // Handler to close the contact profile view and return to the dashboard
+    // --- Handler to close the contact profile view and return to the previous page ---
     const handleCloseProfile = () => {
         setSelectedContact(null);
-        setPage('Dashboard');
+        setNavigationHistory((prevHistory) => {
+            // If there's history to go back to (i.e., we are not at the very first step)
+            if (prevHistory.length > 0) {
+                // Get the page we need to return to (the last one saved in history)
+                const pageToReturnTo = prevHistory[prevHistory.length - 1];
+                setPage(pageToReturnTo);
+
+                // Return history array without the last element
+                return prevHistory.slice(0, -1);
+            }
+
+            // Fallback: If history is empty, go to Dashboard
+            setPage('Dashboard');
+            return ['Dashboard'];
+        });
     };
 
     // Modal handlers
@@ -817,6 +1158,7 @@ export default function App() {
         setIsDropdownOpen(false);
         if (option === 'all') {
             setCurrentPage(1); // Reset to first page when switching to 'All' view
+            handleNavigate('List'); // Ensure we are in the list view context
         }
     };
 
@@ -828,6 +1170,15 @@ export default function App() {
                 title: 'Dashboard',
                 description: 'Key business metrics and campaign overview.',
                 breadcrumb: 'Dashboard',
+            };
+        }
+
+        if (page === 'Campaigns') {
+            return {
+                title: 'New Campaign',
+                description:
+                    'Create and send new bulk outreach campaigns (Email & SMS).',
+                breadcrumb: 'Campaigns',
             };
         }
 
@@ -843,12 +1194,12 @@ export default function App() {
         const categoryContent =
             activeCategory === 'Contacts'
                 ? {
-                      title: 'Contacts',
+                      title: 'Contacts List',
                       description:
                           'List of people or organizations for communication',
                   }
                 : {
-                      title: 'Leads',
+                      title: 'Leads List',
                       description:
                           'List of people or organizations that have been targeted for advertising',
                   };
@@ -878,7 +1229,7 @@ export default function App() {
                     description="All individuals and organizations in your communication network."
                     onClick={() => {
                         setActiveCategory('Contacts');
-                        setPage('List');
+                        handleNavigate('List'); // Use handleNavigate
                         setViewMode('all');
                     }}
                 />
@@ -888,7 +1239,7 @@ export default function App() {
                     description="Potential customers targeted by ongoing marketing campaigns."
                     onClick={() => {
                         setActiveCategory('Leads');
-                        setPage('List');
+                        handleNavigate('List'); // Use handleNavigate
                         setViewMode('all');
                     }}
                 />
@@ -896,13 +1247,13 @@ export default function App() {
                     title="Total Campaigns"
                     count={totalCampaigns}
                     description="The total number of marketing initiatives defined and tracked."
-                    onClick={() => console.log('ACTION: View Total Campaigns')}
+                    onClick={() => handleNavigate('Campaigns')} // Redirect to Campaigns page
                 />
                 <SummaryCard
                     title="Sent Campaigns"
                     count={sentCampaigns}
                     description="Campaigns that have been deployed and delivered to customers/leads."
-                    onClick={() => console.log('ACTION: View Sent Campaigns')}
+                    onClick={() => handleNavigate('Campaigns')} // Redirect to Campaigns page
                 />
             </div>
 
@@ -931,7 +1282,9 @@ export default function App() {
             </div>
 
             {/* Performance Chart */}
-            <div className="mt-10">{/* Passed chart data */}</div>
+            <div className="mt-10">
+                <PerformanceChart data={campaignChartData} />
+            </div>
 
             {/* Recent Activity Feed Placeholder */}
             <div className="mt-10 p-6 bg-gray-100 rounded-2xl shadow-inner border border-gray-200">
@@ -943,7 +1296,6 @@ export default function App() {
                     additions, campaign sends, and pipeline changes.]
                 </p>
             </div>
-            <PerformanceChart data={campaignChartData} />
         </>
     );
 
@@ -961,7 +1313,7 @@ export default function App() {
                     description="All individuals and organizations currently in your communication network."
                     onClick={() => {
                         setActiveCategory('Contacts');
-                        setPage('List');
+                        handleNavigate('List'); // Use handleNavigate
                         setViewMode('all');
                     }}
                 />
@@ -971,7 +1323,7 @@ export default function App() {
                     description="Individuals or organizations identified as potential customers targeted by campaigns."
                     onClick={() => {
                         setActiveCategory('Leads');
-                        setPage('List');
+                        handleNavigate('List'); // Use handleNavigate
                         setViewMode('all');
                     }}
                 />
@@ -989,6 +1341,7 @@ export default function App() {
                         onClick={() => {
                             setActiveCategory('Contacts');
                             setViewMode('recents');
+                            handleNavigate('List');
                         }}
                         className={`font-medium text-lg ${
                             activeCategory === 'Contacts'
@@ -1008,6 +1361,7 @@ export default function App() {
                         onClick={() => {
                             setActiveCategory('Leads');
                             setViewMode('recents');
+                            handleNavigate('List');
                         }}
                         className={`font-medium text-lg ${
                             activeCategory === 'Leads'
@@ -1491,7 +1845,7 @@ export default function App() {
                             Main Menu
                         </h3>
                         <ul className="space-y-1">
-                            {/* Dashboard Link - Now sets page to 'Dashboard' */}
+                            {/* Dashboard Link */}
                             <li
                                 className={`flex items-center p-3 rounded-lg text-[#130F0F] cursor-pointer transition-all duration-200 ${
                                     page === 'Dashboard' &&
@@ -1499,7 +1853,7 @@ export default function App() {
                                         ? 'border border-[#B7B1B1] bg-white shadow-md'
                                         : 'hover:bg-[#FFFFFF] hover:shadow-md'
                                 }`}
-                                onClick={() => handleCloseProfile()}
+                                onClick={() => handleNavigate('Dashboard')}
                             >
                                 <svg
                                     className="h-5 w-5 mr-3"
@@ -1516,20 +1870,16 @@ export default function App() {
                                 </svg>
                                 Dashboard
                             </li>
-                            <li className="flex items-center p-3 rounded-lg text-[#130F0F] hover:bg-[#FFFFFF] hover:shadow-md cursor-pointer transition-colors duration-200">
-                                <svg
-                                    className="h-5 w-5 mr-3"
-                                    fill="none"
-                                    viewBox="0 0 24 24"
-                                    stroke="currentColor"
-                                >
-                                    <path
-                                        strokeLinecap="round"
-                                        strokeLinejoin="round"
-                                        strokeWidth="2"
-                                        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.5-1.5a2.25 2.25 0 013 3L11.5 21l-4.5 1 1-4.5L18 8.5z"
-                                    />
-                                </svg>
+                            {/* Campaigns Link - NEW */}
+                            <li
+                                className={`flex items-center p-3 rounded-lg text-[#130F0F] cursor-pointer transition-all duration-200 ${
+                                    page === 'Campaigns'
+                                        ? 'border border-[#B7B1B1] bg-white shadow-md'
+                                        : 'hover:bg-[#FFFFFF] hover:shadow-md'
+                                }`}
+                                onClick={() => handleNavigate('Campaigns')}
+                            >
+                                <Send className="h-5 w-5 mr-3" />
                                 Campaigns
                             </li>
                         </ul>
@@ -1537,17 +1887,14 @@ export default function App() {
                             Team Management
                         </h3>
                         <ul className="space-y-1">
-                            {/* Sales Center Link - Now sets page to 'Summary' */}
+                            {/* Sales Center Link */}
                             <li
                                 className={`flex items-center p-3 rounded-lg text-[#130F0F] cursor-pointer transition-all duration-200 ${
                                     page === 'Summary' || page === 'List'
                                         ? 'border border-[#B7B1B1] bg-white shadow-md'
                                         : 'hover:bg-[#FFFFFF] hover:shadow-md'
                                 }`}
-                                onClick={() => {
-                                    setPage('Summary');
-                                    setSelectedContact(null);
-                                }}
+                                onClick={() => handleNavigate('Summary')}
                             >
                                 <svg
                                     className="h-5 w-5 mr-3"
@@ -1587,13 +1934,13 @@ export default function App() {
 
             {/* Main Content Area */}
             <main className="flex-1 p-8 bg-[#F8F9FA]">
-                {/* Top Navigation Links (Breadcrumbs) - Simplified to handle Dashboard/Sales Center/List */}
+                {/* Top Navigation Links (Breadcrumbs) - Simplified to handle all pages */}
                 <div className="flex items-center justify-start mb-6 text-[#A4A2A3]">
                     <div className="flex items-center space-x-2 text-sm">
                         {/* Home Icon */}
                         <a
                             href="#"
-                            onClick={() => handleCloseProfile()}
+                            onClick={() => handleNavigate('Dashboard')}
                             className="flex items-center hover:text-[#130F0F] transition-colors duration-200"
                         >
                             <svg
@@ -1623,6 +1970,14 @@ export default function App() {
 
                 <div className="border-t border-[#2A2625] mb-6"></div>
 
+                {/* Page Title and Description Block */}
+                {selectedContact === null && (
+                    <div className="mb-6">
+                        <h1 className="text-3xl font-bold mb-1">{title}</h1>
+                        <p className="text-md text-[#2F2F2F]">{description}</p>
+                    </div>
+                )}
+
                 {/* Render content based on page state */}
                 {selectedContact ? (
                     // If a contact is selected, show the profile view
@@ -1632,6 +1987,10 @@ export default function App() {
                     />
                 ) : page === 'Dashboard' ? (
                     renderDashboard()
+                ) : page === 'Campaigns' ? (
+                    <CampaignsPage
+                        allContacts={[...allContacts, ...allLeads]}
+                    /> // Pass combined list of contacts
                 ) : page === 'Summary' ? (
                     renderSalesCenterSummary()
                 ) : (
