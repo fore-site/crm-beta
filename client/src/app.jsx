@@ -296,7 +296,13 @@ export default function App() {
 
     return (
         <div className="flex min-h-screen bg-gray-50 text-[#130F0F]">
-            <Sidebar />
+            <Sidebar
+                page={page}
+                selectedContact={selectedContact}
+                setPage={setPage}
+                setSelectedContact={setSelectedContact}
+                setIsModalOpen={setIsModalOpen}
+            />
 
             <main className="flex-1 p-8">
                 {/* Header / breadcrumbs */}
