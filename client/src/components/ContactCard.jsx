@@ -46,8 +46,12 @@ export default function ContactCard({ contact, onClick }) {
 
     return (
         <div
-            className="bg-white p-4 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-200 flex items-start relative border border-[#DEE2E6] cursor-pointer"
+            className="bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 flex items-start relative border border-gray-100 cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-100"
             onClick={() => onClick(contact)}
+            tabIndex={0}
+            onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') onClick(contact);
+            }}
         >
             <div
                 className="flex justify-end absolute top-2 right-2 z-10"
@@ -55,7 +59,7 @@ export default function ContactCard({ contact, onClick }) {
                 onClick={(e) => e.stopPropagation()}
             >
                 <button
-                    className="p-1 rounded-full text-[#868281] hover:bg-[#E7F7EB] transition-colors"
+                    className="p-1 rounded-full text-gray-500 hover:bg-emerald-50 transition-colors"
                     onClick={(e) => {
                         e.stopPropagation();
                         setIsMenuOpen(!isMenuOpen);
@@ -71,7 +75,7 @@ export default function ContactCard({ contact, onClick }) {
                     </svg>
                 </button>
                 {isMenuOpen && (
-                    <div className="absolute z-20 right-0 mt-8 w-40 rounded-lg shadow-2xl bg-white ring-1 ring-black ring-opacity-5">
+                    <div className="absolute z-20 right-0 mt-8 w-44 rounded-lg shadow-lg bg-white ring-1 ring-black ring-opacity-5">
                         <div className="py-1">
                             <button
                                 className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
@@ -91,10 +95,10 @@ export default function ContactCard({ contact, onClick }) {
             </div>
 
             {/* Contact Content */}
-            <div className="h-10 w-10 bg-[#DEE2E6] rounded-full flex-shrink-0 mr-3 mt-1"></div>
+            <div className="h-10 w-10 bg-emerald-50 text-emerald-700 rounded-full flex-shrink-0 mr-3 mt-1 flex items-center justify-center font-semibold">{(contact.name || '?').slice(0,2).toUpperCase()}</div>
             <div className="flex-1 min-w-0">
-                <h3 className="font-semibold text-[#130F0F]">{contact.name}</h3>
-                <p className={`text-xs ${contactTextColor} flex items-center`}>
+                <h3 className="font-semibold text-gray-900">{contact.name}</h3>
+                <p className={`text-xs ${contactTextColor.replace('#868281','text-gray-500')} flex items-center`}>
                     <Clock size={12} className="mr-1" />
                     {lastContactDisplay}
                 </p>
@@ -114,9 +118,7 @@ export default function ContactCard({ contact, onClick }) {
                                 d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-3.961a18.06 18.06 0 01-13.486-13.486V5a2 2 0 012-2z"
                             />
                         </svg>
-                        <p className="flex-1 min-w-0 break-words">
-                            {contact.phone || 'N/A'}
-                        </p>
+                        <p className="flex-1 min-w-0 break-words text-gray-700">{contact.phone || 'N/A'}</p>
                     </div>
                     {/* Email */}
                     <div className="flex items-start">
@@ -133,9 +135,7 @@ export default function ContactCard({ contact, onClick }) {
                                 d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8m-17 4v7a2 2 0 002 2h14a2 2 0 002-2v-7"
                             />
                         </svg>
-                        <p className="flex-1 min-w-0 break-words">
-                            {contact.email || 'N/A'}
-                        </p>
+                        <p className="flex-1 min-w-0 break-words text-gray-700">{contact.email || 'N/A'}</p>
                     </div>
                 </div>
             </div>
