@@ -4,7 +4,11 @@ export default {
     // It tells Tailwind which files to scan for class names.
     // We've configured it to look in your HTML file and all
     // JavaScript, TypeScript, JSX, and TSX files inside the 'src' folder.
-    content: ['./index.html', './src/main.jsx', './src/app.jsx'],
+    content: [
+        './index.html',
+        // scan everything under src (components, pages, utils, etc.)
+        './src/**/*.{js,jsx,ts,tsx,html}',
+    ],
     // The 'theme' object is where you can customize Tailwind's default design system.
     // You can extend it to add your own colors, fonts, spacing, etc.
     theme: {
