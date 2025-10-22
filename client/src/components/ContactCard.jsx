@@ -14,8 +14,8 @@ export default function ContactCard({ contact, onClick }) {
         : 'No campaign yet';
 
     const contactTextColor = contact.lastContactDate
-        ? 'text-[#868281]'
-        : 'text-orange-500 font-semibold';
+        ? 'text-gray-500'
+        : 'text-accent-500 font-semibold';
 
     // Simple click-outside handler
     useEffect(() => {
@@ -46,7 +46,7 @@ export default function ContactCard({ contact, onClick }) {
 
     return (
         <div
-            className="bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 flex items-start relative border border-gray-100 cursor-pointer focus:outline-none focus:ring-2 focus:ring-emerald-100"
+            className="bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 flex items-start relative border border-gray-100 cursor-pointer focus:outline-none focus:ring-2 focus:ring-brand-100"
             onClick={() => onClick(contact)}
             tabIndex={0}
             onKeyDown={(e) => {
@@ -59,7 +59,7 @@ export default function ContactCard({ contact, onClick }) {
                 onClick={(e) => e.stopPropagation()}
             >
                 <button
-                    className="p-1 rounded-full text-gray-500 hover:bg-emerald-50 transition-colors"
+                    className="p-1 rounded-full text-gray-500 hover:bg-brand-50 transition-colors"
                     onClick={(e) => {
                         e.stopPropagation();
                         setIsMenuOpen(!isMenuOpen);
@@ -95,21 +95,16 @@ export default function ContactCard({ contact, onClick }) {
             </div>
 
             {/* Contact Content */}
-            <div className="h-10 w-10 bg-emerald-50 text-emerald-700 rounded-full flex-shrink-0 mr-3 mt-1 flex items-center justify-center font-semibold">
+            <div className="h-10 w-10 bg-brand-50 text-brand-700 rounded-full flex-shrink-0 mr-3 mt-1 flex items-center justify-center font-semibold">
                 {(contact.name || '?').slice(0, 2).toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
                 <h3 className="font-semibold text-gray-900">{contact.name}</h3>
-                <p
-                    className={`text-xs ${contactTextColor.replace(
-                        '#868281',
-                        'text-gray-500'
-                    )} flex items-center`}
-                >
+                <p className={`text-xs ${contactTextColor} flex items-center`}>
                     <Clock size={12} className="mr-1" />
                     {lastContactDisplay}
                 </p>
-                <div className="mt-2 text-sm text-[#868281] space-y-1">
+                <div className="mt-2 text-sm text-gray-500 space-y-1">
                     {/* Phone */}
                     <div className="flex items-start">
                         <svg

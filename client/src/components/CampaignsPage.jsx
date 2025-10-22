@@ -48,7 +48,7 @@ const SmsPreview = ({ campaign }) => (
                         <span>Carrier</span>
                         <span>9:41 AM</span>
                     </div>
-                    <div className="max-w-[85%] bg-[#E7F7EB] p-3 rounded-xl rounded-bl-none shadow-sm ml-auto">
+                    <div className="max-w-[85%] bg-neutral-50 p-3 rounded-xl rounded-bl-none shadow-sm ml-auto">
                         <p className="text-xs whitespace-pre-wrap text-gray-800">
                             {campaign.bodySms ||
                                 'Your SMS will appear here. Keep it concise. (Image not supported)'}
@@ -114,7 +114,7 @@ export default function CampaignsPage({ allContacts = [] }) {
 
     return (
         <div className="space-y-8">
-            <div className="p-4 border-l-4 border-emerald-600 bg-emerald-50 rounded-lg shadow-md">
+            <div className="p-4 border-l-4 border-brand-600 bg-brand-50 rounded-lg shadow-md">
                 <p className="font-semibold text-gray-800">
                     Target Audience: All Contacts ({allContacts.length})
                 </p>
@@ -126,7 +126,7 @@ export default function CampaignsPage({ allContacts = [] }) {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                    <h3 className="text-2xl font-bold text-[#130F0F] mb-6">
+                    <h3 className="text-2xl font-bold text-gray-900 mb-6">
                         Campaign Details
                     </h3>
                     <div className="space-y-5">
@@ -146,7 +146,7 @@ export default function CampaignsPage({ allContacts = [] }) {
                                     handleChange('name', e.target.value)
                                 }
                                 placeholder="e.g., Q1 Welcome Offer"
-                                className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-emerald-200 focus:border-emerald-300 transition duration-150"
+                                className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-brand-200 focus:border-brand-300 transition duration-150"
                             />
                         </div>
 
@@ -166,7 +166,7 @@ export default function CampaignsPage({ allContacts = [] }) {
                                     handleChange('subject', e.target.value)
                                 }
                                 placeholder="e.g., Don't Miss Out! Exclusive 20% Discount Inside"
-                                className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-emerald-200 focus:border-emerald-300 transition duration-150"
+                                className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-brand-200 focus:border-brand-300 transition duration-150"
                                 required
                             />
                         </div>
@@ -187,7 +187,7 @@ export default function CampaignsPage({ allContacts = [] }) {
                                     handleChange('imageUrl', e.target.value)
                                 }
                                 placeholder="https://example.com/promo-image.jpg"
-                                className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-emerald-200 focus:border-emerald-300 transition duration-150"
+                                className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-brand-200 focus:border-brand-300 transition duration-150"
                             />
                             <p className="text-xs text-gray-500 mt-1">
                                 Note: Use a public image link. Direct file
@@ -212,7 +212,7 @@ export default function CampaignsPage({ allContacts = [] }) {
                                 }
                                 rows="6"
                                 placeholder="Write your full email content here. Use [Contact Name] for personalization."
-                                className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-emerald-200 focus:border-emerald-300 transition duration-150"
+                                className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-brand-200 focus:border-brand-300 transition duration-150"
                                 required
                             ></textarea>
                         </div>
@@ -234,7 +234,7 @@ export default function CampaignsPage({ allContacts = [] }) {
                                 rows="3"
                                 maxLength="320"
                                 placeholder="Keep it short and concise for SMS. Max 320 characters."
-                                className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-emerald-200 focus:border-emerald-300 transition duration-150"
+                                className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-brand-200 focus:border-brand-300 transition duration-150"
                                 required
                             ></textarea>
                             <p className="text-xs text-gray-500 mt-1">
@@ -245,7 +245,7 @@ export default function CampaignsPage({ allContacts = [] }) {
                         <div className="flex items-center gap-3">
                             <button
                                 onClick={handleSend}
-                                className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
+                                className="px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition-colors"
                             >
                                 {isSending ? 'Sending...' : 'Send Test'}
                             </button>
@@ -268,7 +268,7 @@ export default function CampaignsPage({ allContacts = [] }) {
                 </div>
 
                 <div className="space-y-8">
-                    <h3 className="text-2xl font-bold text-[#130F0F]">
+                    <h3 className="text-2xl font-bold text-gray-900">
                         Live Previews
                     </h3>
                     <EmailPreview
@@ -283,7 +283,7 @@ export default function CampaignsPage({ allContacts = [] }) {
                 <button
                     onClick={handleSend}
                     disabled={isSending}
-                    className="flex items-center p-4 rounded-xl bg-emerald-600 text-white text-lg font-bold shadow-xl hover:bg-emerald-700 transition-all duration-200 transform hover:scale-[1.01] disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    className="flex items-center p-4 rounded-xl bg-brand-600 text-white text-lg font-bold shadow-xl hover:bg-brand-700 transition-all duration-200 transform hover:scale-[1.01] disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
                     {isSending ? (
                         <>

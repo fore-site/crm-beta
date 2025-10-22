@@ -215,7 +215,7 @@ export default function App() {
                     <button
                         className={`px-3 py-2 rounded ${
                             activeCategory === 'Contacts'
-                                ? 'bg-[#26A248] text-white'
+                                ? 'bg-brand text-white'
                                 : 'bg-white border'
                         }`}
                         onClick={() => setActiveCategory('Contacts')}
@@ -225,7 +225,7 @@ export default function App() {
                     <button
                         className={`px-3 py-2 rounded ${
                             activeCategory === 'Leads'
-                                ? 'bg-[#26A248] text-white'
+                                ? 'bg-brand text-white'
                                 : 'bg-white border'
                         }`}
                         onClick={() => setActiveCategory('Leads')}
@@ -295,7 +295,7 @@ export default function App() {
     );
 
     return (
-        <div className="flex min-h-screen bg-gray-50 text-[#130F0F]">
+        <div className="flex min-h-screen bg-gray-50 text-gray-900">
             <Sidebar
                 page={page}
                 selectedContact={selectedContact}

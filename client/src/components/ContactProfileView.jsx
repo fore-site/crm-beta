@@ -15,7 +15,7 @@ const LastContactedCard = ({ date }) => {
 
     return (
         <div className="p-4 bg-white rounded-xl shadow-sm border border-gray-100 min-h-[120px] w-full">
-            <div className="flex items-center text-emerald-600 mb-2">
+            <div className="flex items-center text-brand-600 mb-2">
                 <CalendarCheck className="w-5 h-5 mr-2" />
                 <h3 className="font-bold text-sm uppercase tracking-wider">
                     Last Contacted
@@ -23,7 +23,7 @@ const LastContactedCard = ({ date }) => {
             </div>
             <p
                 className={`text-2xl font-extrabold ${
-                    date ? 'text-gray-900' : 'text-orange-500'
+                    date ? 'text-gray-900' : 'text-accent-500'
                 }`}
             >
                 {displayValue}
@@ -36,10 +36,10 @@ const LastContactedCard = ({ date }) => {
 const ActionButton = ({ icon: Icon, label, onClick }) => (
     <button
         onClick={onClick}
-        className="flex items-center justify-center p-3 text-sm font-semibold transition-all duration-200 bg-white border border-gray-200 rounded-lg hover:bg-emerald-50 hover:border-emerald-200 text-gray-700 shadow-sm flex-1 min-w-[120px]"
+        className="flex items-center justify-center p-3 text-sm font-semibold transition-all duration-200 bg-white border border-gray-200 rounded-lg hover:bg-brand-50 hover:border-brand-200 text-gray-700 shadow-sm flex-1 min-w-[120px]"
         aria-label={`Action: ${label}`}
     >
-        <Icon className="w-5 h-5 mr-2 text-emerald-500" />
+        <Icon className="w-5 h-5 mr-2 text-brand-500" />
         {label}
     </button>
 );
@@ -73,16 +73,16 @@ export default function ContactProfileView({ contact, onClose }) {
 
     const statusBadgeClass =
         detailedData.category === 'Lead'
-            ? 'bg-yellow-100 text-yellow-800'
-            : 'bg-emerald-100 text-emerald-800';
+            ? 'bg-accent-100 text-accent-800'
+            : 'bg-brand-100 text-brand-800';
 
     return (
-        <div className="p-6 bg-gray-50 min-h-[80vh] rounded-2xl shadow-xl w-full">
+        <div className="p-6 bg-neutral-50 min-h-[80vh] rounded-2xl shadow-xl w-full">
             <div className="flex justify-between items-center border-b pb-4 mb-6">
                 <h1 className="text-3xl font-bold text-gray-900 flex items-center">
                     <button
                         onClick={onClose}
-                        className="p-2 mr-3 rounded-full hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-100"
+                        className="p-2 mr-3 rounded-full hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-100"
                         aria-label="Go back to previous page"
                     >
                         <ArrowLeft size={24} />
@@ -91,7 +91,7 @@ export default function ContactProfileView({ contact, onClose }) {
                 </h1>
                 <button
                     onClick={onClose}
-                    className="text-gray-400 hover:text-red-500 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-100 rounded-full p-1"
+                    className="text-gray-400 hover:text-red-500 transition-colors focus:outline-none focus:ring-2 focus:ring-brand-100 rounded-full p-1"
                 >
                     <X size={24} />
                 </button>
@@ -157,11 +157,11 @@ export default function ContactProfileView({ contact, onClose }) {
                 <div className="lg:col-span-2 space-y-6">
                     <div className="p-6 bg-white rounded-xl shadow-sm border border-gray-100">
                         <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center">
-                            <ClipboardList className="w-5 h-5 mr-2 text-gray-600" />
+                            <ClipboardList className="w-5 h-5 mr-2 text-gray-600" />{' '}
                             Internal Notes
                         </h2>
-                        <div className="space-y-3 bg-gray-50 p-4 rounded-lg border border-gray-200 h-32 overflow-y-auto">
-                            <div className="border-l-4 border-amber-400 pl-3">
+                        <div className="space-y-3 bg-neutral-50 p-4 rounded-lg border border-gray-200 h-32 overflow-y-auto">
+                            <div className="border-l-4 border-accent-400 pl-3">
                                 <p className="text-xs text-gray-500 font-medium">
                                     Jan 1, 2025
                                 </p>
@@ -173,12 +173,12 @@ export default function ContactProfileView({ contact, onClose }) {
                         <textarea
                             placeholder="Add a new note..."
                             rows="3"
-                            className="w-full mt-3 p-3 border border-gray-300 rounded-lg focus:ring-emerald-200 focus:border-emerald-300 transition duration-150"
+                            className="w-full mt-3 p-3 border border-gray-300 rounded-lg focus:ring-brand-200 focus:border-brand-300 transition duration-150"
                         ></textarea>
                     </div>
 
                     <div className="p-6 bg-white rounded-xl shadow-md border border-gray-100">
-                        <h2 className="text-2xl font-bold text-[#130F0F] mb-4">
+                        <h2 className="text-2xl font-bold text-gray-900 mb-4">
                             Campaign History
                         </h2>
                         <ul className="space-y-3">
@@ -187,7 +187,7 @@ export default function ContactProfileView({ contact, onClose }) {
                                     key={campaign.id}
                                     className="flex justify-between items-center p-3 bg-white border border-gray-200 rounded-lg shadow-sm"
                                 >
-                                    <span className="font-medium text-[#130F0F]">
+                                    <span className="font-medium text-gray-900">
                                         {campaign.name}
                                     </span>
                                     <div className="text-sm">

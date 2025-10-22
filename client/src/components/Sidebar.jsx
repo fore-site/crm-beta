@@ -10,7 +10,7 @@ export default function Sidebar({
     return (
         <aside className="w-64 bg-white p-6 border-r border-gray-100 flex flex-col">
             <div className="flex items-center mb-6">
-                <div className="h-10 w-10 bg-emerald-50 text-emerald-700 rounded-full flex items-center justify-center font-semibold">
+                <div className="h-10 w-10 bg-brand-50 text-brand-700 rounded-full flex items-center justify-center font-semibold">
                     RA
                 </div>
                 <div className="ml-3">
@@ -33,9 +33,9 @@ export default function Sidebar({
                             <button
                                 className={`w-full text-left px-3 py-2 rounded-lg transition-colors ${
                                     page === item.key
-                                        ? 'bg-emerald-50 font-semibold text-emerald-700'
+                                        ? 'bg-brand-50 font-semibold text-brand-700'
                                         : 'hover:bg-gray-50 text-gray-700'
-                                } focus:outline-none focus:ring-2 focus:ring-emerald-100`}
+                                } focus:outline-none focus:ring-2 focus:ring-brand-100`}
                                 onClick={() => {
                                     setPage(item.key);
                                     setSelectedContact(null);
@@ -50,7 +50,7 @@ export default function Sidebar({
 
             <div className="mt-6">
                 <button
-                    className="w-full px-3 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-200 transition-colors"
+                    className="w-full px-3 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-200 transition-colors"
                     onClick={() => setIsModalOpen(true)}
                 >
                     New Contact

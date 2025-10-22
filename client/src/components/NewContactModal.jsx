@@ -14,7 +14,7 @@ export default function NewContactModal({ isOpen, onClose }) {
                     </h3>
                     <button
                         onClick={onClose}
-                        className="text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-emerald-100 rounded"
+                        className="text-gray-400 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-100 rounded"
                     >
                         Close
                     </button>
@@ -30,7 +30,7 @@ export default function NewContactModal({ isOpen, onClose }) {
                         Full name
                     </label>
                     <input
-                        className="w-full p-3 border border-gray-200 rounded-lg mb-3 focus:ring-emerald-200 focus:border-emerald-300"
+                        className="w-full p-3 border border-gray-200 rounded-lg mb-3 focus:ring-brand-200 focus:border-brand-300"
                         value={form.name}
                         onChange={(e) =>
                             setForm({ ...form, name: e.target.value })
@@ -39,7 +39,7 @@ export default function NewContactModal({ isOpen, onClose }) {
 
                     <label className="block text-sm text-gray-700">Email</label>
                     <input
-                        className="w-full p-3 border border-gray-200 rounded-lg mb-3 focus:ring-emerald-200 focus:border-emerald-300"
+                        className="w-full p-3 border border-gray-200 rounded-lg mb-3 focus:ring-brand-200 focus:border-brand-300"
                         value={form.email}
                         onChange={(e) =>
                             setForm({ ...form, email: e.target.value })
@@ -48,7 +48,7 @@ export default function NewContactModal({ isOpen, onClose }) {
 
                     <label className="block text-sm text-gray-700">Phone</label>
                     <input
-                        className="w-full p-3 border border-gray-200 rounded-lg mb-3 focus:ring-emerald-200 focus:border-emerald-300"
+                        className="w-full p-3 border border-gray-200 rounded-lg mb-3 focus:ring-brand-200 focus:border-brand-300"
                         value={form.phone}
                         onChange={(e) =>
                             setForm({ ...form, phone: e.target.value })
@@ -65,7 +65,7 @@ export default function NewContactModal({ isOpen, onClose }) {
                         </button>
                         <button
                             type="submit"
-                            className="px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-200"
+                            className="px-4 py-2 rounded-lg bg-brand-600 text-white hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-brand-200"
                         >
                             Add
                         </button>
