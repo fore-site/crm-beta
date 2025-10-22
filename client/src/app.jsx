@@ -2,6 +2,8 @@ import React, { useState, useMemo } from 'react';
 import ContactCard from './components/ContactCard.jsx';
 import ContactProfileView from './components/ContactProfileView.jsx';
 import CampaignsPage from './components/CampaignsPage.jsx';
+import AnalyticsPage from './components/AnalyticsPage.jsx';
+import ClientsPage from './components/ClientsPage.jsx';
 import Sidebar from './components/Sidebar.jsx';
 import SummaryCard from './components/SummaryCard.jsx';
 import NewContactModal from './components/NewContactModal.jsx';
@@ -138,14 +140,22 @@ export default function App() {
         <div>
             <div className="mb-6 flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold">Dashboard</h1>
+                    <h1 className="text-3xl font-semibold">Dashboard</h1>
                     <p className="text-sm text-gray-500">
                         Key business metrics and quick actions
                     </p>
                 </div>
+                <div className="flex items-center space-x-3">
+                    <button className="px-4 py-2 rounded-lg bg-brand-600 text-white hover:bg-brand-700 transition">
+                        Add Campaign
+                    </button>
+                    <button className="px-4 py-2 rounded-lg border border-gray-200">
+                        Export
+                    </button>
+                </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <SummaryCard
                     title="Total Contacts"
                     count={allContacts.length}
@@ -295,7 +305,7 @@ export default function App() {
     );
 
     return (
-        <div className="flex min-h-screen bg-gray-50 text-gray-900">
+        <div className="flex min-h-screen bg-neutral-50 text-gray-900">
             <Sidebar
                 page={page}
                 selectedContact={selectedContact}
@@ -316,7 +326,7 @@ export default function App() {
                     </div>
                 </div>
 
-                <div className="space-y-6">
+                <div className="space-y-6 container mx-auto max-w-7xl">
                     {selectedContact ? (
                         <ContactProfileView
                             contact={selectedContact}
@@ -327,11 +337,13 @@ export default function App() {
                     ) : page === 'Summary' ? (
                         renderSalesCenterSummary()
                     ) : page === 'List' ? (
-                        renderContactsLeadsList()
+                        <ClientsPage contacts={[...allContacts, ...allLeads]} onOpenProfile={openProfile} />
                     ) : page === 'Campaigns' ? (
                         <CampaignsPage
                             allContacts={[...allContacts, ...allLeads]}
                         />
+                    ) : page === 'Analytics' ? (
+                        <AnalyticsPage />
                     ) : (
                         <div />
                     )}

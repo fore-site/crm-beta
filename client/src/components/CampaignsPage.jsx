@@ -76,6 +76,31 @@ export default function CampaignsPage({ allContacts = [] }) {
         imageUrl: '',
     });
     const [isSending, setIsSending] = useState(false);
+    // Campaign library + UI filters (mock data)
+    const [search, setSearch] = useState('');
+    const [statusFilter, setStatusFilter] = useState('All');
+    const [library] = useState([
+        { id: 1, name: 'Q1 Welcome Offer', status: 'Active', channel: 'Email', spend: '$1,200', start: '2025-01-05', end: '2025-01-12', subject: 'Welcome to Q1 Savings', bodyEmail: 'Hi [Contact Name], welcome!', bodySms: 'Welcome offer inside.' },
+        { id: 2, name: 'Service Announcement', status: 'Paused', channel: 'SMS', spend: '$300', start: '2024-10-01', end: '2024-10-10', subject: 'Service Notice', bodyEmail: 'Important service update', bodySms: 'Service update: please read.' },
+        { id: 3, name: 'Holiday Promo', status: 'Completed', channel: 'Email', spend: '$2,400', start: '2024-12-01', end: '2024-12-25', subject: 'Holiday Deals', bodyEmail: 'Our holiday deals are live!', bodySms: 'Holiday deals inside.' },
+    ]);
+
+    const filteredLibrary = library.filter((c) => {
+        const matchesSearch = c.name.toLowerCase().includes(search.toLowerCase()) || (c.subject || '').toLowerCase().includes(search.toLowerCase());
+        const matchesStatus = statusFilter === 'All' ? true : c.status === statusFilter;
+        return matchesSearch && matchesStatus;
+    });
+
+    const loadCampaign = (c) => {
+        setCampaign({
+            name: c.name,
+            subject: c.subject || '',
+            bodyEmail: c.bodyEmail || '',
+            bodySms: c.bodySms || '',
+            imageUrl: c.imageUrl || '',
+        });
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
 
     const handleChange = (name, value) =>
         setCampaign((p) => ({ ...p, [name]: value }));
@@ -124,145 +149,69 @@ export default function CampaignsPage({ allContacts = [] }) {
                 </p>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-                    <h3 className="text-2xl font-bold text-gray-900 mb-6">
-                        Campaign Details
-                    </h3>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div className="lg:col-span-1 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <div className="mb-4">
+                        <input value={search} onChange={(e)=>setSearch(e.target.value)} placeholder="Search campaigns..." className="w-full p-2 border border-gray-200 rounded-lg" />
+                    </div>
+                    <div className="mb-4 flex items-center gap-2">
+                        {['All','Active','Paused','Completed'].map((s)=> (
+                            <button key={s} onClick={()=>setStatusFilter(s)} className={`px-3 py-1 rounded ${statusFilter===s? 'bg-brand-600 text-white':'bg-gray-50 text-gray-700 border'}`}>
+                                {s}
+                            </button>
+                        ))}
+                    </div>
+
+                    <div className="space-y-2">
+                        {filteredLibrary.map((c)=> (
+                            <div key={c.id} onClick={()=>loadCampaign(c)} className="p-3 rounded-lg border border-gray-200 hover:shadow-md cursor-pointer bg-white">
+                                <div className="flex justify-between items-center">
+                                    <div>
+                                        <div className="font-medium text-gray-900">{c.name}</div>
+                                        <div className="text-xs text-gray-500">{c.channel} • {c.start} - {c.end}</div>
+                                    </div>
+                                    <div>
+                                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${c.status==='Active'?'bg-green-100 text-green-700': c.status==='Paused'?'bg-yellow-100 text-yellow-700':'bg-gray-100 text-gray-700'}`}>{c.status}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+                    <h3 className="text-2xl font-bold text-gray-900 mb-6">Campaign Details</h3>
                     <div className="space-y-5">
                         <div>
-                            <label
-                                htmlFor="name"
-                                className="block text-sm font-medium text-gray-700"
-                            >
-                                Campaign Name (Internal)
-                            </label>
-                            <input
-                                type="text"
-                                name="name"
-                                id="name"
-                                value={campaign.name}
-                                onChange={(e) =>
-                                    handleChange('name', e.target.value)
-                                }
-                                placeholder="e.g., Q1 Welcome Offer"
-                                className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-brand-200 focus:border-brand-300 transition duration-150"
-                            />
+                            <label htmlFor="name" className="block text-sm font-medium text-gray-700">Campaign Name (Internal)</label>
+                            <input type="text" name="name" id="name" value={campaign.name} onChange={(e) => handleChange('name', e.target.value)} placeholder="e.g., Q1 Welcome Offer" className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-brand-200 focus:border-brand-300 transition duration-150" />
                         </div>
 
                         <div>
-                            <label
-                                htmlFor="subject"
-                                className="block text-sm font-medium text-gray-700"
-                            >
-                                Subject
-                            </label>
-                            <input
-                                type="text"
-                                name="subject"
-                                id="subject"
-                                value={campaign.subject}
-                                onChange={(e) =>
-                                    handleChange('subject', e.target.value)
-                                }
-                                placeholder="e.g., Don't Miss Out! Exclusive 20% Discount Inside"
-                                className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-brand-200 focus:border-brand-300 transition duration-150"
-                                required
-                            />
+                            <label htmlFor="subject" className="block text-sm font-medium text-gray-700">Subject</label>
+                            <input type="text" name="subject" id="subject" value={campaign.subject} onChange={(e) => handleChange('subject', e.target.value)} placeholder="e.g., Don't Miss Out! Exclusive 20% Discount Inside" className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-brand-200 focus:border-brand-300 transition duration-150" required />
                         </div>
 
                         <div>
-                            <label
-                                htmlFor="imageUrl"
-                                className="block text-sm font-medium text-gray-700"
-                            >
-                                Image URL (Optional, for Email)
-                            </label>
-                            <input
-                                type="url"
-                                name="imageUrl"
-                                id="imageUrl"
-                                value={campaign.imageUrl}
-                                onChange={(e) =>
-                                    handleChange('imageUrl', e.target.value)
-                                }
-                                placeholder="https://example.com/promo-image.jpg"
-                                className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-brand-200 focus:border-brand-300 transition duration-150"
-                            />
-                            <p className="text-xs text-gray-500 mt-1">
-                                Note: Use a public image link. Direct file
-                                uploads are complex and often fail in real email
-                                clients.
-                            </p>
+                            <label htmlFor="imageUrl" className="block text-sm font-medium text-gray-700">Image URL (Optional, for Email)</label>
+                            <input type="url" name="imageUrl" id="imageUrl" value={campaign.imageUrl} onChange={(e) => handleChange('imageUrl', e.target.value)} placeholder="https://example.com/promo-image.jpg" className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-brand-200 focus:border-brand-300 transition duration-150" />
+                            <p className="text-xs text-gray-500 mt-1">Note: Use a public image link. Direct file uploads are complex and often fail in real email clients.</p>
                         </div>
 
                         <div>
-                            <label
-                                htmlFor="bodyEmail"
-                                className="block text-sm font-medium text-gray-700"
-                            >
-                                Email Body Content
-                            </label>
-                            <textarea
-                                name="bodyEmail"
-                                id="bodyEmail"
-                                value={campaign.bodyEmail}
-                                onChange={(e) =>
-                                    handleChange('bodyEmail', e.target.value)
-                                }
-                                rows="6"
-                                placeholder="Write your full email content here. Use [Contact Name] for personalization."
-                                className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-brand-200 focus:border-brand-300 transition duration-150"
-                                required
-                            ></textarea>
+                            <label htmlFor="bodyEmail" className="block text-sm font-medium text-gray-700">Email Body Content</label>
+                            <textarea name="bodyEmail" id="bodyEmail" value={campaign.bodyEmail} onChange={(e) => handleChange('bodyEmail', e.target.value)} rows="6" placeholder="Write your full email content here. Use [Contact Name] for personalization." className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-brand-200 focus:border-brand-300 transition duration-150" required></textarea>
                         </div>
 
                         <div>
-                            <label
-                                htmlFor="bodySms"
-                                className="block text-sm font-medium text-gray-700"
-                            >
-                                SMS Body Content
-                            </label>
-                            <textarea
-                                name="bodySms"
-                                id="bodySms"
-                                value={campaign.bodySms}
-                                onChange={(e) =>
-                                    handleChange('bodySms', e.target.value)
-                                }
-                                rows="3"
-                                maxLength="320"
-                                placeholder="Keep it short and concise for SMS. Max 320 characters."
-                                className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-brand-200 focus:border-brand-300 transition duration-150"
-                                required
-                            ></textarea>
-                            <p className="text-xs text-gray-500 mt-1">
-                                Characters: {campaign.bodySms.length}
-                            </p>
+                            <label htmlFor="bodySms" className="block text-sm font-medium text-gray-700">SMS Body Content</label>
+                            <textarea name="bodySms" id="bodySms" value={campaign.bodySms} onChange={(e) => handleChange('bodySms', e.target.value)} rows="3" maxLength="320" placeholder="Keep it short and concise for SMS. Max 320 characters." className="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-brand-200 focus:border-brand-300 transition duration-150" required></textarea>
+                            <p className="text-xs text-gray-500 mt-1">Characters: {campaign.bodySms.length}</p>
                         </div>
 
                         <div className="flex items-center gap-3">
-                            <button
-                                onClick={handleSend}
-                                className="px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition-colors"
-                            >
-                                {isSending ? 'Sending...' : 'Send Test'}
-                            </button>
-                            <button
-                                onClick={() =>
-                                    setCampaign({
-                                        name: '',
-                                        subject: '',
-                                        bodyEmail: '',
-                                        bodySms: '',
-                                        imageUrl: '',
-                                    })
-                                }
-                                className="px-4 py-2 border border-gray-200 rounded-lg"
-                            >
-                                Reset
-                            </button>
+                            <button onClick={handleSend} className="px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700 transition-colors">{isSending ? 'Sending...' : 'Send Test'}</button>
+                            <button onClick={() => setCampaign({ name: '', subject: '', bodyEmail: '', bodySms: '', imageUrl: '' })} className="px-4 py-2 border border-gray-200 rounded-lg">Reset</button>
                         </div>
                     </div>
                 </div>

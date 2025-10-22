@@ -28,6 +28,7 @@ export default function Sidebar({
                         { key: 'Summary', label: 'Sales Center' },
                         { key: 'List', label: 'Contacts / Leads' },
                         { key: 'Campaigns', label: 'Campaigns' },
+                        { key: 'Analytics', label: 'Analytics' },
                     ].map((item) => (
                         <li key={item.key}>
                             <button
