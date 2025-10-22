@@ -1,4 +1,5 @@
 import React from 'react';
+import { colors } from '../styles/colors';
 import {
     ResponsiveContainer,
     LineChart,
@@ -70,7 +71,7 @@ export default function AnalyticsPage({ activeCampaign = null }) {
                         >
                             <CartesianGrid
                                 strokeDasharray="3 3"
-                                stroke="#F3F4F6"
+                                stroke={colors.neutral100}
                             />
                             <XAxis dataKey="date" tick={{ fontSize: 12 }} />
                             <YAxis tick={{ fontSize: 12 }} />
@@ -78,7 +79,7 @@ export default function AnalyticsPage({ activeCampaign = null }) {
                             <Line
                                 type="monotone"
                                 dataKey="visits"
-                                stroke="#0EA5A3"
+                                stroke={colors.teal500}
                                 strokeWidth={2}
                                 dot={{ r: 3 }}
                             />
@@ -95,15 +96,11 @@ export default function AnalyticsPage({ activeCampaign = null }) {
                             data={revenueData}
                             margin={{ top: 8, right: 12, left: 0, bottom: 0 }}
                         >
-                            <CartesianGrid
-                                strokeDasharray="3 3"
-                                stroke="#F3F4F6"
-                            />
                             <XAxis dataKey="source" tick={{ fontSize: 12 }} />
                             <YAxis tick={{ fontSize: 12 }} />
                             <Tooltip />
                             <Legend />
-                            <Bar dataKey="revenue" fill="#2563EB" />
+                            <Bar dataKey="revenue" fill={colors.brand600} />
                         </BarChart>
                     </ResponsiveContainer>
                 </div>

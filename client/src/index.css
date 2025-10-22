@@ -9,3 +9,42 @@ body {
     /* Neutral background (matches Tailwind neutral-50) */
     background-color: #f9fafb;
 }
+
+:root {
+    /* PROMPT_GUIDE color tokens */
+    --color-brand-500: #3B82F6;
+    --color-brand-600: #2563EB;
+    --color-accent-500: #F59E0B;
+    --color-neutral-50: #F9FAFB;
+    --color-neutral-100: #F3F4F6;
+    --color-text: #111827;
+}
+
+/* Global focus and interaction styles per PROMPT_GUIDE */
+*:focus {
+    outline: none;
+}
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+    box-shadow: 0 0 0 4px rgba(37,99,235,0.12);
+}
+
+/* Card default to match design system */
+.ds-card {
+    @apply bg-white rounded-2xl shadow-sm border border-gray-100 p-6 transition-all duration-300;
+}
+
+/* Button primary */
+.ds-btn-primary {
+    background-color: var(--color-brand-600);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+}
+
+/* Utility to apply smooth transitions for interactive elements */
+.ds-interactive {
+    transition: all 0.2s ease-in-out;
+}
