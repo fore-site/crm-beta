@@ -65,7 +65,7 @@ const SmsPreview = ({ campaign }) => (
     </div>
 );
 
-export default function CampaignsPage({ allContacts = [] }) {
+export default function CampaignsPage({ allContacts = [], onOpenAnalytics }) {
     const [campaign, setCampaign] = useState({
         name: '',
         subject: '',
@@ -136,6 +136,10 @@ export default function CampaignsPage({ allContacts = [] }) {
             imageUrl: c.imageUrl || '',
         });
         window.scrollTo({ top: 0, behavior: 'smooth' });
+        // Navigate to analytics detail for this campaign if a handler was provided
+        if (typeof onOpenAnalytics === 'function') {
+            onOpenAnalytics(c);
+        }
     };
 
     const handleChange = (name, value) =>

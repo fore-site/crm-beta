@@ -29,7 +29,7 @@ const revenueData = [
     { source: 'Email', revenue: 2700 },
 ];
 
-export default function AnalyticsPage() {
+export default function AnalyticsPage({ activeCampaign = null }) {
     return (
         <div className="p-6 bg-white rounded-2xl shadow-sm border border-gray-100">
             <h2 className="text-2xl font-semibold text-gray-900 mb-4">
@@ -39,6 +39,24 @@ export default function AnalyticsPage() {
                 Interactive charts powered by Recharts. Data shown is
                 sample/demo data.
             </p>
+
+            {activeCampaign && (
+                <div className="mb-4 p-3 rounded-lg bg-brand-50 border border-brand-100">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <div className="text-sm font-semibold text-brand-700">
+                                {activeCampaign.name}
+                            </div>
+                            <div className="text-xs text-gray-600">
+                                {activeCampaign.subject}
+                            </div>
+                        </div>
+                        <div className="text-xs text-gray-500">
+                            Channel: {activeCampaign.channel || 'Mixed'}
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <div className="p-4 bg-neutral-50 rounded-lg h-72">

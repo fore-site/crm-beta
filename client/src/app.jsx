@@ -24,6 +24,7 @@ export default function App() {
 
     // Modal state
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [activeCampaign, setActiveCampaign] = useState(null);
 
     // Minimal mock data preserved from original file
     const allContacts = useMemo(
@@ -344,9 +345,13 @@ export default function App() {
                     ) : page === 'Campaigns' ? (
                         <CampaignsPage
                             allContacts={[...allContacts, ...allLeads]}
+                            onOpenAnalytics={(c) => {
+                                setActiveCampaign(c);
+                                setPage('Analytics');
+                            }}
                         />
                     ) : page === 'Analytics' ? (
-                        <AnalyticsPage />
+                        <AnalyticsPage activeCampaign={activeCampaign} />
                     ) : (
                         <div />
                     )}

@@ -115,7 +115,7 @@ The platform should feel modern, clean, and creative — inspired by tools like 
 
 ## Example UX Flow
 
--   Login → Dashboard with KPI and campaign summary
--   Click “View Campaign” → Opens analytics detail with charts
+-   Login → Dashboard with KPI and campaigns summary
+-   Click a Campaign → Opens analytics detail with charts
 -   Switch to “Clients” → View searchable, sortable client list
--   Add note → Modal confirmation and live timeline update
+-   Add Internal note → Modal confirmation and live timeline update

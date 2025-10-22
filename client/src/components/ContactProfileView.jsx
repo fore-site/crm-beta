@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
     ArrowLeft,
     X,
@@ -69,6 +69,13 @@ export default function ContactProfileView({ contact, onClose }) {
             ],
         }),
         [contact]
+    );
+
+    // Local editable state for notes and campaign history so UI updates immediately
+    const [notes, setNotes] = useState(detailedData.notes);
+    const [newNote, setNewNote] = useState('');
+    const [campaignHistory, setCampaignHistory] = useState(
+        detailedData.campaignHistory
     );
 
     const statusBadgeClass =
@@ -163,18 +170,43 @@ export default function ContactProfileView({ contact, onClose }) {
                         <div className="space-y-3 bg-neutral-50 p-4 rounded-lg border border-gray-200 h-32 overflow-y-auto">
                             <div className="border-l-4 border-accent-400 pl-3">
                                 <p className="text-xs text-gray-500 font-medium">
-                                    Jan 1, 2025
+                                    {new Date().toLocaleDateString()}
                                 </p>
-                                <p className="text-sm text-gray-900">
-                                    {detailedData.notes}
-                                </p>
+                                <p className="text-sm text-gray-900">{notes}</p>
                             </div>
                         </div>
                         <textarea
                             placeholder="Add a new note..."
                             rows="3"
+                            value={newNote}
+                            onChange={(e) => setNewNote(e.target.value)}
                             className="w-full mt-3 p-3 border border-gray-300 rounded-lg focus:ring-brand-200 focus:border-brand-300 transition duration-150"
                         ></textarea>
+                        <div className="flex justify-end mt-2">
+                            <button
+                                onClick={() => {
+                                    if (!newNote.trim()) return;
+                                    const noteText = newNote.trim();
+                                    const timestamp =
+                                        new Date().toLocaleString();
+                                    // Prepend to notes and campaign history locally
+                                    setNotes(`${noteText}`);
+                                    setCampaignHistory((h) => [
+                                        {
+                                            id: Date.now(),
+                                            name: noteText,
+                                            date: timestamp,
+                                            status: 'Note',
+                                        },
+                                        ...h,
+                                    ]);
+                                    setNewNote('');
+                                }}
+                                className="px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700"
+                            >
+                                Add Note
+                            </button>
+                        </div>
                     </div>
 
                     <div className="p-6 bg-white rounded-xl shadow-md border border-gray-100">
