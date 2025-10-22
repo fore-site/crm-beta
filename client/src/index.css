@@ -12,11 +12,11 @@ body {
 
 :root {
     /* PROMPT_GUIDE color tokens */
-    --color-brand-500: #3B82F6;
-    --color-brand-600: #2563EB;
-    --color-accent-500: #F59E0B;
-    --color-neutral-50: #F9FAFB;
-    --color-neutral-100: #F3F4F6;
+    --color-brand-500: #3b82f6;
+    --color-brand-600: #2563eb;
+    --color-accent-500: #f59e0b;
+    --color-neutral-50: #f9fafb;
+    --color-neutral-100: #f3f4f6;
     --color-text: #111827;
 }
 
@@ -28,7 +28,7 @@ button:focus,
 input:focus,
 select:focus,
 textarea:focus {
-    box-shadow: 0 0 0 4px rgba(37,99,235,0.12);
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
 }
 
 /* Card default to match design system */
