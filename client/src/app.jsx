@@ -337,7 +337,10 @@ export default function App() {
                     ) : page === 'Summary' ? (
                         renderSalesCenterSummary()
                     ) : page === 'List' ? (
-                        <ClientsPage contacts={[...allContacts, ...allLeads]} onOpenProfile={openProfile} />
+                        <ClientsPage
+                            contacts={[...allContacts, ...allLeads]}
+                            onOpenProfile={openProfile}
+                        />
                     ) : page === 'Campaigns' ? (
                         <CampaignsPage
                             allContacts={[...allContacts, ...allLeads]}
