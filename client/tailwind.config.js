@@ -1,70 +1,40 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-    darkMode: 'class',
-    // The 'content' array is the most important part.
-    // It tells Tailwind which files to scan for class names.
-    // We've configured it to look in your HTML file and all
-    // JavaScript, TypeScript, JSX, and TSX files inside the 'src' folder.
-    content: [
-        './index.html',
-        // scan everything under src (components, pages, utils, etc.)
-        './src/**/*.{js,jsx,ts,tsx,html}',
-    ],
-    // The 'theme' object is where you can customize Tailwind's default design system.
-    // You can extend it to add your own colors, fonts, spacing, etc.
-    theme: {
-        extend: {
-            colors: {
-                // From PROMPT_GUIDE: primary blue and amber accent
-                // provide a set of blue shades so classes like brand-50..brand-700 exist
-                brand: {
-                    50: '#EFF6FF',
-                    100: '#DBEAFE',
-                    200: '#BFDBFE',
-                    300: '#93C5FD',
-                    400: '#60A5FA',
-                    500: '#3B82F6',
-                    600: '#2563EB',
-                    700: '#1D4ED8',
-                },
-                accent: {
-                    DEFAULT: '#F59E0B', // amber-500
-                    500: '#F59E0B',
-                },
-                neutral: {
-                    50: '#F9FAFB',
-                    100: '#F3F4F6',
-                    200: '#E5E7EB',
-                    300: '#D1D5DB',
-                    400: '#9CA3AF',
-                    500: '#6B7280',
-                    600: '#4B5563',
-                    700: '#374151',
-                    800: '#1F2937',
-                },
-            },
-            fontFamily: {
-                sans: ['Inter', 'ui-sans-serif', 'system-ui'],
-            },
-            container: {
-                center: true,
-                padding: '1.5rem',
-                screens: {
-                    lg: '1120px',
-                    xl: '1280px',
-                    '2xl': '1400px',
-                },
-            },
-            borderRadius: {
-                '2xl': '1rem',
-            },
-            boxShadow: {
-                sm: '0 1px 2px rgba(16,24,40,0.05)',
-                md: '0 4px 12px rgba(16,24,40,0.08)',
-            },
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {
+      colors: {
+        primary: '#4F46E5',
+        'primary-dark': '#4338CA',
+        secondary: '#10B981',
+        'gray-800': '#1F2937',
+        'gray-700': '#374151',
+        'gray-600': '#4B5563',
+        'gray-500': '#6B7280',
+        'gray-400': '#9CA3AF',
+        'gray-300': '#D1D5DB',
+        'gray-200': '#E5E7EB',
+        'gray-100': '#F3F4F6',
+        'gray-50': '#F9FAFB',
+      },
+      animation: {
+        'slide-in': 'slide-in 0.3s ease-out forwards',
+        'fade-in': 'fade-in 0.3s ease-out forwards',
+      },
+      keyframes: {
+        'slide-in': {
+          '0%': { transform: 'translateX(100%)', opacity: '0' },
+          '100%': { transform: 'translateX(0)', opacity: '1' },
         },
-    },
-    // 'plugins' allow you to add extra functionality to Tailwind.
-    // For now, we'll leave this empty.
-    plugins: [],
-};
+        'fade-in': {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        }
+      }
+    }
+  },
+  plugins: [],
+}
