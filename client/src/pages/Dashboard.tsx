@@ -1,3 +1,4 @@
+
 import React, { useContext, useMemo } from 'react';
 import { AppContext } from '../App';
 import Card from '../components/ui/Card';
@@ -7,8 +8,8 @@ import AdvertCard from '../components/adverts/AdvertCard';
 import AdvertListItem from '../components/adverts/AdvertListItem';
 
 // Fix: Replaced JSX.Element with React.ReactElement to resolve namespace issue.
-const StatCard: React.FC<{ title: string; value: string | number; icon: React.ReactElement; color: string }> = ({ title, value, icon, color }) => (
-  <Card className="p-6 flex items-center">
+const StatCard: React.FC<{ title: string; value: string | number; icon: React.ReactElement; color: string; onClick?: () => void }> = ({ title, value, icon, color, onClick }) => (
+  <Card className="p-6 flex items-center" onClick={onClick}>
     <div className={`p-3 rounded-full mr-4 ${color}`}>
       {icon}
     </div>
@@ -32,7 +33,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
 };
 
 const Dashboard: React.FC = () => {
-  const { clients, adverts, convertCurrency } = useContext(AppContext);
+  const { clients, adverts, convertCurrency, navigateToPage } = useContext(AppContext);
   const [advertView, setAdvertView] = React.useState<ViewType>('grid');
 
   const totalAdSpend = useMemo(() => {
@@ -79,16 +80,14 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="space-y-8">
-      <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <StatCard title="Total Clients" value={clients.length} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.653-.124-1.282-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.653.124-1.282.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>} color="bg-blue-500" />
-        <StatCard title="Total Adverts" value={adverts.length} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>} color="bg-green-500" />
+        <StatCard title="Total Clients" value={clients.length} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.653-.124-1.282-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.653.124-1.282.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>} color="bg-blue-500" onClick={() => navigateToPage('Clients')} />
+        <StatCard title="Total Adverts" value={adverts.length} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>} color="bg-green-500" onClick={() => navigateToPage('Adverts')} />
         <StatCard title="Total Ad Spend" value={convertCurrency(totalAdSpend)} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01" /></svg>} color="bg-purple-500" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-        <Card className="lg:col-span-3 p-4">
+        <Card className="lg:col-span-3 p-4" onClick={() => navigateToPage('Analytics')}>
           <h2 className="text-lg font-semibold text-gray-800 mb-4">Client Growth</h2>
            <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={clientGrowthData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
@@ -101,7 +100,7 @@ const Dashboard: React.FC = () => {
                 </LineChart>
             </ResponsiveContainer>
         </Card>
-        <Card className="lg:col-span-2 p-4">
+        <Card className="lg:col-span-2 p-4" onClick={() => navigateToPage('Analytics')}>
           <h2 className="text-lg font-semibold text-gray-800 mb-4">Advert Status</h2>
           <ResponsiveContainer width="100%" height={300}>
               <BarChart data={advertStatusData} layout="vertical" margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>

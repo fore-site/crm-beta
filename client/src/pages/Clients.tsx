@@ -17,27 +17,12 @@ const ClientsPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-    setCurrentPage(1); // Reset to first page on new search
-  };
-  
-  const filteredClients = useMemo(() => {
-    if (!searchQuery) return clients;
-    const lowercasedQuery = searchQuery.toLowerCase();
-    return clients.filter(client =>
-      client.name.toLowerCase().includes(lowercasedQuery) ||
-      client.company.toLowerCase().includes(lowercasedQuery)
-    );
-  }, [clients, searchQuery]);
 
   const paginatedClients = useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
-    return filteredClients.slice(startIndex, endIndex);
-  }, [filteredClients, currentPage]);
+    return clients.slice(startIndex, endIndex);
+  }, [clients, currentPage]);
 
   const handleAddClient = () => {
     setEditingClient(null);
@@ -70,40 +55,18 @@ const ClientsPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row justify-between md:items-center space-y-4 md:space-y-0">
-        <h1 className="text-3xl font-bold text-gray-900">Clients</h1>
+      <div className="flex flex-col md:flex-row justify-end md:items-center space-y-4 md:space-y-0">
         <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-1 p-1 bg-gray-200 rounded-lg">
+              <button onClick={() => setView('grid')} className={`p-2 rounded-md ${view === 'grid' ? 'bg-white shadow' : ''}`} aria-label="Grid view"><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg></button>
+              <button onClick={() => setView('list')} className={`p-2 rounded-md ${view === 'list' ? 'bg-white shadow' : ''}`} aria-label="List view"><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" /></svg></button>
+            </div>
             <Button variant="ghost" onClick={handleImport}>Import CSV</Button>
             <Button onClick={handleAddClient} leftIcon={<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110 2h3V6a1 1 0 011-1z" clipRule="evenodd" /></svg>}>Add Client</Button>
         </div>
       </div>
-      
-      <div className="flex flex-col md:flex-row justify-between md:items-center space-y-4 md:space-y-0 bg-white p-4 rounded-lg shadow-sm border">
-        <div className="relative w-full md:w-1/3">
-            <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-            </span>
-            <input
-                type="text"
-                placeholder="Search by name or company..."
-                value={searchQuery}
-                onChange={handleSearchChange}
-                className="w-full py-2 pl-10 pr-4 text-gray-700 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-        </div>
-        <div className="flex items-center space-x-1 p-1 bg-gray-200 rounded-lg">
-            <button onClick={() => setView('grid')} className={`p-2 rounded-md ${view === 'grid' ? 'bg-white shadow' : ''}`} aria-label="Grid view"><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg></button>
-            <button onClick={() => setView('list')} className={`p-2 rounded-md ${view === 'list' ? 'bg-white shadow' : ''}`} aria-label="List view"><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" /></svg></button>
-        </div>
-      </div>
 
-      {paginatedClients.length === 0 ? (
-        <div className="text-center py-16">
-            <p className="text-gray-500">{searchQuery ? 'No clients match your search.' : 'You have not added any clients yet.'}</p>
-        </div>
-      ) : view === 'grid' ? (
+      {view === 'grid' ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6">
           {paginatedClients.map(client => <ClientCard key={client.id} client={client} onEdit={handleEditClient} />)}
         </div>
@@ -117,7 +80,7 @@ const ClientsPage: React.FC = () => {
       
       <Pagination
         currentPage={currentPage}
-        totalItems={filteredClients.length}
+        totalItems={clients.length}
         itemsPerPage={ITEMS_PER_PAGE}
         onPageChange={setCurrentPage}
       />

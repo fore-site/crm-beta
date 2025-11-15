@@ -64,15 +64,13 @@ const AnalyticsPage: React.FC = () => {
 
   return (
     <div className="space-y-8">
-      <h1 className="text-3xl font-bold text-gray-900">Analytics</h1>
-
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="p-4">
           <h2 className="text-lg font-semibold text-gray-800 mb-4">Advert Channels</h2>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie data={advertChannelData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label>
-                {advertChannelData.map((_, index: number) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
+                {advertChannelData.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
               </Pie>
               <Tooltip content={<CustomTooltip />} />
               <Legend />
@@ -84,7 +82,7 @@ const AnalyticsPage: React.FC = () => {
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie data={advertStatusData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={100} paddingAngle={5} label>
-                 {advertStatusData.map((_, index: number) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
+                 {advertStatusData.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
               </Pie>
               <Tooltip content={<CustomTooltip />} />
                <Legend />

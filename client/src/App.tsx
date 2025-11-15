@@ -21,6 +21,7 @@ export const AppContext = React.createContext<{
   currency: Currency;
   setCurrency: (currency: Currency) => void;
   convertCurrency: (amount: number) => string;
+  navigateToPage: (page: Page) => void;
 }>({
   clients: [],
   adverts: [],
@@ -33,10 +34,13 @@ export const AppContext = React.createContext<{
   currency: 'USD',
   setCurrency: () => {},
   convertCurrency: () => '',
+  navigateToPage: () => {},
 });
 
 const App: React.FC = () => {
-  const [currentPage, setCurrentPage] = useState<Page>('Dashboard');
+  const [pageHistory, setPageHistory] = useState<Page[]>(['Dashboard']);
+  const currentPage = pageHistory[pageHistory.length - 1];
+
   const [clients, setClients] = useState<Client[]>([]);
   const [adverts, setAdverts] = useState<Advert[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -70,6 +74,25 @@ const App: React.FC = () => {
     generateMockClients();
     generateMockAdverts();
   }, []);
+
+  const setCurrentPage = (page: Page) => {
+    // For navbar clicks, resets history
+    if (pageHistory.length === 1 && pageHistory[0] === page) return;
+    setPageHistory([page]);
+  };
+
+  const navigateToPage = (page: Page) => {
+    // For in-app navigation, adds to history
+    if (page !== currentPage) {
+      setPageHistory(prev => [...prev, page]);
+    }
+  };
+
+  const goBack = () => {
+    if (pageHistory.length > 1) {
+      setPageHistory(prev => prev.slice(0, -1));
+    }
+  };
 
   const addNotification = useCallback((message: string, type: Notification['type']) => {
     const newNotification: Notification = {
@@ -144,9 +167,14 @@ const App: React.FC = () => {
   };
 
   return (
-    <AppContext.Provider value={{ clients, adverts, addClient, updateClient, addAdvert, updateAdvert, deleteAdvert, addNotification, currency, setCurrency, convertCurrency }}>
+    <AppContext.Provider value={{ clients, adverts, addClient, updateClient, addAdvert, updateAdvert, deleteAdvert, addNotification, currency, setCurrency, convertCurrency, navigateToPage }}>
       <div className="flex h-screen bg-gray-50 text-gray-800">
-        <Layout currentPage={currentPage} setCurrentPage={setCurrentPage}>
+        <Layout 
+          currentPage={currentPage} 
+          setCurrentPage={setCurrentPage}
+          goBack={goBack}
+          historyLength={pageHistory.length}
+        >
           {renderPage()}
         </Layout>
         <NotificationContainer notifications={notifications} removeNotification={removeNotification} />
