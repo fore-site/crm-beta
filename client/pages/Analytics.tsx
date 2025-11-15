@@ -111,12 +111,14 @@ const AnalyticsPage: React.FC = () => {
                                 outerRadius={100}
                                 label
                             >
-                                {advertChannelData.map((_, index: number) => (
-                                    <Cell
-                                        key={`cell-${index}`}
-                                        fill={COLORS[index % COLORS.length]}
-                                    />
-                                ))}
+                                {advertChannelData.map(
+                                    (_: any, index: number) => (
+                                        <Cell
+                                            key={`cell-${index}`}
+                                            fill={COLORS[index % COLORS.length]}
+                                        />
+                                    )
+                                )}
                             </Pie>
                             <Tooltip content={<CustomTooltip />} />
                             <Legend />
@@ -140,12 +142,14 @@ const AnalyticsPage: React.FC = () => {
                                 paddingAngle={5}
                                 label
                             >
-                                {advertStatusData.map((_, index: number) => (
-                                    <Cell
-                                        key={`cell-${index}`}
-                                        fill={COLORS[index % COLORS.length]}
-                                    />
-                                ))}
+                                {advertStatusData.map(
+                                    (_: any, index: number) => (
+                                        <Cell
+                                            key={`cell-${index}`}
+                                            fill={COLORS[index % COLORS.length]}
+                                        />
+                                    )
+                                )}
                             </Pie>
                             <Tooltip content={<CustomTooltip />} />
                             <Legend />
