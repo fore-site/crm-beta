@@ -72,7 +72,7 @@ const AnalyticsPage: React.FC = () => {
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie data={advertChannelData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} label>
-                {advertChannelData.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
+                {advertChannelData.map((_, index: number) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
               </Pie>
               <Tooltip content={<CustomTooltip />} />
               <Legend />
@@ -84,7 +84,7 @@ const AnalyticsPage: React.FC = () => {
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie data={advertStatusData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={100} paddingAngle={5} label>
-                 {advertStatusData.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
+                 {advertStatusData.map((_, index: number) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
               </Pie>
               <Tooltip content={<CustomTooltip />} />
                <Legend />
