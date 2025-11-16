@@ -30,17 +30,17 @@ const Pagination: React.FC<PaginationProps> = ({ currentPage, totalItems, itemsP
       <button
         onClick={handlePrevious}
         disabled={currentPage === 1}
-        className="px-3 py-1 rounded-md bg-white border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="px-3 py-1 rounded-md bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         Previous
       </button>
-      <span className="text-sm text-gray-700">
+      <span className="text-sm text-slate-700 dark:text-slate-300">
         Page {currentPage} of {totalPages}
       </span>
       <button
         onClick={handleNext}
         disabled={currentPage === totalPages}
-        className="px-3 py-1 rounded-md bg-white border border-gray-300 text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="px-3 py-1 rounded-md bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-slate-600 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-600 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         Next
       </button>

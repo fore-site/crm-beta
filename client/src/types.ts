@@ -5,6 +5,8 @@ export type ViewType = 'grid' | 'list';
 
 export type Currency = 'USD' | 'NGN';
 
+export type Theme = 'light' | 'dark';
+
 export interface Client {
   id: string;
   name: string;

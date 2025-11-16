@@ -40,23 +40,26 @@ const ClientForm: React.FC<ClientFormProps> = ({ client, onSave, onCancel }) => 
     onSave(formData);
   };
 
+  const inputClasses = "mt-1 block w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm dark:bg-slate-700 dark:border-slate-600 dark:placeholder-slate-400 dark:text-white";
+  const labelClasses = "block text-sm font-medium text-slate-700 dark:text-slate-300";
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700">Name</label>
-        <input type="text" name="name" id="name" value={formData.name} onChange={handleChange} required className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm" />
+        <label htmlFor="name" className={labelClasses}>Name</label>
+        <input type="text" name="name" id="name" value={formData.name} onChange={handleChange} required className={inputClasses} />
       </div>
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
-        <input type="email" name="email" id="email" value={formData.email} onChange={handleChange} required className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm" />
+        <label htmlFor="email" className={labelClasses}>Email</label>
+        <input type="email" name="email" id="email" value={formData.email} onChange={handleChange} required className={inputClasses} />
       </div>
        <div>
-        <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Phone</label>
-        <input type="tel" name="phone" id="phone" value={formData.phone} onChange={handleChange} required className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm" />
+        <label htmlFor="phone" className={labelClasses}>Phone</label>
+        <input type="tel" name="phone" id="phone" value={formData.phone} onChange={handleChange} required className={inputClasses} />
       </div>
        <div>
-        <label htmlFor="company" className="block text-sm font-medium text-gray-700">Company</label>
-        <input type="text" name="company" id="company" value={formData.company} onChange={handleChange} required className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm" />
+        <label htmlFor="company" className={labelClasses}>Company</label>
+        <input type="text" name="company" id="company" value={formData.company} onChange={handleChange} required className={inputClasses} />
       </div>
       <div className="flex justify-end space-x-2 pt-4">
         <Button type="button" variant="ghost" onClick={onCancel}>Cancel</Button>

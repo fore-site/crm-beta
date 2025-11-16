@@ -1,3 +1,4 @@
+
 import React, { useContext, useMemo } from 'react';
 import { AppContext } from '../App';
 import Card from '../components/ui/Card';
@@ -19,7 +20,7 @@ const StatCard: React.FC<{ title: string; value: string | number; icon: React.Re
   </Card>
 );
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: { value: number }[]; label?: string | number }) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-white p-2 border border-gray-200 rounded-lg shadow-sm">

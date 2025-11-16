@@ -76,35 +76,38 @@ const AdvertForm: React.FC<AdvertFormProps> = ({ advert, onSave, onCancel }) => 
     });
   };
 
+  const inputBaseClasses = "mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm dark:bg-slate-700 dark:border-slate-600 dark:placeholder-slate-400 dark:text-white";
+  const labelClasses = "block text-sm font-medium text-slate-700 dark:text-slate-300";
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
       <form className="space-y-4">
         <div>
-          <label htmlFor="title" className="block text-sm font-medium text-gray-700">Title</label>
-          <input type="text" name="title" id="title" value={title} onChange={(e) => setTitle(e.target.value)} className={`mt-1 block w-full px-3 py-2 border ${errors.title ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm`} />
+          <label htmlFor="title" className={labelClasses}>Title</label>
+          <input type="text" name="title" id="title" value={title} onChange={(e) => setTitle(e.target.value)} className={`${inputBaseClasses} ${errors.title ? 'border-red-500' : 'border-slate-300'}`} />
           {errors.title && <p className="text-red-500 text-xs mt-1">{errors.title}</p>}
         </div>
         <div>
-          <label htmlFor="message" className="block text-sm font-medium text-gray-700">Message</label>
-          <textarea name="message" id="message" value={message} onChange={(e) => setMessage(e.target.value)} rows={5} className={`mt-1 block w-full px-3 py-2 border ${errors.message ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm`}></textarea>
+          <label htmlFor="message" className={labelClasses}>Message</label>
+          <textarea name="message" id="message" value={message} onChange={(e) => setMessage(e.target.value)} rows={5} className={`${inputBaseClasses} ${errors.message ? 'border-red-500' : 'border-slate-300'}`}></textarea>
           {errors.message && <p className="text-red-500 text-xs mt-1">{errors.message}</p>}
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">Channel</label>
+          <label className={labelClasses}>Channel</label>
           <div className="flex space-x-4 mt-1">
-            <label className="flex items-center"><input type="radio" name="channel" value="Email" checked={channel === 'Email'} onChange={() => setChannel('Email')} className="focus:ring-primary h-4 w-4 text-primary border-gray-300"/> <span className="ml-2">Email</span></label>
-            <label className="flex items-center"><input type="radio" name="channel" value="SMS" checked={channel === 'SMS'} onChange={() => setChannel('SMS')} className="focus:ring-primary h-4 w-4 text-primary border-gray-300"/> <span className="ml-2">SMS</span></label>
+            <label className="flex items-center"><input type="radio" name="channel" value="Email" checked={channel === 'Email'} onChange={() => setChannel('Email')} className="focus:ring-primary h-4 w-4 text-primary border-slate-300 dark:bg-slate-700 dark:border-slate-600"/> <span className="ml-2">Email</span></label>
+            <label className="flex items-center"><input type="radio" name="channel" value="SMS" checked={channel === 'SMS'} onChange={() => setChannel('SMS')} className="focus:ring-primary h-4 w-4 text-primary border-slate-300 dark:bg-slate-700 dark:border-slate-600"/> <span className="ml-2">SMS</span></label>
           </div>
         </div>
         {channel === 'Email' && (
           <div>
-            <label htmlFor="image" className="block text-sm font-medium text-gray-700">Image</label>
-            <input type="file" name="image" id="image" accept="image/*" onChange={handleImageUpload} className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-primary hover:file:bg-violet-100"/>
+            <label htmlFor="image" className={labelClasses}>Image</label>
+            <input type="file" name="image" id="image" accept="image/*" onChange={handleImageUpload} className="mt-1 block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-violet-50 file:text-primary hover:file:bg-violet-100 dark:file:bg-slate-600 dark:file:text-slate-200 dark:hover:file:bg-slate-500"/>
           </div>
         )}
         <div>
-          <label htmlFor="scheduleDate" className="block text-sm font-medium text-gray-700">Schedule Date (Optional)</label>
-          <input type="datetime-local" name="scheduleDate" id="scheduleDate" value={scheduleDate} onChange={(e) => setScheduleDate(e.target.value)} className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm" />
+          <label htmlFor="scheduleDate" className={labelClasses}>Schedule Date (Optional)</label>
+          <input type="datetime-local" name="scheduleDate" id="scheduleDate" value={scheduleDate} onChange={(e) => setScheduleDate(e.target.value)} className={`${inputBaseClasses} border-slate-300`} />
         </div>
         <div className="flex justify-end space-x-2 pt-4">
           <Button type="button" variant="ghost" onClick={onCancel}>Cancel</Button>

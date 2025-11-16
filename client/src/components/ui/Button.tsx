@@ -21,7 +21,7 @@ const Button: React.FC<ButtonProps> = ({
     primary: 'bg-primary text-white hover:bg-primary-dark focus:ring-primary',
     secondary: 'bg-secondary text-white hover:bg-green-600 focus:ring-secondary',
     danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
-    ghost: 'bg-transparent text-gray-600 hover:bg-gray-100 focus:ring-primary',
+    ghost: 'bg-transparent text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 focus:ring-primary',
   };
 
   const sizeClasses = {

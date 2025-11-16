@@ -12,11 +12,11 @@ interface AdvertPreviewProps {
 const AdvertPreview: React.FC<AdvertPreviewProps> = ({ title, message, channel, imageUrl }) => {
   if (channel === 'SMS') {
     return (
-      <div className="w-full max-w-xs mx-auto bg-gray-900 rounded-3xl p-2 border-4 border-gray-700">
+      <div className="w-full max-w-xs mx-auto bg-slate-900 rounded-3xl p-2 border-4 border-slate-700">
         <div className="bg-white h-96 rounded-2xl p-4 flex flex-col">
-            <div className="text-center text-sm font-semibold mb-4">New Message</div>
-            <div className="bg-gray-200 p-3 rounded-lg self-start max-w-[80%]">
-                <p className="text-sm">{message || 'Your message here...'}</p>
+            <div className="text-center text-sm text-slate-800 font-semibold mb-4">New Message</div>
+            <div className="bg-slate-200 p-3 rounded-lg self-start max-w-[80%]">
+                <p className="text-sm text-slate-900">{message || 'Your message here...'}</p>
             </div>
         </div>
       </div>
@@ -24,16 +24,16 @@ const AdvertPreview: React.FC<AdvertPreviewProps> = ({ title, message, channel, 
   }
 
   return (
-    <div className="border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-      <div className="bg-gray-100 p-3 border-b">
-        <p className="text-sm text-gray-600">To: All Clients</p>
-        <p className="text-sm font-semibold text-gray-800">Subject: {title || '[Your Title Here]'}</p>
+    <div className="border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm overflow-hidden">
+      <div className="bg-slate-100 dark:bg-slate-700 p-3 border-b border-slate-200 dark:border-slate-600">
+        <p className="text-sm text-slate-600 dark:text-slate-300">To: All Clients</p>
+        <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">Subject: {title || '[Your Title Here]'}</p>
       </div>
-      <div className="p-4 bg-white">
+      <div className="p-4 bg-white dark:bg-slate-800">
         {imageUrl && (
             <img src={imageUrl} alt="Advert preview" className="w-full h-auto object-cover rounded mb-4 max-h-48" />
         )}
-        <p className="text-base text-gray-700 whitespace-pre-wrap">{message || 'Your message content here...'}</p>
+        <p className="text-base text-slate-700 dark:text-slate-200 whitespace-pre-wrap">{message || 'Your message content here...'}</p>
       </div>
     </div>
   );
