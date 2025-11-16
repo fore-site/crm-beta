@@ -1,11 +1,13 @@
 
-import React, { useContext, useMemo } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 import { AppContext } from '../App';
 import Card from '../components/ui/Card';
 import { Advert, ChartData, ViewType } from '../types';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, Legend, CartesianGrid } from 'recharts';
 import AdvertCard from '../components/adverts/AdvertCard';
 import AdvertListItem from '../components/adverts/AdvertListItem';
+import Modal from '../components/ui/Modal';
+import AdvertDetailView from '../components/adverts/AdvertDetailView';
 
 // Fix: Replaced JSX.Element with React.ReactElement to resolve namespace issue.
 const StatCard: React.FC<{ title: string; value: string | number; icon: React.ReactElement; color: string; onClick?: () => void }> = ({ title, value, icon, color, onClick }) => (
@@ -33,8 +35,9 @@ const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?:
 };
 
 const Dashboard: React.FC = () => {
-  const { clients, adverts, convertCurrency, setCurrentPage, theme } = useContext(AppContext);
-  const [advertView, setAdvertView] = React.useState<ViewType>('grid');
+  const { clients, adverts, convertCurrency, navigateTo, theme } = useContext(AppContext);
+  const [advertView, setAdvertView] = useState<ViewType>('grid');
+  const [selectedAdvert, setSelectedAdvert] = useState<Advert | null>(null);
   
   const tickColor = theme === 'dark' ? '#94a3b8' : '#6b7280';
   const gridColor = theme === 'dark' ? '#334155' : '#e5e7eb';
@@ -80,19 +83,27 @@ const Dashboard: React.FC = () => {
   }, [clients]);
 
   const recentAdverts = adverts.slice(0, 4);
+  
+  const handleOpenAdvertModal = (advert: Advert) => {
+    setSelectedAdvert(advert);
+  };
+  
+  const handleCloseAdvertModal = () => {
+    setSelectedAdvert(null);
+  };
 
   return (
     <div className="space-y-8">
       <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">Dashboard</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <StatCard title="Total Clients" value={clients.length} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.653-.124-1.282-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.653.124-1.282.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>} color="bg-blue-500" onClick={() => setCurrentPage('Clients')} />
-        <StatCard title="Total Adverts" value={adverts.length} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>} color="bg-green-500" onClick={() => setCurrentPage('Adverts')} />
-        <StatCard title="Total Ad Spend" value={convertCurrency(totalAdSpend)} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01" /></svg>} color="bg-purple-500" />
+        <StatCard title="Total Clients" value={clients.length} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.653-.124-1.282-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.653.124-1.282.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>} color="bg-blue-500" onClick={() => navigateTo({ page: 'Clients' })} />
+        <StatCard title="Total Adverts" value={adverts.length} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>} color="bg-green-500" onClick={() => navigateTo({ page: 'Adverts' })} />
+        <StatCard title="Total Ad Spend" value={convertCurrency(totalAdSpend)} icon={<svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v.01" /></svg>} color="bg-purple-500" onClick={() => navigateTo({ page: 'Analytics' })} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-        <Card className="lg:col-span-3 p-4" onClick={() => setCurrentPage('Analytics')}>
+        <Card className="lg:col-span-3 p-4">
           <h2 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-4">Client Growth</h2>
            <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={clientGrowthData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
@@ -105,7 +116,7 @@ const Dashboard: React.FC = () => {
                 </LineChart>
             </ResponsiveContainer>
         </Card>
-        <Card className="lg:col-span-2 p-4" onClick={() => setCurrentPage('Analytics')}>
+        <Card className="lg:col-span-2 p-4">
           <h2 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-4">Advert Status</h2>
           <ResponsiveContainer width="100%" height={300}>
               <BarChart data={advertStatusData} layout="vertical" margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
@@ -129,16 +140,20 @@ const Dashboard: React.FC = () => {
         </div>
         {advertView === 'grid' ? (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-            {recentAdverts.map(advert => <AdvertCard key={advert.id} advert={advert} />)}
+            {recentAdverts.map(advert => <AdvertCard key={advert.id} advert={advert} onClick={handleOpenAdvertModal} />)}
           </div>
         ) : (
           <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-slate-700 overflow-hidden">
-            <div className="space-y-2 p-4">
-              {recentAdverts.map(advert => <AdvertListItem key={advert.id} advert={advert} />)}
+            <div className="divide-y divide-slate-200 dark:divide-slate-700">
+              {recentAdverts.map(advert => <AdvertListItem key={advert.id} advert={advert} onClick={handleOpenAdvertModal} />)}
             </div>
           </div>
         )}
       </div>
+
+      <Modal isOpen={!!selectedAdvert} onClose={handleCloseAdvertModal} title={selectedAdvert?.title || 'Advert Details'}>
+        {selectedAdvert && <AdvertDetailView advert={selectedAdvert} />}
+      </Modal>
     </div>
   );
 };

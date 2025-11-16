@@ -1,18 +1,13 @@
+
 import React, { useState, useContext } from 'react';
-import { Page } from '../../types';
 import { ICONS, PAGES } from '../../constants';
 import { AppContext } from '../../App';
 import ToggleSwitch from '../ui/ToggleSwitch';
 import ThemeToggle from '../ui/ThemeToggle';
 
-interface NavbarProps {
-  currentPage: Page;
-  setCurrentPage: (page: Page) => void;
-}
-
-const Navbar: React.FC<NavbarProps> = ({ currentPage, setCurrentPage }) => {
+const Navbar: React.FC = () => {
   const [isMobileNavOpen, setMobileNavOpen] = useState(false);
-  const { currency, setCurrency } = useContext(AppContext);
+  const { currency, setCurrency, currentPage, navigateTo } = useContext(AppContext);
 
   const NavContent = () => (
     <div className="flex flex-col h-full p-2">
@@ -21,7 +16,7 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, setCurrentPage }) => {
           <button
             key={page}
             onClick={() => {
-              setCurrentPage(page);
+              navigateTo({ page });
               setMobileNavOpen(false);
             }}
             className={`group relative flex items-center justify-start lg:justify-center w-full px-3 py-3 text-sm font-medium rounded-lg transition-all duration-200 ease-in-out ${
@@ -44,12 +39,12 @@ const Navbar: React.FC<NavbarProps> = ({ currentPage, setCurrentPage }) => {
       </nav>
       <div className="mt-auto p-2 space-y-4">
          <div className="relative group flex items-center justify-center space-x-2">
-          <span className={`text-sm font-medium lg:hidden ${currency === 'NGN' ? 'text-slate-800 dark:text-slate-200' : 'text-slate-400'}`}>NGN</span>
+          <span className={`text-lg font-medium lg:hidden ${currency === 'NGN' ? 'text-slate-800 dark:text-slate-200' : 'text-slate-400'}`}>₦</span>
           <ToggleSwitch
             checked={currency === 'USD'}
             onChange={(checked) => setCurrency(checked ? 'USD' : 'NGN')}
           />
-          <span className={`text-sm font-medium lg:hidden ${currency === 'USD' ? 'text-slate-800 dark:text-slate-200' : 'text-slate-400'}`}>USD</span>
+          <span className={`text-lg font-medium lg:hidden ${currency === 'USD' ? 'text-slate-800 dark:text-slate-200' : 'text-slate-400'}`}>$</span>
            <span className="absolute left-full ml-4 px-2 py-1 text-sm bg-slate-800 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none hidden lg:block whitespace-nowrap"
               style={{ top: '50%', transform: 'translateY(-50%)' }}
             >

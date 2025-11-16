@@ -7,6 +7,7 @@ interface AdvertCardProps {
   advert: Advert;
   onEdit?: (advert: Advert) => void;
   onDelete?: (advertId: string) => void;
+  onClick?: (advert: Advert) => void;
 }
 
 const statusClasses: Record<Advert['status'], string> = {
@@ -15,11 +16,11 @@ const statusClasses: Record<Advert['status'], string> = {
     Draft: 'bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-300',
 };
 
-const AdvertCard: React.FC<AdvertCardProps> = ({ advert, onEdit, onDelete }) => {
+const AdvertCard: React.FC<AdvertCardProps> = ({ advert, onEdit, onDelete, onClick }) => {
   const canEditOrDelete = advert.status === 'Scheduled' || advert.status === 'Draft';
   
   return (
-    <Card className="flex flex-col">
+    <Card className="flex flex-col" onClick={onClick ? () => onClick(advert) : undefined}>
       {advert.imageUrl && advert.channel === 'Email' && <img src={advert.imageUrl} alt={advert.title} className="w-full h-40 object-cover" />}
       <div className="p-4 flex flex-col flex-grow">
         <div className="flex justify-between items-start">
@@ -33,8 +34,8 @@ const AdvertCard: React.FC<AdvertCardProps> = ({ advert, onEdit, onDelete }) => 
         }
         {(onEdit || onDelete) && canEditOrDelete && (
              <div className="mt-4 border-t border-slate-200 dark:border-slate-700 pt-3 flex justify-end space-x-2">
-                {onEdit && <button onClick={() => onEdit && onEdit(advert)} className="text-sm text-blue-600 hover:underline">Edit</button>}
-                {onDelete && <button onClick={() => onDelete && onDelete(advert.id)} className="text-sm text-red-600 hover:underline">Delete</button>}
+                {onEdit && <button onClick={(e) => { e.stopPropagation(); onEdit(advert); }} className="text-sm text-blue-600 hover:underline">Edit</button>}
+                {onDelete && <button onClick={(e) => { e.stopPropagation(); onDelete(advert.id); }} className="text-sm text-red-600 hover:underline">Delete</button>}
              </div>
         )}
       </div>

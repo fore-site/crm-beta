@@ -6,7 +6,6 @@ import Button from '../components/ui/Button';
 
 interface ClientDetailProps {
   client: Client;
-  onBack: () => void;
   onEdit: (client: Client) => void;
 }
 
@@ -17,19 +16,10 @@ const DetailItem: React.FC<{ label: string; value: string }> = ({ label, value }
     </div>
 );
 
-const ClientDetailPage: React.FC<ClientDetailProps> = ({ client, onBack, onEdit }) => {
+const ClientDetailPage: React.FC<ClientDetailProps> = ({ client, onEdit }) => {
   return (
     <div className="animate-fade-in">
-        <div className="mb-6">
-            <Button variant="ghost" onClick={onBack} leftIcon={
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
-                </svg>
-            }>
-                Back to Clients
-            </Button>
-        </div>
-        <Card className="p-6 sm:p-8">
+        <Card className="p-6 sm:p-8 mt-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center">
                 <img src={client.avatarUrl} alt={client.name} className="w-24 h-24 rounded-full mb-4 sm:mb-0 sm:mr-8 border-4 border-slate-200 dark:border-slate-700" />
                 <div className="flex-grow">

@@ -6,6 +6,7 @@ interface AdvertListItemProps {
   advert: Advert;
   onEdit?: (advert: Advert) => void;
   onDelete?: (advertId: string) => void;
+  onClick?: (advert: Advert) => void;
 }
 
 const statusClasses: Record<Advert['status'], string> = {
@@ -14,23 +15,41 @@ const statusClasses: Record<Advert['status'], string> = {
     Draft: 'bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-300',
 };
 
-const AdvertListItem: React.FC<AdvertListItemProps> = ({ advert, onEdit, onDelete }) => {
+const AdvertListItem: React.FC<AdvertListItemProps> = ({ advert, onEdit, onDelete, onClick }) => {
   const canEditOrDelete = advert.status === 'Scheduled' || advert.status === 'Draft';
+  const isClickable = !!onClick;
+
+  const handleClick = () => {
+    if (onClick) {
+      onClick(advert);
+    }
+  };
 
   return (
-    <div className="flex items-center p-4 hover:bg-slate-50 dark:hover:bg-slate-700/50">
+    <div
+      className={`flex items-center p-4 hover:bg-slate-50 dark:hover:bg-slate-700/50 ${isClickable ? 'cursor-pointer' : ''}`}
+      onClick={handleClick}
+      role={isClickable ? 'button' : undefined}
+      tabIndex={isClickable ? 0 : undefined}
+      onKeyDown={(e: React.KeyboardEvent) => {
+        if (isClickable && (e.key === 'Enter' || e.key === ' ')) {
+          e.preventDefault();
+          handleClick();
+        }
+      }}
+    >
       <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
         <div>
           <p className="font-semibold text-slate-900 dark:text-slate-100">{advert.title}</p>
           <p className="text-sm text-slate-500 dark:text-slate-400">{advert.channel}</p>
         </div>
-        <p className="text-sm text-slate-600 dark:text-slate-300 md:col-span-2">{advert.message}</p>
+        <p className="text-sm text-slate-600 dark:text-slate-300 md:col-span-2 truncate">{advert.message}</p>
         <div className="flex flex-col md:flex-row md:items-center justify-end space-y-2 md:space-y-0 md:space-x-4">
           <span className={`px-2 py-1 text-xs font-medium rounded-full ${statusClasses[advert.status]} w-max`}>{advert.status}</span>
           {(onEdit || onDelete) && canEditOrDelete && (
             <div className="flex space-x-2">
-                {onEdit && <button onClick={() => onEdit && onEdit(advert)} className="text-sm font-medium text-blue-600 hover:text-blue-800">Edit</button>}
-                {onDelete && <button onClick={() => onDelete && onDelete(advert.id)} className="text-sm font-medium text-red-600 hover:text-red-800">Delete</button>}
+                {onEdit && <button onClick={(e) => { e.stopPropagation(); onEdit(advert); }} className="text-sm font-medium text-blue-600 hover:text-blue-800">Edit</button>}
+                {onDelete && <button onClick={(e) => { e.stopPropagation(); onDelete(advert.id); }} className="text-sm font-medium text-red-600 hover:text-red-800">Delete</button>}
             </div>
           )}
         </div>

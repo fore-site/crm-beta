@@ -1,13 +1,16 @@
 
-import React, { useState, useCallback, useEffect } from 'react';
-import { Page, Client, Advert, Currency, Notification, Theme } from './types';
+import React, { useState, useCallback, useEffect, lazy, Suspense } from 'react';
+import { Page, Client, Advert, Currency, Notification, Theme, NavigationState } from './types';
 import Layout from './components/layout/Layout';
-import Dashboard from './pages/Dashboard';
-import ClientsPage from './pages/Clients';
-import AdvertsPage from './pages/Adverts';
-import AnalyticsPage from './pages/Analytics';
-import { NGN_TO_USD_RATE } from './constants';
 import NotificationContainer from './components/ui/NotificationContainer';
+import { NGN_TO_USD_RATE } from './constants';
+import LoadingSpinner from './components/ui/LoadingSpinner';
+
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const ClientsPage = lazy(() => import('./pages/Clients'));
+const AdvertsPage = lazy(() => import('./pages/Adverts'));
+const AnalyticsPage = lazy(() => import('./pages/Analytics'));
+
 
 export const AppContext = React.createContext<{
   clients: Client[];
@@ -21,9 +24,12 @@ export const AppContext = React.createContext<{
   currency: Currency;
   setCurrency: (currency: Currency) => void;
   convertCurrency: (amount: number) => string;
-  setCurrentPage: (page: Page) => void;
   theme: Theme;
   toggleTheme: () => void;
+  navigateTo: (state: NavigationState) => void;
+  handleBack: () => void;
+  navigationHistory: NavigationState[];
+  currentPage: Page;
 }>({
   clients: [],
   adverts: [],
@@ -36,18 +42,24 @@ export const AppContext = React.createContext<{
   currency: 'USD',
   setCurrency: () => {},
   convertCurrency: () => '',
-  setCurrentPage: () => {},
   theme: 'light',
   toggleTheme: () => {},
+  navigateTo: () => {},
+  handleBack: () => {},
+  navigationHistory: [],
+  currentPage: 'Dashboard',
 });
 
 const App: React.FC = () => {
-  const [currentPage, setCurrentPage] = useState<Page>('Dashboard');
+  const [navigationHistory, setNavigationHistory] = useState<NavigationState[]>([{ page: 'Dashboard' }]);
   const [clients, setClients] = useState<Client[]>([]);
   const [adverts, setAdverts] = useState<Advert[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [currency, setCurrency] = useState<Currency>('USD');
   const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem('theme') as Theme) || 'light');
+
+  const currentState = navigationHistory[navigationHistory.length - 1];
+  const currentPage = currentState.page;
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -61,6 +73,20 @@ const App: React.FC = () => {
   
   const toggleTheme = () => {
     setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
+  };
+
+  const navigateTo = (state: NavigationState) => {
+    setNavigationHistory(prev => {
+        const lastState = prev[prev.length - 1];
+        if (lastState.page === state.page && (lastState.detailId || null) === (state.detailId || null)) {
+            return prev;
+        }
+        return [...prev, state];
+    });
+  };
+
+  const handleBack = () => {
+      setNavigationHistory(prev => (prev.length > 1 ? prev.slice(0, -1) : prev));
   };
 
   useEffect(() => {
@@ -150,11 +176,12 @@ const App: React.FC = () => {
   };
   
   const renderPage = () => {
+    const key = `${currentState.page}-${currentState.detailId || 'list'}`;
     switch (currentPage) {
       case 'Dashboard':
         return <Dashboard />;
       case 'Clients':
-        return <ClientsPage />;
+        return <ClientsPage key={key} selectedClientId={currentState.detailId} />;
       case 'Adverts':
         return <AdvertsPage />;
       case 'Analytics':
@@ -165,10 +192,12 @@ const App: React.FC = () => {
   };
 
   return (
-    <AppContext.Provider value={{ clients, adverts, addClient, updateClient, addAdvert, updateAdvert, deleteAdvert, addNotification, currency, setCurrency, convertCurrency, setCurrentPage, theme, toggleTheme }}>
+    <AppContext.Provider value={{ clients, adverts, addClient, updateClient, addAdvert, updateAdvert, deleteAdvert, addNotification, currency, setCurrency, convertCurrency, theme, toggleTheme, navigateTo, handleBack, navigationHistory, currentPage }}>
       <div className="flex h-screen bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200">
-        <Layout currentPage={currentPage} setCurrentPage={setCurrentPage}>
-          {renderPage()}
+        <Layout>
+          <Suspense fallback={<div className="w-full h-full flex items-center justify-center"><LoadingSpinner /></div>}>
+            {renderPage()}
+          </Suspense>
         </Layout>
         <NotificationContainer notifications={notifications} removeNotification={removeNotification} />
       </div>
