@@ -12,14 +12,28 @@ import LoadingSpinner from '../components/ui/LoadingSpinner';
 const AdvertDetailView = lazy(() => import('../components/adverts/AdvertDetailView'));
 
 const StatCard: React.FC<{ title: string; value: string | number; icon: React.ReactElement; color: string; onClick?: () => void; delay?: string }> = ({ title, value, icon, color, onClick, delay = '' }) => (
-  <Card className={`p-6 flex items-center group animate-fade-in opacity-0 fill-mode-forwards ${delay}`} onClick={onClick}>
-    <div className={`p-4 rounded-2xl mr-5 transition-transform duration-300 group-hover:scale-110 ${color} text-white shadow-lg`}>
+  <Card className={`relative overflow-hidden p-6 flex items-center group animate-fade-in opacity-0 fill-mode-forwards ${delay}`} onClick={onClick}>
+    
+    {/* Background decoration - Blobs */}
+    <div className={`absolute -right-10 -top-10 w-40 h-40 rounded-full opacity-[0.07] dark:opacity-[0.12] ${color} blur-3xl transition-all duration-500 group-hover:scale-125 group-hover:opacity-[0.15] dark:group-hover:opacity-[0.2]`}></div>
+    <div className={`absolute -left-10 -bottom-10 w-32 h-32 rounded-full opacity-[0.07] dark:opacity-[0.12] ${color} blur-3xl transition-all duration-500 group-hover:scale-125`}></div>
+    
+    <div className={`relative z-10 p-4 rounded-2xl mr-5 transition-transform duration-300 group-hover:scale-110 ${color} text-white shadow-lg shadow-black/5`}>
       {icon}
     </div>
-    <div>
-      <p className="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wide">{title}</p>
+    
+    <div className="relative z-10 flex-1">
+      <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{title}</p>
       <p className="text-3xl font-extrabold text-slate-900 dark:text-white mt-1">{value}</p>
     </div>
+    
+    {onClick && (
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-slate-400 dark:text-slate-500">
+             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+        </div>
+    )}
   </Card>
 );
 
@@ -177,3 +191,4 @@ const Dashboard: React.FC = () => {
 };
 
 export default Dashboard;
+    

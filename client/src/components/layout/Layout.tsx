@@ -14,7 +14,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <>
       <Navbar />
-      <main className="flex-1 overflow-y-auto p-4 pt-24 sm:p-6 sm:pt-24 lg:p-8 lg:pt-24">
+      {/* 
+        Padding explanation:
+        pt-24: Mobile/Tablet top padding to clear the floating button.
+        lg:pt-8: Desktop top padding (button is hidden).
+        lg:pl-28: Desktop left padding (Sidebar width 20 + padding 8).
+      */}
+      <main className="flex-1 overflow-y-auto p-4 pt-24 lg:p-8 lg:pl-28">
         {showBackButton && (
           <div className="mb-4">
             <button
