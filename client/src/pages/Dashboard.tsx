@@ -1,8 +1,9 @@
+
 import React, { useContext, useMemo, useState, lazy, Suspense } from 'react';
 import { AppContext } from '../App';
 import Card from '../components/ui/Card';
 import { Advert, ChartData, ViewType } from '../types';
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, Legend, CartesianGrid } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, Line, CartesianGrid } from 'recharts';
 import AdvertCard from '../components/adverts/AdvertCard';
 import AdvertListItem from '../components/adverts/AdvertListItem';
 import Modal from '../components/ui/Modal';

@@ -1,3 +1,4 @@
+
 import React, { useState, useContext, memo } from 'react';
 import { ICONS, PAGES } from '../../constants';
 import { AppContext } from '../../App';
@@ -9,7 +10,7 @@ interface NavContentProps {
   onNavigate?: () => void;
 }
 
-const NavContent = memo(({ mobile, onNavigate }: NavContentProps) => {
+const NavContent = memo(({ mobile: _mobile, onNavigate }: NavContentProps) => {
   const { currency, setCurrency, currentPage, navigateTo } = useContext(AppContext);
 
   return (
