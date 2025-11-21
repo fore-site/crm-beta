@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useEffect, lazy, Suspense } from 'react';
 import { Page, Client, Advert, Currency, Notification, Theme, NavigationState } from './types';
 import Layout from './components/layout/Layout';
@@ -193,7 +192,7 @@ const App: React.FC = () => {
 
   return (
     <AppContext.Provider value={{ clients, adverts, addClient, updateClient, addAdvert, updateAdvert, deleteAdvert, addNotification, currency, setCurrency, convertCurrency, theme, toggleTheme, navigateTo, handleBack, navigationHistory, currentPage }}>
-      <div className="flex h-screen bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200">
+      <div className="flex h-screen overflow-hidden bg-transparent text-slate-800 dark:text-slate-200 font-sans selection:bg-indigo-500/20">
         <Layout>
           <Suspense fallback={<div className="w-full h-full flex items-center justify-center"><LoadingSpinner /></div>}>
             {renderPage()}
