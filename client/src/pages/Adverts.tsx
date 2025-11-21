@@ -1,13 +1,15 @@
 
-import React, { useContext, useState, useMemo } from 'react';
+import React, { useContext, useState, useMemo, lazy, Suspense } from 'react';
 import { AppContext } from '../App';
 import { ViewType, Advert, AdvertChannel } from '../types';
 import Button from '../components/ui/Button';
 import AdvertCard from '../components/adverts/AdvertCard';
 import AdvertListItem from '../components/adverts/AdvertListItem';
 import Modal from '../components/ui/Modal';
-import AdvertForm from '../components/adverts/AdvertForm';
 import Input from '../components/ui/Input';
+import LoadingSpinner from '../components/ui/LoadingSpinner';
+
+const AdvertForm = lazy(() => import('../components/adverts/AdvertForm'));
 
 const AdvertsPage: React.FC = () => {
   const { adverts, addAdvert, updateAdvert, deleteAdvert } = useContext(AppContext);
@@ -184,7 +186,9 @@ const AdvertsPage: React.FC = () => {
       )}
 
       <Modal isOpen={isModalOpen} onClose={handleCloseModal} title={editingAdvert ? 'Edit Advert' : 'Create New Advert'}>
-        <AdvertForm advert={editingAdvert} onSave={handleSaveAdvert} onCancel={handleCloseModal} />
+        <Suspense fallback={<div className="p-8"><LoadingSpinner /></div>}>
+          <AdvertForm advert={editingAdvert} onSave={handleSaveAdvert} onCancel={handleCloseModal} />
+        </Suspense>
       </Modal>
     </div>
   );

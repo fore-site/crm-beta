@@ -1,5 +1,5 @@
 
-import React, { useContext, useMemo, useState } from 'react';
+import React, { useContext, useMemo, useState, lazy, Suspense } from 'react';
 import { AppContext } from '../App';
 import Card from '../components/ui/Card';
 import { Advert, ChartData, ViewType } from '../types';
@@ -7,7 +7,9 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, LineChart, L
 import AdvertCard from '../components/adverts/AdvertCard';
 import AdvertListItem from '../components/adverts/AdvertListItem';
 import Modal from '../components/ui/Modal';
-import AdvertDetailView from '../components/adverts/AdvertDetailView';
+import LoadingSpinner from '../components/ui/LoadingSpinner';
+
+const AdvertDetailView = lazy(() => import('../components/adverts/AdvertDetailView'));
 
 // Fix: Replaced JSX.Element with React.ReactElement to resolve namespace issue.
 const StatCard: React.FC<{ title: string; value: string | number; icon: React.ReactElement; color: string; onClick?: () => void }> = ({ title, value, icon, color, onClick }) => (
@@ -152,7 +154,9 @@ const Dashboard: React.FC = () => {
       </div>
 
       <Modal isOpen={!!selectedAdvert} onClose={handleCloseAdvertModal} title={selectedAdvert?.title || 'Advert Details'}>
-        {selectedAdvert && <AdvertDetailView advert={selectedAdvert} />}
+        <Suspense fallback={<div className="p-8"><LoadingSpinner /></div>}>
+          {selectedAdvert && <AdvertDetailView advert={selectedAdvert} />}
+        </Suspense>
       </Modal>
     </div>
   );

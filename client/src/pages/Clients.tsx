@@ -7,12 +7,12 @@ import ClientCard from '../components/clients/ClientCard';
 import ClientListItem from '../components/clients/ClientListItem';
 import Pagination from '../components/ui/Pagination';
 import Modal from '../components/ui/Modal';
-import ClientForm from '../components/clients/ClientForm';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 import Input from '../components/ui/Input';
 import Select from '../components/ui/Select';
 
 const ClientDetailPage = lazy(() => import('./ClientDetail'));
+const ClientForm = lazy(() => import('../components/clients/ClientForm'));
 
 interface ClientsPageProps {
   selectedClientId: string | null | undefined;
@@ -215,7 +215,9 @@ const ClientsPage: React.FC<ClientsPageProps> = ({ selectedClientId }) => {
       )}
 
       <Modal isOpen={isModalOpen} onClose={handleCloseModal} title={editingClient ? 'Edit Client' : 'Add New Client'}>
-        <ClientForm client={editingClient} onSave={handleSaveClient} onCancel={handleCloseModal} />
+        <Suspense fallback={<div className="p-8"><LoadingSpinner /></div>}>
+          <ClientForm client={editingClient} onSave={handleSaveClient} onCancel={handleCloseModal} />
+        </Suspense>
       </Modal>
     </div>
   );
