@@ -14,7 +14,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <>
       <Navbar />
-      <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+      <main className="flex-1 overflow-y-auto p-4 pt-24 sm:p-6 sm:pt-24 lg:p-8 lg:pt-24">
         {showBackButton && (
           <div className="mb-4">
             <button
