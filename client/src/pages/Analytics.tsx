@@ -1,3 +1,4 @@
+
 import React, { useContext, useMemo } from 'react';
 import { AppContext } from '../App';
 import Card from '../components/ui/Card';
@@ -6,18 +7,15 @@ import { AdvertChannel, AdvertStatus } from '../types';
 
 // Palette: Deep Purple, Bright Green, Lavender, Darker Green
 const COLORS = ['#4B2E83', '#2ECC71', '#E6E6FA', '#27AE60'];
-// Dark mode palette
-const DARK_COLORS = ['#6544a3', '#58d68d', '#a78bfa', '#2ecc71'];
-
 
 const PieChartTooltip = ({ active, payload }: { active?: boolean; payload?: any[] }) => {
   if (active && payload && payload.length) {
     const data = payload[0];
     return (
-      <div className="bg-white dark:bg-[#1e1b2e] p-3 border border-slate-100 dark:border-white/5 rounded-2xl shadow-xl text-sm">
-        <p className="font-bold text-slate-900 dark:text-white mb-1">{data.name}</p>
-        <p className="text-slate-500 dark:text-slate-400">Value: {data.value}</p>
-        <p className="text-primary dark:text-accent font-bold">{(data.percent * 100).toFixed(1)}%</p>
+      <div className="bg-white p-3 border border-slate-100 rounded-2xl shadow-xl text-sm">
+        <p className="font-bold text-slate-900 mb-1">{data.name}</p>
+        <p className="text-slate-500">Value: {data.value}</p>
+        <p className="text-primary font-bold">{(data.percent * 100).toFixed(1)}%</p>
       </div>
     );
   }
@@ -27,8 +25,8 @@ const PieChartTooltip = ({ active, payload }: { active?: boolean; payload?: any[
 const MultiDataTooltip = ({ active, payload, label }: { active?: boolean; payload?: any[]; label?: string }) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-white dark:bg-[#1e1b2e] p-3 border border-slate-100 dark:border-white/5 rounded-2xl shadow-xl text-sm">
-        <p className="font-bold text-slate-900 dark:text-white mb-2">{label}</p>
+      <div className="bg-white p-3 border border-slate-100 rounded-2xl shadow-xl text-sm">
+        <p className="font-bold text-slate-900 mb-2">{label}</p>
         {payload.map((entry, index) => (
           <p key={`item-${index}`} style={{ color: entry.color }} className="font-bold">
             {entry.name}: {entry.value}
@@ -41,11 +39,11 @@ const MultiDataTooltip = ({ active, payload, label }: { active?: boolean; payloa
 };
 
 const AnalyticsPage: React.FC = () => {
-  const { clients, adverts, theme } = useContext(AppContext);
+  const { clients, adverts } = useContext(AppContext);
 
-  const tickColor = theme === 'dark' ? '#94a3b8' : '#64748b';
-  const gridColor = theme === 'dark' ? '#334155' : '#e2e8f0';
-  const chartColors = theme === 'dark' ? DARK_COLORS : COLORS;
+  const tickColor = '#64748b';
+  const gridColor = '#e2e8f0';
+  const chartColors = COLORS;
 
   const advertChannelData = useMemo(() => {
     const counts = adverts.reduce((acc, ad) => {
@@ -91,13 +89,13 @@ const AnalyticsPage: React.FC = () => {
   return (
     <div className="space-y-8 max-w-7xl mx-auto pb-12">
       <div className="animate-fade-in">
-        <h1 className="text-4xl font-extrabold text-primary dark:text-white tracking-tight">Analytics</h1>
-        <p className="text-slate-500 dark:text-slate-400 mt-2 text-lg">Deep dive into your performance metrics.</p>
+        <h1 className="text-4xl font-extrabold text-primary tracking-tight">Analytics</h1>
+        <p className="text-slate-500 mt-2 text-lg">Deep dive into your performance metrics.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="p-8 animate-slide-in animation-delay-100 opacity-0 fill-mode-forwards">
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-8">Advert Channels</h2>
+          <h2 className="text-xl font-bold text-slate-900 mb-8">Advert Channels</h2>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie data={advertChannelData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} innerRadius={60} stroke="none">
@@ -109,7 +107,7 @@ const AnalyticsPage: React.FC = () => {
           </ResponsiveContainer>
         </Card>
         <Card className="p-8 animate-slide-in animation-delay-200 opacity-0 fill-mode-forwards">
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-8">Advert Status Distribution</h2>
+          <h2 className="text-xl font-bold text-slate-900 mb-8">Advert Status Distribution</h2>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie data={advertStatusData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={100} paddingAngle={5} stroke="none" cornerRadius={8}>
@@ -123,7 +121,7 @@ const AnalyticsPage: React.FC = () => {
       </div>
       
       <Card className="p-8 animate-slide-in animation-delay-300 opacity-0 fill-mode-forwards">
-        <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-8">Monthly Activity</h2>
+        <h2 className="text-xl font-bold text-slate-900 mb-8">Monthly Activity</h2>
         <ResponsiveContainer width="100%" height={400}>
             <BarChart data={activityByMonthData}>
                 <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false}/>
@@ -138,7 +136,7 @@ const AnalyticsPage: React.FC = () => {
       </Card>
       
        <Card className="p-8 animate-slide-in animation-delay-400 opacity-0 fill-mode-forwards">
-        <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-8">Advert Performance by Day</h2>
+        <h2 className="text-xl font-bold text-slate-900 mb-8">Advert Performance by Day</h2>
         <ResponsiveContainer width="100%" height={400}>
             <RadarChart cx="50%" cy="50%" outerRadius="75%" data={advertPerformanceData}>
                 <PolarGrid stroke={gridColor} />

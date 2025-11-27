@@ -10,9 +10,9 @@ interface AdvertListItemProps {
 }
 
 const statusClasses: Record<Advert['status'], string> = {
-    Sent: 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300',
-    Scheduled: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300',
-    Draft: 'bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-300',
+    Sent: 'bg-green-100 text-green-800',
+    Scheduled: 'bg-yellow-100 text-yellow-800',
+    Draft: 'bg-slate-100 text-slate-800',
 };
 
 const AdvertListItem: React.FC<AdvertListItemProps> = ({ advert, onEdit, onDelete, onClick }) => {
@@ -27,7 +27,7 @@ const AdvertListItem: React.FC<AdvertListItemProps> = ({ advert, onEdit, onDelet
 
   return (
     <div
-      className={`flex items-center p-4 hover:bg-slate-50 dark:hover:bg-slate-700/50 ${isClickable ? 'cursor-pointer' : ''}`}
+      className={`flex items-center p-4 hover:bg-slate-50 ${isClickable ? 'cursor-pointer' : ''}`}
       onClick={handleClick}
       role={isClickable ? 'button' : undefined}
       tabIndex={isClickable ? 0 : undefined}
@@ -40,10 +40,10 @@ const AdvertListItem: React.FC<AdvertListItemProps> = ({ advert, onEdit, onDelet
     >
       <div className="flex-1 grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
         <div>
-          <p className="font-semibold text-slate-900 dark:text-slate-100">{advert.title}</p>
-          <p className="text-sm text-slate-500 dark:text-slate-400">{advert.channel}</p>
+          <p className="font-semibold text-slate-900">{advert.title}</p>
+          <p className="text-sm text-slate-500">{advert.channel}</p>
         </div>
-        <p className="text-sm text-slate-600 dark:text-slate-300 md:col-span-2 truncate">{advert.message}</p>
+        <p className="text-sm text-slate-600 md:col-span-2 truncate">{advert.message}</p>
         <div className="flex flex-col md:flex-row md:items-center justify-end space-y-2 md:space-y-0 md:space-x-4">
           <span className={`px-2 py-1 text-xs font-medium rounded-full ${statusClasses[advert.status]} w-max`}>{advert.status}</span>
           {(onEdit || onDelete) && canEditOrDelete && (

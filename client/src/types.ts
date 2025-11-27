@@ -5,8 +5,6 @@ export type ViewType = 'grid' | 'list';
 
 export type Currency = 'USD' | 'NGN';
 
-export type Theme = 'light' | 'dark';
-
 export type NavigationState = {
   page: Page;
   detailId?: string | null;

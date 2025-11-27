@@ -111,7 +111,7 @@ const AdvertsPage: React.FC = () => {
     <button
       onClick={() => setFilter(status)}
       className={`px-4 py-2 text-sm font-medium rounded-full transition-colors ${
-        currentFilter === status ? 'bg-primary text-white shadow' : 'bg-white dark:bg-slate-700 text-slate-600 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-600'
+        currentFilter === status ? 'bg-primary text-white shadow' : 'bg-white text-slate-600 hover:bg-slate-100'
       }`}
     >
       {status}
@@ -121,17 +121,17 @@ const AdvertsPage: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row justify-between md:items-center space-y-4 md:space-y-0">
-        <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">Adverts</h1>
+        <h1 className="text-3xl font-bold text-slate-900">Adverts</h1>
         <div className="flex items-center space-x-2">
-            <div className="hidden md:flex items-center space-x-1 p-1 bg-slate-200 dark:bg-slate-700 rounded-lg">
-              <button onClick={() => setView('grid')} className={`p-2 rounded-md ${view === 'grid' ? 'bg-white dark:bg-slate-800 shadow' : ''}`} aria-label="Grid view"><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg></button>
-              <button onClick={() => setView('list')} className={`p-2 rounded-md ${view === 'list' ? 'bg-white dark:bg-slate-800 shadow' : ''}`} aria-label="List view"><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" /></svg></button>
+            <div className="hidden md:flex items-center space-x-1 p-1 bg-slate-200 rounded-lg">
+              <button onClick={() => setView('grid')} className={`p-2 rounded-md ${view === 'grid' ? 'bg-white shadow' : ''}`} aria-label="Grid view"><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg></button>
+              <button onClick={() => setView('list')} className={`p-2 rounded-md ${view === 'list' ? 'bg-white shadow' : ''}`} aria-label="List view"><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" /></svg></button>
             </div>
             <Button onClick={handleAddAdvert} leftIcon={<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110 2h3V6a1 1 0 011-1z" clipRule="evenodd" /></svg>}>New Advert</Button>
         </div>
       </div>
       
-      <div className="space-y-4 p-4 bg-slate-100 dark:bg-slate-800/50 rounded-lg">
+      <div className="space-y-4 p-4 bg-slate-100 rounded-lg">
           <Input 
             type="text"
             placeholder="Search by title or message..."
@@ -169,14 +169,14 @@ const AdvertsPage: React.FC = () => {
 
       {filteredAdverts.length === 0 ? (
         <div className="text-center py-16">
-          <p className="text-slate-500 dark:text-slate-400">No adverts found for the selected filters.</p>
+          <p className="text-slate-500">No adverts found for the selected filters.</p>
         </div>
       ) : (
         <>
           {/* Mobile view: Always list */}
           <div className="md:hidden">
-            <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-slate-700 overflow-hidden">
-              <div className="divide-y divide-slate-200 dark:divide-slate-700">
+            <div className="bg-white rounded-lg shadow-md overflow-hidden">
+              <div className="divide-y divide-slate-200">
                 {filteredAdverts.map(advert => (
                     <AdvertListItem 
                         key={advert.id} 
@@ -205,8 +205,8 @@ const AdvertsPage: React.FC = () => {
                 ))}
               </div>
             ) : (
-              <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-slate-700 overflow-hidden">
-                <div className="divide-y divide-slate-200 dark:divide-slate-700">
+              <div className="bg-white rounded-lg shadow-md overflow-hidden">
+                <div className="divide-y divide-slate-200">
                   {filteredAdverts.map(advert => (
                     <AdvertListItem 
                         key={advert.id} 
@@ -224,14 +224,14 @@ const AdvertsPage: React.FC = () => {
       )}
 
       {/* Modal for Creating/Editing Adverts */}
-      <Modal isOpen={isFormModalOpen} onClose={handleCloseFormModal} title={editingAdvert ? 'Edit Advert' : 'Create New Advert'}>
+      <Modal isOpen={isFormModalOpen} onClose={handleCloseFormModal} title={editingAdvert ? 'Edit Advert' : 'Create New Advert'} size="xl">
         <Suspense fallback={<div className="p-8"><LoadingSpinner /></div>}>
           <AdvertForm advert={editingAdvert} onSave={handleSaveAdvert} onCancel={handleCloseFormModal} />
         </Suspense>
       </Modal>
 
       {/* Modal for Viewing Advert Details */}
-      <Modal isOpen={!!selectedAdvert} onClose={handleCloseDetailModal} title={selectedAdvert?.title || 'Advert Details'}>
+      <Modal isOpen={!!selectedAdvert} onClose={handleCloseDetailModal} title={selectedAdvert?.title || 'Advert Details'} size="lg">
         <Suspense fallback={<div className="p-8"><LoadingSpinner /></div>}>
           {selectedAdvert && <AdvertDetailView advert={selectedAdvert} />}
         </Suspense>

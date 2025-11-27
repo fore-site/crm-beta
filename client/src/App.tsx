@@ -1,6 +1,6 @@
 
 import React, { useState, useCallback, useEffect, lazy, Suspense } from 'react';
-import { Page, Client, Advert, Currency, Notification, Theme, NavigationState } from './types';
+import { Page, Client, Advert, Currency, Notification, NavigationState } from './types';
 import Layout from './components/layout/Layout';
 import NotificationContainer from './components/ui/NotificationContainer';
 import { NGN_TO_USD_RATE } from './constants';
@@ -24,14 +24,14 @@ export const AppContext = React.createContext<{
   currency: Currency;
   setCurrency: (currency: Currency) => void;
   convertCurrency: (amount: number) => string;
-  theme: Theme;
-  toggleTheme: () => void;
   navigateTo: (state: NavigationState) => void;
   handleBack: () => void;
   navigationHistory: NavigationState[];
   currentPage: Page;
   isSidebarCollapsed: boolean;
   toggleSidebar: () => void;
+  theme: 'light' | 'dark';
+  toggleTheme: () => void;
 }>({
   clients: [],
   adverts: [],
@@ -44,44 +44,55 @@ export const AppContext = React.createContext<{
   currency: 'USD',
   setCurrency: () => {},
   convertCurrency: () => '',
-  theme: 'light',
-  toggleTheme: () => {},
   navigateTo: () => {},
   handleBack: () => {},
   navigationHistory: [],
   currentPage: 'Dashboard',
   isSidebarCollapsed: false,
   toggleSidebar: () => {},
+  theme: 'light',
+  toggleTheme: () => {},
 });
 
 const App: React.FC = () => {
-  const [navigationHistory, setNavigationHistory] = useState<NavigationState[]>([{ page: 'Dashboard' }]);
+  const [navigationHistory, setNavigationHistory] = useState<NavigationState[]>(() => {
+    try {
+      const savedHistory = localStorage.getItem('navigationHistory');
+      return savedHistory ? JSON.parse(savedHistory) : [{ page: 'Dashboard' }];
+    } catch (error) {
+      console.error('Failed to parse navigation history:', error);
+      return [{ page: 'Dashboard' }];
+    }
+  });
+
   const [clients, setClients] = useState<Client[]>([]);
   const [adverts, setAdverts] = useState<Advert[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [currency, setCurrency] = useState<Currency>('USD');
-  const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem('theme') as Theme) || 'light');
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+  const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
   const currentState = navigationHistory[navigationHistory.length - 1];
   const currentPage = currentState.page;
 
   useEffect(() => {
-    const root = window.document.documentElement;
-    if (theme === 'dark') {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
-    }
-    localStorage.setItem('theme', theme);
-  }, [theme]);
-  
-  const toggleTheme = () => {
-    setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
-  };
+    localStorage.setItem('navigationHistory', JSON.stringify(navigationHistory));
+  }, [navigationHistory]);
 
   const toggleSidebar = () => {
     setIsSidebarCollapsed(prev => !prev);
+  };
+
+  const toggleTheme = () => {
+    setTheme(prev => {
+        const newTheme = prev === 'light' ? 'dark' : 'light';
+        if (newTheme === 'dark') {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+        return newTheme;
+    });
   };
 
   const navigateTo = (state: NavigationState) => {
@@ -201,8 +212,8 @@ const App: React.FC = () => {
   };
 
   return (
-    <AppContext.Provider value={{ clients, adverts, addClient, updateClient, addAdvert, updateAdvert, deleteAdvert, addNotification, currency, setCurrency, convertCurrency, theme, toggleTheme, navigateTo, handleBack, navigationHistory, currentPage, isSidebarCollapsed, toggleSidebar }}>
-      <div className="flex min-h-screen bg-transparent text-slate-800 dark:text-slate-200 font-sans selection:bg-indigo-500/20">
+    <AppContext.Provider value={{ clients, adverts, addClient, updateClient, addAdvert, updateAdvert, deleteAdvert, addNotification, currency, setCurrency, convertCurrency, navigateTo, handleBack, navigationHistory, currentPage, isSidebarCollapsed, toggleSidebar, theme, toggleTheme }}>
+      <div className="flex min-h-screen bg-transparent text-slate-800 font-sans selection:bg-indigo-500/20">
         <Layout>
           <Suspense fallback={<div className="w-full h-full flex items-center justify-center"><LoadingSpinner /></div>}>
             {renderPage()}

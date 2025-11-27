@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 interface CardProps {
@@ -16,8 +17,8 @@ const Card: React.FC<CardProps> = ({ children, className = '', onClick }) => {
       onClick={onClick} 
       className={`
         relative overflow-hidden
-        bg-white dark:bg-[#1e1b2e]
-        shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-black/40
+        bg-white
+        shadow-[0_8px_30px_rgb(0,0,0,0.04)]
         rounded-3xl
         border-none
         ${interactiveClasses} 

@@ -7,7 +7,6 @@ export default {
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
-  darkMode: 'class',
   theme: {
     extend: {
       fontFamily: {
@@ -31,7 +30,7 @@ export default {
         },
         slate: {
             ...colors.slate,
-            850: '#1e1b2e', // Custom dark shade matching purple vibe
+            850: '#1e1b2e',
             900: '#161321',
             950: '#0c0a12',
         }

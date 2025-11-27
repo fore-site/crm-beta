@@ -11,8 +11,8 @@ interface ClientDetailProps {
 
 const DetailItem: React.FC<{ label: string; value: string }> = ({ label, value }) => (
     <div>
-        <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{label}</h3>
-        <p className="mt-1 text-lg text-slate-900 dark:text-slate-100">{value}</p>
+        <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider">{label}</h3>
+        <p className="mt-1 text-lg text-slate-900">{value}</p>
     </div>
 );
 
@@ -21,10 +21,10 @@ const ClientDetailPage: React.FC<ClientDetailProps> = ({ client, onEdit }) => {
     <div className="animate-fade-in">
         <Card className="p-6 sm:p-8 mt-6">
             <div className="flex flex-col sm:flex-row items-start sm:items-center">
-                <img src={client.avatarUrl} alt={client.name} className="w-24 h-24 rounded-full mb-4 sm:mb-0 sm:mr-8 border-4 border-slate-200 dark:border-slate-700" />
+                <img src={client.avatarUrl} alt={client.name} className="w-24 h-24 rounded-full mb-4 sm:mb-0 sm:mr-8 border-4 border-slate-200" />
                 <div className="flex-grow">
-                    <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100">{client.name}</h2>
-                    <p className="text-xl text-slate-500 dark:text-slate-400">{client.company}</p>
+                    <h2 className="text-3xl font-bold text-slate-900">{client.name}</h2>
+                    <p className="text-xl text-slate-500">{client.company}</p>
                 </div>
                 <div className="mt-4 sm:mt-0">
                     <Button onClick={() => onEdit(client)} leftIcon={
@@ -38,16 +38,16 @@ const ClientDetailPage: React.FC<ClientDetailProps> = ({ client, onEdit }) => {
                 </div>
             </div>
 
-            <div className="mt-8 pt-8 border-t border-slate-200 dark:border-slate-700">
-                <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-6">Contact Information</h3>
+            <div className="mt-8 pt-8 border-t border-slate-200">
+                <h3 className="text-lg font-semibold text-slate-800 mb-6">Contact Information</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                     <DetailItem label="Email Address" value={client.email} />
                     <DetailItem label="Phone Number" value={client.phone} />
                 </div>
             </div>
             
-             <div className="mt-8 pt-8 border-t border-slate-200 dark:border-slate-700">
-                <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-6">Additional Details</h3>
+             <div className="mt-8 pt-8 border-t border-slate-200">
+                <h3 className="text-lg font-semibold text-slate-800 mb-6">Additional Details</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                    <DetailItem label="Client Since" value={new Date(client.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })} />
                    <DetailItem label="Client ID" value={client.id} />

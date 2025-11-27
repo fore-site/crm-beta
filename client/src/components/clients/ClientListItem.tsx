@@ -11,7 +11,7 @@ interface ClientListItemProps {
 const ClientListItem: React.FC<ClientListItemProps> = ({ client, onEdit, onSelect }) => {
   return (
     <div
-      className="flex items-center p-4 hover:bg-slate-50 dark:hover:bg-slate-700/50 cursor-pointer"
+      className="flex items-center p-4 hover:bg-slate-50 cursor-pointer"
       onClick={() => onSelect(client.id)}
       role="button"
       tabIndex={0}
@@ -25,12 +25,12 @@ const ClientListItem: React.FC<ClientListItemProps> = ({ client, onEdit, onSelec
       <img src={client.avatarUrl} alt={client.name} className="w-12 h-12 rounded-full mr-4" />
       <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
         <div>
-          <p className="font-semibold text-slate-900 dark:text-slate-100">{client.name}</p>
-          <p className="text-sm text-slate-500 dark:text-slate-400">{client.company}</p>
+          <p className="font-semibold text-slate-900">{client.name}</p>
+          <p className="text-sm text-slate-500">{client.company}</p>
         </div>
         <div>
-          <p className="text-sm text-slate-600 dark:text-slate-300">{client.email}</p>
-          <p className="text-sm text-slate-600 dark:text-slate-300">{client.phone}</p>
+          <p className="text-sm text-slate-600">{client.email}</p>
+          <p className="text-sm text-slate-600">{client.phone}</p>
         </div>
         <div className="text-right">
           <button 

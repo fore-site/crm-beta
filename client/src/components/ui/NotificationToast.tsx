@@ -8,15 +8,15 @@ interface NotificationToastProps {
 }
 
 const ICONS: Record<NotificationType, React.ReactNode> = {
-    success: <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-emerald-500 dark:text-emerald-400" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>,
-    error: <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-500 dark:text-red-400" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" /></svg>,
-    info: <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-500 dark:text-blue-400" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" /></svg>,
+    success: <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-emerald-500" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" /></svg>,
+    error: <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" /></svg>,
+    info: <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" /></svg>,
 };
 
 const STYLE_MAP: Record<NotificationType, string> = {
-    success: 'bg-emerald-50/90 dark:bg-emerald-900/20 border-emerald-200 dark:border-emerald-800 shadow-emerald-500/10',
-    error: 'bg-red-50/90 dark:bg-red-900/20 border-red-200 dark:border-red-800 shadow-red-500/10',
-    info: 'bg-blue-50/90 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 shadow-blue-500/10',
+    success: 'bg-emerald-50/90 border-emerald-200 shadow-emerald-500/10',
+    error: 'bg-red-50/90 border-red-200 shadow-red-500/10',
+    info: 'bg-blue-50/90 border-blue-200 shadow-blue-500/10',
 };
 
 const NotificationToast: React.FC<NotificationToastProps> = ({ notification, onDismiss }) => {
@@ -34,12 +34,12 @@ const NotificationToast: React.FC<NotificationToastProps> = ({ notification, onD
         {ICONS[notification.type]}
       </div>
       <div className="ml-3 w-0 flex-1">
-        <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">{notification.message}</p>
+        <p className="text-sm font-semibold text-slate-800">{notification.message}</p>
       </div>
       <div className="ml-4 flex-shrink-0 flex">
         <button 
           onClick={onDismiss} 
-          className="inline-flex text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 focus:outline-none transition-colors"
+          className="inline-flex text-slate-400 hover:text-slate-600 focus:outline-none transition-colors"
         >
           <span className="sr-only">Close</span>
           <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">

@@ -3,9 +3,9 @@ import React from 'react';
 import { Advert } from '../../types';
 
 const statusClasses: Record<Advert['status'], string> = {
-    Sent: 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300',
-    Scheduled: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300',
-    Draft: 'bg-slate-100 text-slate-800 dark:bg-slate-700 dark:text-slate-300',
+    Sent: 'bg-green-100 text-green-800',
+    Scheduled: 'bg-yellow-100 text-yellow-800',
+    Draft: 'bg-slate-100 text-slate-800',
 };
 
 interface AdvertDetailViewProps {
@@ -14,8 +14,8 @@ interface AdvertDetailViewProps {
 
 const DetailItem: React.FC<{ label: string; value: string | React.ReactNode }> = ({ label, value }) => (
     <div>
-        <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">{label}</h3>
-        <p className="mt-1 text-base text-slate-900 dark:text-slate-100">{value}</p>
+        <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider">{label}</h3>
+        <p className="mt-1 text-base text-slate-900">{value}</p>
     </div>
 );
 
@@ -35,9 +35,9 @@ const AdvertDetailView: React.FC<AdvertDetailViewProps> = ({ advert }) => {
       </div>
 
       <div>
-        <h3 className="text-sm font-medium text-slate-500 dark:text-slate-400 uppercase tracking-wider">Message</h3>
-        <div className="mt-2 p-4 bg-slate-50 dark:bg-slate-700/50 rounded-lg">
-            <p className="text-base text-slate-800 dark:text-slate-200 whitespace-pre-wrap">{advert.message}</p>
+        <h3 className="text-sm font-medium text-slate-500 uppercase tracking-wider">Message</h3>
+        <div className="mt-2 p-4 bg-slate-50 rounded-lg">
+            <p className="text-base text-slate-800 whitespace-pre-wrap">{advert.message}</p>
         </div>
       </div>
     </div>

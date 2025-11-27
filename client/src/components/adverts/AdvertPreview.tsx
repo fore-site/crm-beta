@@ -24,16 +24,16 @@ const AdvertPreview: React.FC<AdvertPreviewProps> = ({ title, message, channel, 
   }
 
   return (
-    <div className="border border-slate-200 dark:border-slate-700 rounded-lg shadow-sm overflow-hidden">
-      <div className="bg-slate-100 dark:bg-slate-700 p-3 border-b border-slate-200 dark:border-slate-600">
-        <p className="text-sm text-slate-600 dark:text-slate-300">To: All Clients</p>
-        <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">Subject: {title || '[Your Title Here]'}</p>
+    <div className="border border-slate-200 rounded-lg shadow-sm overflow-hidden">
+      <div className="bg-slate-100 p-3 border-b border-slate-200">
+        <p className="text-sm text-slate-600">To: All Clients</p>
+        <p className="text-sm font-semibold text-slate-800">Subject: {title || '[Your Title Here]'}</p>
       </div>
-      <div className="p-4 bg-white dark:bg-slate-800">
+      <div className="p-4 bg-white">
         {imageUrl && (
             <img src={imageUrl} alt="Advert preview" className="w-full h-auto object-cover rounded mb-4 max-h-48" />
         )}
-        <p className="text-base text-slate-700 dark:text-slate-200 whitespace-pre-wrap">{message || 'Your message content here...'}</p>
+        <p className="text-base text-slate-700 whitespace-pre-wrap">{message || 'Your message content here...'}</p>
       </div>
     </div>
   );

@@ -14,16 +14,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <>
       <Navbar />
-      {/* 
-        Padding explanation:
-        pt-24: Mobile/Tablet top padding to clear the floating button.
-        lg:pt-8: Desktop top padding (button is hidden).
-        lg:pl-[...]: Desktop left padding adapts to sidebar width (w-64 = 16rem/256px, w-20 = 5rem/80px) + padding.
-      */}
       <main 
         className={`
-            flex-1 overflow-y-auto p-4 pt-24 lg:p-8 
-            transition-all duration-300 ease-in-out
+            flex-1 p-4 lg:pt-8 lg:pr-8
+            transition-all duration-300 ease-in-out scrollbar-thin
             ${isSidebarCollapsed ? 'lg:pl-28' : 'lg:pl-72'}
         `}
       >
@@ -31,7 +25,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           <div className="mb-4">
             <button
               onClick={handleBack}
-              className="flex items-center text-sm font-medium text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-indigo-400 transition-colors"
+              className="flex items-center text-sm font-medium text-slate-600 hover:text-primary transition-colors"
               aria-label="Go back to previous page"
             >
               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
