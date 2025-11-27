@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback, useEffect, lazy, Suspense } from 'react';
+import React, { useState, useCallback, useEffect, lazy, Suspense, useMemo } from 'react';
 import { Page, Client, Advert, Currency, Notification, NavigationState } from './types';
 import Layout from './components/layout/Layout';
 import NotificationContainer from './components/ui/NotificationContainer';
@@ -79,11 +79,11 @@ const App: React.FC = () => {
     localStorage.setItem('navigationHistory', JSON.stringify(navigationHistory));
   }, [navigationHistory]);
 
-  const toggleSidebar = () => {
+  const toggleSidebar = useCallback(() => {
     setIsSidebarCollapsed(prev => !prev);
-  };
+  }, []);
 
-  const toggleTheme = () => {
+  const toggleTheme = useCallback(() => {
     setTheme(prev => {
         const newTheme = prev === 'light' ? 'dark' : 'light';
         if (newTheme === 'dark') {
@@ -93,9 +93,9 @@ const App: React.FC = () => {
         }
         return newTheme;
     });
-  };
+  }, []);
 
-  const navigateTo = (state: NavigationState) => {
+  const navigateTo = useCallback((state: NavigationState) => {
     setNavigationHistory(prev => {
         const lastState = prev[prev.length - 1];
         if (lastState.page === state.page && (lastState.detailId || null) === (state.detailId || null)) {
@@ -103,11 +103,11 @@ const App: React.FC = () => {
         }
         return [...prev, state];
     });
-  };
+  }, []);
 
-  const handleBack = () => {
+  const handleBack = useCallback(() => {
       setNavigationHistory(prev => (prev.length > 1 ? prev.slice(0, -1) : prev));
-  };
+  }, []);
 
   useEffect(() => {
     // Generate mock data on initial load
@@ -147,11 +147,11 @@ const App: React.FC = () => {
     setNotifications(prev => [...prev, newNotification]);
   }, []);
 
-  const removeNotification = (id: number) => {
+  const removeNotification = useCallback((id: number) => {
     setNotifications(prev => prev.filter(n => n.id !== id));
-  };
+  }, []);
   
-  const addClient = (clientData: Omit<Client, 'id' | 'createdAt' | 'avatarUrl'>) => {
+  const addClient = useCallback((clientData: Omit<Client, 'id' | 'createdAt' | 'avatarUrl'>) => {
     const newClient: Client = {
       ...clientData,
       id: `client-${Date.now()}`,
@@ -160,14 +160,14 @@ const App: React.FC = () => {
     };
     setClients(prev => [newClient, ...prev]);
     addNotification('Client added successfully!', 'success');
-  };
+  }, [addNotification]);
   
-  const updateClient = (updatedClient: Client) => {
+  const updateClient = useCallback((updatedClient: Client) => {
     setClients(prev => prev.map(c => c.id === updatedClient.id ? updatedClient : c));
     addNotification('Client updated successfully!', 'success');
-  };
+  }, [addNotification]);
 
-  const addAdvert = (advertData: Omit<Advert, 'id' | 'createdAt'>) => {
+  const addAdvert = useCallback((advertData: Omit<Advert, 'id' | 'createdAt'>) => {
     const newAdvert: Advert = {
       ...advertData,
       id: `advert-${Date.now()}`,
@@ -176,24 +176,24 @@ const App: React.FC = () => {
     setAdverts(prev => [newAdvert, ...prev]);
     const message = advertData.status === 'Draft' ? 'Advert saved to drafts!' : advertData.status === 'Scheduled' ? 'Advert scheduled successfully!' : 'Advert sent successfully!';
     addNotification(message, 'success');
-  };
+  }, [addNotification]);
 
-  const updateAdvert = (updatedAdvert: Advert) => {
+  const updateAdvert = useCallback((updatedAdvert: Advert) => {
     setAdverts(prev => prev.map(a => a.id === updatedAdvert.id ? updatedAdvert : a));
     addNotification('Advert updated successfully!', 'success');
-  };
+  }, [addNotification]);
 
-  const deleteAdvert = (advertId: string) => {
+  const deleteAdvert = useCallback((advertId: string) => {
     setAdverts(prev => prev.filter(a => a.id !== advertId));
     addNotification('Advert deleted successfully!', 'info');
-  };
+  }, [addNotification]);
 
-  const convertCurrency = (amount: number) => {
+  const convertCurrency = useCallback((amount: number) => {
     if (currency === 'NGN') {
       return `₦${(amount / NGN_TO_USD_RATE).toLocaleString('en-NG', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     }
     return `$${amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-  };
+  }, [currency]);
   
   const renderPage = () => {
     const key = `${currentState.page}-${currentState.detailId || 'list'}`;
@@ -211,9 +211,13 @@ const App: React.FC = () => {
     }
   };
 
+  const contextValue = useMemo(() => ({
+    clients, adverts, addClient, updateClient, addAdvert, updateAdvert, deleteAdvert, addNotification, currency, setCurrency, convertCurrency, navigateTo, handleBack, navigationHistory, currentPage, isSidebarCollapsed, toggleSidebar, theme, toggleTheme
+  }), [clients, adverts, addClient, updateClient, addAdvert, updateAdvert, deleteAdvert, addNotification, currency, convertCurrency, navigateTo, handleBack, navigationHistory, currentPage, isSidebarCollapsed, toggleSidebar, theme, toggleTheme]);
+
   return (
-    <AppContext.Provider value={{ clients, adverts, addClient, updateClient, addAdvert, updateAdvert, deleteAdvert, addNotification, currency, setCurrency, convertCurrency, navigateTo, handleBack, navigationHistory, currentPage, isSidebarCollapsed, toggleSidebar, theme, toggleTheme }}>
-      <div className="flex min-h-screen bg-transparent text-slate-800 font-sans selection:bg-indigo-500/20">
+    <AppContext.Provider value={contextValue}>
+      <div className="flex flex-col min-h-screen bg-transparent text-slate-800 font-sans selection:bg-indigo-500/20">
         <Layout>
           <Suspense fallback={<div className="w-full h-full flex items-center justify-center"><LoadingSpinner /></div>}>
             {renderPage()}

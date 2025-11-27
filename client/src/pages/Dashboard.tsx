@@ -1,5 +1,5 @@
 
-import React, { useContext, useMemo, useState, lazy, Suspense } from 'react';
+import React, { useContext, useMemo, useState, lazy, Suspense, memo } from 'react';
 import { AppContext } from '../App';
 import Card from '../components/ui/Card';
 import { Advert, ChartData, ViewType } from '../types';
@@ -12,7 +12,7 @@ import LoadingSpinner from '../components/ui/LoadingSpinner';
 const AdvertDetailView = lazy(() => import('../components/adverts/AdvertDetailView'));
 
 // Clean, white StatCard design
-const StatCard: React.FC<{ title: string; value: string | number; icon: React.ReactElement<{ className?: string }>; onClick?: () => void; delay?: string }> = ({ title, value, icon, onClick, delay = '' }) => (
+const StatCard: React.FC<{ title: string; value: string | number; icon: React.ReactElement<{ className?: string }>; onClick?: () => void; delay?: string }> = memo(({ title, value, icon, onClick, delay = '' }) => (
   <Card className={`p-6 flex flex-col justify-between h-full group animate-fade-in opacity-0 fill-mode-forwards ${delay}`} onClick={onClick}>
     <div className="flex justify-between items-start mb-4">
         {/* Icon Container - Primary Color */}
@@ -40,7 +40,7 @@ const StatCard: React.FC<{ title: string; value: string | number; icon: React.Re
         </p>
     </div>
   </Card>
-);
+));
 
 const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: { value: number }[]; label?: string | number }) => {
   if (active && payload && payload.length) {
@@ -54,14 +54,55 @@ const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?:
   return null;
 };
 
+// Memoized Chart Components
+const ClientGrowthChart = memo(({ data }: { data: any[] }) => {
+    const tickColor = '#94a3b8';
+    const gridColor = '#f1f5f9';
+    return (
+        <Card className="lg:col-span-3 p-8 animate-slide-in animation-delay-300 opacity-0 fill-mode-forwards">
+          <h2 className="text-xl font-bold text-slate-900 mb-8">Client Growth</h2>
+           <div className="h-[300px] w-full">
+               <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={data} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                        <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
+                        <XAxis dataKey="name" stroke={tickColor} axisLine={false} tickLine={false} dy={10} />
+                        <YAxis stroke={tickColor} axisLine={false} tickLine={false} dx={-10} />
+                        <Tooltip content={<CustomTooltip />} />
+                        <Line type="monotone" dataKey="clients" stroke="#4B2E83" strokeWidth={4} dot={{ r: 4, fill: '#4B2E83', strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 8, fill: '#2ECC71' }} />
+                    </LineChart>
+                </ResponsiveContainer>
+           </div>
+        </Card>
+    );
+});
+
+const AdvertStatusChart = memo(({ data }: { data: any[] }) => {
+    const tickColor = '#94a3b8';
+    const gridColor = '#f1f5f9';
+    return (
+        <Card className="lg:col-span-2 p-8 animate-slide-in animation-delay-400 opacity-0 fill-mode-forwards">
+          <h2 className="text-xl font-bold text-slate-900 mb-8">Advert Status</h2>
+           <div className="h-[300px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={data} layout="vertical" margin={{ top: 5, right: 30, left: 30, bottom: 5 }}>
+                      <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke={gridColor}/>
+                      <XAxis type="number" hide />
+                      <YAxis type="category" dataKey="name" tickLine={false} axisLine={false} stroke={tickColor} width={80} style={{ fontSize: '12px', fontWeight: '500' }}/>
+                      <Tooltip cursor={{fill: 'transparent'}} content={<CustomTooltip />}/>
+                      <Bar dataKey="value" fill="#2ECC71" barSize={32} radius={[0, 8, 8, 0]} />
+                  </BarChart>
+              </ResponsiveContainer>
+           </div>
+        </Card>
+    );
+});
+
+
 const Dashboard: React.FC = () => {
   const { clients, adverts, convertCurrency, navigateTo } = useContext(AppContext);
   const [advertView, setAdvertView] = useState<ViewType>('grid');
   const [selectedAdvert, setSelectedAdvert] = useState<Advert | null>(null);
   
-  const tickColor = '#94a3b8';
-  const gridColor = '#f1f5f9';
-
   const totalAdSpend = useMemo(() => {
     return adverts.length * 150;
   }, [adverts]);
@@ -100,7 +141,7 @@ const Dashboard: React.FC = () => {
     return data;
   }, [clients]);
 
-  const recentAdverts = adverts.slice(0, 4);
+  const recentAdverts = useMemo(() => adverts.slice(0, 4), [adverts]);
   
   const handleOpenAdvertModal = (advert: Advert) => {
     setSelectedAdvert(advert);
@@ -129,34 +170,8 @@ const Dashboard: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-        <Card className="lg:col-span-3 p-8 animate-slide-in animation-delay-300 opacity-0 fill-mode-forwards">
-          <h2 className="text-xl font-bold text-slate-900 mb-8">Client Growth</h2>
-           <div className="h-[300px] w-full">
-               <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={clientGrowthData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
-                        <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false} />
-                        <XAxis dataKey="name" stroke={tickColor} axisLine={false} tickLine={false} dy={10} />
-                        <YAxis stroke={tickColor} axisLine={false} tickLine={false} dx={-10} />
-                        <Tooltip content={<CustomTooltip />} />
-                        <Line type="monotone" dataKey="clients" stroke="#4B2E83" strokeWidth={4} dot={{ r: 4, fill: '#4B2E83', strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 8, fill: '#2ECC71' }} />
-                    </LineChart>
-                </ResponsiveContainer>
-           </div>
-        </Card>
-        <Card className="lg:col-span-2 p-8 animate-slide-in animation-delay-400 opacity-0 fill-mode-forwards">
-          <h2 className="text-xl font-bold text-slate-900 mb-8">Advert Status</h2>
-           <div className="h-[300px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={advertStatusData} layout="vertical" margin={{ top: 5, right: 30, left: 30, bottom: 5 }}>
-                      <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke={gridColor}/>
-                      <XAxis type="number" hide />
-                      <YAxis type="category" dataKey="name" tickLine={false} axisLine={false} stroke={tickColor} width={80} style={{ fontSize: '12px', fontWeight: '500' }}/>
-                      <Tooltip cursor={{fill: 'transparent'}} content={<CustomTooltip />}/>
-                      <Bar dataKey="value" fill="#2ECC71" barSize={32} radius={[0, 8, 8, 0]} />
-                  </BarChart>
-              </ResponsiveContainer>
-           </div>
-        </Card>
+        <ClientGrowthChart data={clientGrowthData} />
+        <AdvertStatusChart data={advertStatusData} />
       </div>
 
       <div className="animate-slide-in animation-delay-500 opacity-0 fill-mode-forwards">
