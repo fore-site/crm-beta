@@ -8,7 +8,7 @@ interface CardProps {
 
 const Card: React.FC<CardProps> = ({ children, className = '', onClick }) => {
   const interactiveClasses = onClick 
-    ? 'cursor-pointer hover:border-indigo-300/50 dark:hover:border-indigo-500/50 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300' 
+    ? 'cursor-pointer hover:shadow-xl hover:-translate-y-1 transition-all duration-300' 
     : '';
 
   return (
@@ -16,11 +16,10 @@ const Card: React.FC<CardProps> = ({ children, className = '', onClick }) => {
       onClick={onClick} 
       className={`
         relative overflow-hidden
-        bg-white/60 dark:bg-slate-900/60 
-        backdrop-blur-xl 
-        border border-slate-200/60 dark:border-slate-800/60 
-        shadow-sm dark:shadow-black/20
-        rounded-2xl 
+        bg-white dark:bg-[#1e1b2e]
+        shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-black/40
+        rounded-3xl
+        border-none
         ${interactiveClasses} 
         ${className}
       `}

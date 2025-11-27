@@ -10,12 +10,18 @@ import Input from '../components/ui/Input';
 import LoadingSpinner from '../components/ui/LoadingSpinner';
 
 const AdvertForm = lazy(() => import('../components/adverts/AdvertForm'));
+const AdvertDetailView = lazy(() => import('../components/adverts/AdvertDetailView'));
 
 const AdvertsPage: React.FC = () => {
   const { adverts, addAdvert, updateAdvert, deleteAdvert } = useContext(AppContext);
   const [view, setView] = useState<ViewType>('grid');
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  
+  // State for Form Modal (Create/Edit)
+  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
   const [editingAdvert, setEditingAdvert] = useState<Advert | null>(null);
+  
+  // State for Detail Modal (View)
+  const [selectedAdvert, setSelectedAdvert] = useState<Advert | null>(null);
   
   const [statusFilter, setStatusFilter] = useState<'All' | Advert['status']>('All');
   const [searchQuery, setSearchQuery] = useState('');
@@ -54,17 +60,25 @@ const AdvertsPage: React.FC = () => {
 
   const handleAddAdvert = () => {
     setEditingAdvert(null);
-    setIsModalOpen(true);
+    setIsFormModalOpen(true);
   };
 
   const handleEditAdvert = (advert: Advert) => {
     setEditingAdvert(advert);
-    setIsModalOpen(true);
+    setIsFormModalOpen(true);
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
+  const handleCloseFormModal = () => {
+    setIsFormModalOpen(false);
     setEditingAdvert(null);
+  };
+  
+  const handleAdvertClick = (advert: Advert) => {
+    setSelectedAdvert(advert);
+  };
+
+  const handleCloseDetailModal = () => {
+    setSelectedAdvert(null);
   };
   
   const handleSaveAdvert = (advertData: Omit<Advert, 'id' | 'createdAt'>) => {
@@ -73,7 +87,7 @@ const AdvertsPage: React.FC = () => {
     } else {
       addAdvert(advertData);
     }
-    handleCloseModal();
+    handleCloseFormModal();
   };
 
   const handleDeleteAdvert = (advertId: string) => {
@@ -110,7 +124,7 @@ const AdvertsPage: React.FC = () => {
         <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">Adverts</h1>
         <div className="flex items-center space-x-2">
             <div className="hidden md:flex items-center space-x-1 p-1 bg-slate-200 dark:bg-slate-700 rounded-lg">
-              <button onClick={() => setView('grid')} className={`p-2 rounded-md ${view === 'grid' ? 'bg-white dark:bg-slate-800 shadow' : ''}`} aria-label="Grid view"><svg xmlns="http://www.w.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg></button>
+              <button onClick={() => setView('grid')} className={`p-2 rounded-md ${view === 'grid' ? 'bg-white dark:bg-slate-800 shadow' : ''}`} aria-label="Grid view"><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg></button>
               <button onClick={() => setView('list')} className={`p-2 rounded-md ${view === 'list' ? 'bg-white dark:bg-slate-800 shadow' : ''}`} aria-label="List view"><svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" /></svg></button>
             </div>
             <Button onClick={handleAddAdvert} leftIcon={<svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110 2h3V6a1 1 0 011-1z" clipRule="evenodd" /></svg>}>New Advert</Button>
@@ -163,7 +177,15 @@ const AdvertsPage: React.FC = () => {
           <div className="md:hidden">
             <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-slate-700 overflow-hidden">
               <div className="divide-y divide-slate-200 dark:divide-slate-700">
-                {filteredAdverts.map(advert => <AdvertListItem key={advert.id} advert={advert} onEdit={handleEditAdvert} onDelete={handleDeleteAdvert}/>)}
+                {filteredAdverts.map(advert => (
+                    <AdvertListItem 
+                        key={advert.id} 
+                        advert={advert} 
+                        onEdit={handleEditAdvert} 
+                        onDelete={handleDeleteAdvert} 
+                        onClick={handleAdvertClick}
+                    />
+                ))}
               </div>
             </div>
           </div>
@@ -172,12 +194,28 @@ const AdvertsPage: React.FC = () => {
           <div className="hidden md:block">
             {view === 'grid' ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredAdverts.map(advert => <AdvertCard key={advert.id} advert={advert} onEdit={handleEditAdvert} onDelete={handleDeleteAdvert} />)}
+                {filteredAdverts.map(advert => (
+                    <AdvertCard 
+                        key={advert.id} 
+                        advert={advert} 
+                        onEdit={handleEditAdvert} 
+                        onDelete={handleDeleteAdvert} 
+                        onClick={handleAdvertClick}
+                    />
+                ))}
               </div>
             ) : (
               <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md dark:shadow-none dark:border dark:border-slate-700 overflow-hidden">
                 <div className="divide-y divide-slate-200 dark:divide-slate-700">
-                  {filteredAdverts.map(advert => <AdvertListItem key={advert.id} advert={advert} onEdit={handleEditAdvert} onDelete={handleDeleteAdvert}/>)}
+                  {filteredAdverts.map(advert => (
+                    <AdvertListItem 
+                        key={advert.id} 
+                        advert={advert} 
+                        onEdit={handleEditAdvert} 
+                        onDelete={handleDeleteAdvert} 
+                        onClick={handleAdvertClick}
+                    />
+                  ))}
                 </div>
               </div>
             )}
@@ -185,9 +223,17 @@ const AdvertsPage: React.FC = () => {
         </>
       )}
 
-      <Modal isOpen={isModalOpen} onClose={handleCloseModal} title={editingAdvert ? 'Edit Advert' : 'Create New Advert'}>
+      {/* Modal for Creating/Editing Adverts */}
+      <Modal isOpen={isFormModalOpen} onClose={handleCloseFormModal} title={editingAdvert ? 'Edit Advert' : 'Create New Advert'}>
         <Suspense fallback={<div className="p-8"><LoadingSpinner /></div>}>
-          <AdvertForm advert={editingAdvert} onSave={handleSaveAdvert} onCancel={handleCloseModal} />
+          <AdvertForm advert={editingAdvert} onSave={handleSaveAdvert} onCancel={handleCloseFormModal} />
+        </Suspense>
+      </Modal>
+
+      {/* Modal for Viewing Advert Details */}
+      <Modal isOpen={!!selectedAdvert} onClose={handleCloseDetailModal} title={selectedAdvert?.title || 'Advert Details'}>
+        <Suspense fallback={<div className="p-8"><LoadingSpinner /></div>}>
+          {selectedAdvert && <AdvertDetailView advert={selectedAdvert} />}
         </Suspense>
       </Modal>
     </div>

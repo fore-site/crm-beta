@@ -4,19 +4,20 @@ import Card from '../components/ui/Card';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, BarChart, Bar, XAxis, YAxis, Legend, CartesianGrid, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
 import { AdvertChannel, AdvertStatus } from '../types';
 
-// Tech-forward color palette
-const COLORS = ['#6366f1', '#14b8a6', '#f59e0b', '#ec4899'];
-const DARK_COLORS = ['#818cf8', '#2dd4bf', '#fbbf24', '#f472b6'];
+// Palette: Deep Purple, Bright Green, Lavender, Darker Green
+const COLORS = ['#4B2E83', '#2ECC71', '#E6E6FA', '#27AE60'];
+// Dark mode palette
+const DARK_COLORS = ['#6544a3', '#58d68d', '#a78bfa', '#2ecc71'];
 
 
 const PieChartTooltip = ({ active, payload }: { active?: boolean; payload?: any[] }) => {
   if (active && payload && payload.length) {
     const data = payload[0];
     return (
-      <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl p-3 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl text-sm">
+      <div className="bg-white dark:bg-[#1e1b2e] p-3 border border-slate-100 dark:border-white/5 rounded-2xl shadow-xl text-sm">
         <p className="font-bold text-slate-900 dark:text-white mb-1">{data.name}</p>
-        <p className="text-slate-600 dark:text-slate-300">Value: {data.value}</p>
-        <p className="text-indigo-500 font-medium">{(data.percent * 100).toFixed(1)}%</p>
+        <p className="text-slate-500 dark:text-slate-400">Value: {data.value}</p>
+        <p className="text-primary dark:text-accent font-bold">{(data.percent * 100).toFixed(1)}%</p>
       </div>
     );
   }
@@ -26,10 +27,10 @@ const PieChartTooltip = ({ active, payload }: { active?: boolean; payload?: any[
 const MultiDataTooltip = ({ active, payload, label }: { active?: boolean; payload?: any[]; label?: string }) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl p-3 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl text-sm">
+      <div className="bg-white dark:bg-[#1e1b2e] p-3 border border-slate-100 dark:border-white/5 rounded-2xl shadow-xl text-sm">
         <p className="font-bold text-slate-900 dark:text-white mb-2">{label}</p>
         {payload.map((entry, index) => (
-          <p key={`item-${index}`} style={{ color: entry.color }} className="font-medium">
+          <p key={`item-${index}`} style={{ color: entry.color }} className="font-bold">
             {entry.name}: {entry.value}
           </p>
         ))}
@@ -88,65 +89,65 @@ const AnalyticsPage: React.FC = () => {
   }, [adverts]);
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto">
+    <div className="space-y-8 max-w-7xl mx-auto pb-12">
       <div className="animate-fade-in">
-        <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">Analytics</h1>
-        <p className="text-slate-500 dark:text-slate-400 mt-2">Deep dive into your performance metrics.</p>
+        <h1 className="text-4xl font-extrabold text-primary dark:text-white tracking-tight">Analytics</h1>
+        <p className="text-slate-500 dark:text-slate-400 mt-2 text-lg">Deep dive into your performance metrics.</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="p-6 animate-slide-in animation-delay-100 opacity-0 fill-mode-forwards">
-          <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-6">Advert Channels</h2>
+        <Card className="p-8 animate-slide-in animation-delay-100 opacity-0 fill-mode-forwards">
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-8">Advert Channels</h2>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie data={advertChannelData} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={100} innerRadius={60} stroke="none">
                 {advertChannelData.map((_, index: number) => <Cell key={`cell-${index}`} fill={chartColors[index % chartColors.length]} />)}
               </Pie>
               <Tooltip content={<PieChartTooltip />} />
-              <Legend wrapperStyle={{ color: tickColor }} iconType="circle" />
+              <Legend wrapperStyle={{ color: tickColor, paddingTop: '20px' }} iconType="circle" />
             </PieChart>
           </ResponsiveContainer>
         </Card>
-        <Card className="p-6 animate-slide-in animation-delay-200 opacity-0 fill-mode-forwards">
-          <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-6">Advert Status Distribution</h2>
+        <Card className="p-8 animate-slide-in animation-delay-200 opacity-0 fill-mode-forwards">
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-8">Advert Status Distribution</h2>
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
-              <Pie data={advertStatusData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={100} paddingAngle={5} stroke="none" cornerRadius={4}>
+              <Pie data={advertStatusData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={60} outerRadius={100} paddingAngle={5} stroke="none" cornerRadius={8}>
                  {advertStatusData.map((_, index: number) => <Cell key={`cell-${index}`} fill={chartColors[index % chartColors.length]} />)}
               </Pie>
               <Tooltip content={<PieChartTooltip />} />
-               <Legend wrapperStyle={{ color: tickColor }} iconType="circle"/>
+               <Legend wrapperStyle={{ color: tickColor, paddingTop: '20px' }} iconType="circle"/>
             </PieChart>
           </ResponsiveContainer>
         </Card>
       </div>
       
-      <Card className="p-6 animate-slide-in animation-delay-300 opacity-0 fill-mode-forwards">
-        <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-6">Monthly Activity</h2>
+      <Card className="p-8 animate-slide-in animation-delay-300 opacity-0 fill-mode-forwards">
+        <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-8">Monthly Activity</h2>
         <ResponsiveContainer width="100%" height={400}>
             <BarChart data={activityByMonthData}>
                 <CartesianGrid strokeDasharray="3 3" stroke={gridColor} vertical={false}/>
-                <XAxis dataKey="name" stroke={tickColor} axisLine={false} tickLine={false} dy={10}/>
+                <XAxis dataKey="name" stroke={tickColor} axisLine={false} tickLine={false} dy={10} style={{ fontWeight: '600' }}/>
                 <YAxis stroke={tickColor} axisLine={false} tickLine={false} dx={-10}/>
-                <Tooltip cursor={{ fill: 'rgba(99, 102, 241, 0.1)' }} content={<MultiDataTooltip />} />
-                <Legend wrapperStyle={{ color: tickColor }} iconType="circle"/>
-                <Bar dataKey="clients" fill={chartColors[0]} name="New Clients" radius={[4, 4, 0, 0]}/>
-                <Bar dataKey="adverts" fill={chartColors[1]} name="Adverts Created" radius={[4, 4, 0, 0]}/>
+                <Tooltip cursor={{ fill: 'rgba(75, 46, 131, 0.05)' }} content={<MultiDataTooltip />} />
+                <Legend wrapperStyle={{ color: tickColor, paddingTop: '20px' }} iconType="circle"/>
+                <Bar dataKey="clients" fill={chartColors[0]} name="New Clients" radius={[8, 8, 0, 0]} barSize={40}/>
+                <Bar dataKey="adverts" fill={chartColors[1]} name="Adverts Created" radius={[8, 8, 0, 0]} barSize={40}/>
             </BarChart>
         </ResponsiveContainer>
       </Card>
       
-       <Card className="p-6 animate-slide-in animation-delay-400 opacity-0 fill-mode-forwards">
-        <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-6">Advert Performance by Day</h2>
+       <Card className="p-8 animate-slide-in animation-delay-400 opacity-0 fill-mode-forwards">
+        <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-8">Advert Performance by Day</h2>
         <ResponsiveContainer width="100%" height={400}>
-            <RadarChart cx="50%" cy="50%" outerRadius="80%" data={advertPerformanceData}>
+            <RadarChart cx="50%" cy="50%" outerRadius="75%" data={advertPerformanceData}>
                 <PolarGrid stroke={gridColor} />
-                <PolarAngleAxis dataKey="day" stroke={tickColor} tick={{ fill: tickColor }} />
+                <PolarAngleAxis dataKey="day" stroke={tickColor} tick={{ fill: tickColor, fontWeight: '600' }} />
                 <PolarRadiusAxis stroke={tickColor} angle={30} domain={[0, 'auto']} />
                 <Tooltip content={<MultiDataTooltip />} />
-                <Legend wrapperStyle={{ color: tickColor }} iconType="circle"/>
-                <Radar name="Sent" dataKey="sent" stroke={chartColors[0]} fill={chartColors[0]} fillOpacity={0.3} />
-                <Radar name="Scheduled" dataKey="scheduled" stroke={chartColors[1]} fill={chartColors[1]} fillOpacity={0.3} />
+                <Legend wrapperStyle={{ color: tickColor, paddingTop: '20px' }} iconType="circle"/>
+                <Radar name="Sent" dataKey="sent" stroke={chartColors[0]} fill={chartColors[0]} fillOpacity={0.4} />
+                <Radar name="Scheduled" dataKey="scheduled" stroke={chartColors[1]} fill={chartColors[1]} fillOpacity={0.4} />
             </RadarChart>
         </ResponsiveContainer>
       </Card>

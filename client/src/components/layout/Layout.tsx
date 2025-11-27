@@ -8,7 +8,7 @@ interface LayoutProps {
 }
 
 const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const { navigationHistory, handleBack } = useContext(AppContext);
+  const { navigationHistory, handleBack, isSidebarCollapsed } = useContext(AppContext);
   const showBackButton = navigationHistory.length > 1;
 
   return (
@@ -18,9 +18,15 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
         Padding explanation:
         pt-24: Mobile/Tablet top padding to clear the floating button.
         lg:pt-8: Desktop top padding (button is hidden).
-        lg:pl-28: Desktop left padding (Sidebar width 20 + padding 8).
+        lg:pl-[...]: Desktop left padding adapts to sidebar width (w-64 = 16rem/256px, w-20 = 5rem/80px) + padding.
       */}
-      <main className="flex-1 overflow-y-auto p-4 pt-24 lg:p-8 lg:pl-28">
+      <main 
+        className={`
+            flex-1 overflow-y-auto p-4 pt-24 lg:p-8 
+            transition-all duration-300 ease-in-out
+            ${isSidebarCollapsed ? 'lg:pl-28' : 'lg:pl-72'}
+        `}
+      >
         {showBackButton && (
           <div className="mb-4">
             <button

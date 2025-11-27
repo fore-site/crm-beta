@@ -14,21 +14,26 @@ export default {
         sans: ['Manrope', ...defaultTheme.fontFamily.sans],
       },
       colors: {
-        // Using a more vibrant indigo/violet for primary
         primary: {
-            DEFAULT: '#6366f1', // Indigo 500
-            dark: '#4f46e5',    // Indigo 600
-            light: '#818cf8',   // Indigo 400
+            DEFAULT: '#4B2E83', // Deep Purple
+            dark: '#351e60',
+            light: '#6544a3',
         },
         secondary: {
-            DEFAULT: '#14b8a6', // Teal 500
-            dark: '#0d9488',    // Teal 600
+            DEFAULT: '#E6E6FA', // Lavender
+            dark: '#C3C3E6',
+            foreground: '#4B2E83',
+        },
+        accent: {
+            DEFAULT: '#2ECC71', // Bright Green
+            dark: '#27AE60',
+            light: '#58D68D',
         },
         slate: {
             ...colors.slate,
-            850: '#152033', // Custom dark shade
-            900: '#0f172a',
-            950: '#020617',
+            850: '#1e1b2e', // Custom dark shade matching purple vibe
+            900: '#161321',
+            950: '#0c0a12',
         }
       },
       animation: {

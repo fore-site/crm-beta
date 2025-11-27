@@ -30,6 +30,8 @@ export const AppContext = React.createContext<{
   handleBack: () => void;
   navigationHistory: NavigationState[];
   currentPage: Page;
+  isSidebarCollapsed: boolean;
+  toggleSidebar: () => void;
 }>({
   clients: [],
   adverts: [],
@@ -48,6 +50,8 @@ export const AppContext = React.createContext<{
   handleBack: () => {},
   navigationHistory: [],
   currentPage: 'Dashboard',
+  isSidebarCollapsed: false,
+  toggleSidebar: () => {},
 });
 
 const App: React.FC = () => {
@@ -57,6 +61,7 @@ const App: React.FC = () => {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [currency, setCurrency] = useState<Currency>('USD');
   const [theme, setTheme] = useState<Theme>(() => (localStorage.getItem('theme') as Theme) || 'light');
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
   const currentState = navigationHistory[navigationHistory.length - 1];
   const currentPage = currentState.page;
@@ -73,6 +78,10 @@ const App: React.FC = () => {
   
   const toggleTheme = () => {
     setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
+  };
+
+  const toggleSidebar = () => {
+    setIsSidebarCollapsed(prev => !prev);
   };
 
   const navigateTo = (state: NavigationState) => {
@@ -192,7 +201,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <AppContext.Provider value={{ clients, adverts, addClient, updateClient, addAdvert, updateAdvert, deleteAdvert, addNotification, currency, setCurrency, convertCurrency, theme, toggleTheme, navigateTo, handleBack, navigationHistory, currentPage }}>
+    <AppContext.Provider value={{ clients, adverts, addClient, updateClient, addAdvert, updateAdvert, deleteAdvert, addNotification, currency, setCurrency, convertCurrency, theme, toggleTheme, navigateTo, handleBack, navigationHistory, currentPage, isSidebarCollapsed, toggleSidebar }}>
       <div className="flex min-h-screen bg-transparent text-slate-800 dark:text-slate-200 font-sans selection:bg-indigo-500/20">
         <Layout>
           <Suspense fallback={<div className="w-full h-full flex items-center justify-center"><LoadingSpinner /></div>}>
